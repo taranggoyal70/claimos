@@ -1,0 +1,15 @@
+{
+  "name": "claimos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Claim OS — an autonomous recovery company built with Naive.",
+  "scripts": {
+    "dev": "node prototype/server.mjs",
+    "check": "node --check prototype/server.mjs && node --check prototype/assets/story.js && node --check prototype/assets/live.js && node --check prototype/assets/product.js"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}
+

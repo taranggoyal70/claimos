@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Live Recovery — Claim OS</title>
+  <script>
+    try { if (localStorage.getItem('gcm-theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch {}
+  </script>
+  <link rel="stylesheet" href="assets/base.css">
+  <link rel="stylesheet" href="assets/live.css">
+</head>
+<body class="live-body">
+  <main class="live-shell">
+    <header class="live-topbar">
+      <div class="live-heading">
+        <a class="brand" href="/"><i class="brand-mark" aria-hidden="true"></i><span>Claim OS</span></a>
+        <span class="case-id">PT-2026-11847</span>
+      </div>
+      <div class="live-indicator"><span class="status-dot live"></span><span>LIVE REPLAY</span></div>
+      <button class="voice-toggle" type="button" data-voice>Voice off</button>
+      <div class="live-stat"><span>Autonomy</span><b>96%</b></div>
+      <div class="live-stat"><span>Revenue</span><b>$49</b></div>
+    </header>
+
+    <section class="live-main">
+      <div class="flow-layer" id="flow-layer" aria-hidden="true"></div>
+      <section class="moment-overlay" id="moment-overlay" aria-live="polite">
+        <span id="moment-kicker"></span><h2 id="moment-title"></h2><p id="moment-sub"></p>
+      </section>
+      <section class="channel" id="channel">
+        <header class="panel-head">
+          <div class="panel-label"><b>A</b><span>Claimant channel</span></div>
+          <span class="panel-sub">What the customer says.</span>
+        </header>
+        <div class="channel-stage">
+          <div class="call-empty">
+            <p>No conversation yet.<br>Press → to let the company work the case.</p>
+          </div>
+          <div class="call-live">
+            <div class="call-summary">
+              <div class="call-summary-top"><strong>Live call — Jordan Lee</strong><span class="call-clock" data-call-clock>00:00</span></div>
+              <p><span data-speaker-state>Connected</span> · Property Tax desk</p>
+              <div class="wave" aria-label="Live voice waveform"></div>
+            </div>
+            <div class="transcript" aria-live="polite"></div>
+          </div>
+          <div class="channel-caption" id="caption"></div>
+        </div>
+      </section>
+
+      <section class="dossier-live" id="dossier-live">
+        <header class="panel-head">
+          <div class="panel-label"><b>B</b><span>Company case</span></div>
+          <span class="panel-sub">What the company knows and does.</span>
+        </header>
+        <div class="dossier-canvas">
+          <section class="money-header">
+            <div class="money-header-top"><h2>Money Trail</h2><p>possible recovery → company revenue</p></div>
+            <div class="money-line" id="money-line">
+              <i class="money-node" data-label="Found" style="left:3%"></i>
+              <i class="money-node" data-label="Qualified" style="left:20%"></i>
+              <i class="money-node" data-label="Contacted" style="left:38%"></i>
+              <i class="money-node" data-label="Proved" style="left:56%"></i>
+              <i class="money-node" data-label="Funded" style="left:72%"></i>
+              <i class="money-node" data-label="Authorized" style="left:86%"></i>
+              <i class="money-node" data-label="Filed" style="left:98%"></i>
+            </div>
+          </section>
+
+          <section class="dossier-stage">
+            <p class="dossier-empty">Waiting for the opportunity agent.</p>
+            <article class="dossier-card">
+              <section class="dossier-left">
+                <header class="dossier-title">
+                  <span class="eyebrow">Living claim dossier</span>
+                  <h2>San Francisco property-tax appeal</h2>
+                </header>
+                <dl class="dossier-facts">
+                  <div class="dossier-fact" data-fact="claimant"><dt>Claimant</dt><dd>Jordan Lee</dd></div>
+                  <div class="dossier-fact" data-fact="apn"><dt>Parcel</dt><dd>1234/056</dd></div>
+                  <div class="dossier-fact" data-fact="assessed"><dt>Assessed value</dt><dd>$1,190,000</dd></div>
+                  <div class="dossier-fact recovery" data-fact="recovery"><dt>Potential recovery</dt><dd>$1,018 / year</dd></div>
+                </dl>
+                <section class="evidence-live">
+                  <h3>Evidence exhibits</h3>
+                  <div id="evidence-list"></div>
+                </section>
+              </section>
+              <section class="dossier-right">
+                <div class="work-live">
+                  <h3>Autonomous work</h3>
+                  <div class="work-row" data-work="find"><i></i><div><b>Opportunity Agent</b><span>Scan public roll and identify recoverable value.</span></div></div>
+                  <div class="work-row" data-work="qualify"><i></i><div><b>Eligibility Agent</b><span>Verify deadline, ownership, evidence and economics.</span></div></div>
+                  <div class="work-row" data-work="voice"><i></i><div><b>Voice Agent</b><span>Explain the case and confirm claimant facts.</span></div></div>
+                  <div class="work-row" data-work="evidence"><i></i><div><b>Evidence Agent</b><span>Build the comparable-sales and assessment packet.</span></div></div>
+                  <div class="work-row" data-work="filing"><i></i><div><b>Filing Agent</b><span>Prepare the official filing and wait for authorization.</span></div></div>
+                  <div class="decision-card" id="decision-card"><b>$713 expected value</b><span>Funded: 70% probability · $18.40 agent cost · $120 filing fee</span></div>
+                </div>
+              </section>
+            </article>
+          </section>
+
+          <section class="approval-live" id="approval-card">
+            <div class="approval-mark">305</div>
+            <div class="approval-copy">
+              <span>One required human act</span>
+              <h3>Authorize the filing-ready packet?</h3>
+              <p>4 exhibits · $713 expected value · $120 filing fee · submission creates the county response clock</p>
+            </div>
+            <div class="approval-actions">
+              <button class="btn recovery" type="button" data-approve><span class="kbd">A</span> Authorize</button>
+              <button class="btn" type="button" data-reject><span class="kbd">R</span> Reject</button>
+            </div>
+          </section>
+
+          <button class="next-cue ready" type="button" aria-label="Next beat" data-next>→</button>
+
+          <section class="details-panel" id="details-panel">
+            <section><h2>Agent event stream</h2><pre id="event-stream"></pre></section>
+            <section><h2>Case state</h2><pre id="case-state"></pre></section>
+          </section>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <section class="finale" id="finale" aria-live="polite">
+    <div class="finale-card">
+      <span class="mono">1 CLAIMANT · 8 AGENTS · 4 EXHIBITS · 1 REQUIRED HUMAN ACT</span>
+      <h2 id="finale-title">One complete recovery.</h2>
+      <p id="finale-sub">Filing-ready packet delivered · $49 revenue collected · $1,018 potential annual savings</p>
+      <div class="finale-metrics"><span><b>$49</b> revenue now</span><span><b>$1,018</b> annual savings</span><span><b>96%</b> autonomous</span></div>
+      <div class="finale-actions">
+        <button class="btn primary" type="button" data-restart>Replay</button>
+        <a class="btn" href="/">Back to the story</a>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="assets/live.js"></script>
+</body>
+</html>

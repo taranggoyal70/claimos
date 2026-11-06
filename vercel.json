@@ -1,0 +1,20 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "functions": {
+    "api/**/*.mjs": {
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/prototype/index.html" },
+    { "source": "/live", "destination": "/prototype/live.html" },
+    { "source": "/app", "destination": "/prototype/app.html" },
+    { "source": "/case", "destination": "/prototype/case.html" },
+    { "source": "/desks", "destination": "/prototype/desks.html" },
+    { "source": "/intake", "destination": "/prototype/intake.html" },
+    { "source": "/proof", "destination": "/prototype/proof.html" },
+    { "source": "/assets/:path*", "destination": "/prototype/assets/:path*" }
+  ]
+}
+

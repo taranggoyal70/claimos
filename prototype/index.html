@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Claim OS — Autonomous Recovery Company</title>
+  <meta name="description" content="An autonomous company that finds money owed, proves the claim, files it, and follows through to recovery.">
+  <script>
+    try { if (localStorage.getItem('gcm-theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch {}
+  </script>
+  <link rel="stylesheet" href="assets/base.css">
+  <link rel="stylesheet" href="assets/story.css">
+</head>
+<body>
+  <a class="skip" href="#problem">Skip to content</a>
+
+  <nav class="nav" id="nav">
+    <div class="nav-in">
+      <a class="brand" href="#top" aria-label="Claim OS, back to top">
+        <i class="brand-mark" aria-hidden="true"></i><span>Claim OS</span>
+      </a>
+      <div class="nav-links" aria-label="Story navigation">
+        <a href="#problem">Problem</a>
+        <a href="#mechanism">Mechanism</a>
+        <a href="#recovery">Recovery</a>
+        <a href="#proof">Proof</a>
+      </div>
+      <div class="nav-end">
+        <button class="theme-btn" type="button" data-theme-toggle>Dark</button>
+        <a class="btn primary nav-cta" href="/live">See it live <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" id="top">
+      <div class="market-field" aria-hidden="true">
+        <span class="market-case case-a"><b>RF-08312</b><em>+$246</em><small>carrier refund</small></span>
+        <span class="market-case case-b"><b>UP-00291</b><em>+$180</em><small>evidence missing</small></span>
+        <span class="market-case case-c rejected"><b>PT-11832</b><em>−$31</em><small>deadline expired</small></span>
+        <span class="market-case case-d selected"><b>PT-11847</b><em>+$713 EV</em><small>fund this case</small></span>
+        <span class="market-case case-e"><b>RF-08324</b><em>+$92</em><small>awaiting reply</small></span>
+        <i class="market-scan"></i>
+      </div>
+      <div class="wrap hero-copy">
+        <h1 class="hero-title reveal" data-split>
+          A company that turns forgotten claims into recovered cash.
+        </h1>
+        <div class="hero-foot reveal" style="--delay:.14s">
+          <p>It discovers opportunities, prices the work, builds the case, and keeps pursuing recovery with one human checkpoint.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="/live">See the company operate <span class="arrow">→</span></a>
+            <a class="btn" href="#recovery">Watch the recovery</a>
+          </div>
+        </div>
+      </div>
+
+      <figure class="hero-figure reveal" style="--delay:.2s">
+        <div class="exchange-tape" aria-label="Recovery exchange state">
+          <div class="exchange-cell"><span>Records scanned</span><b data-records>0</b><small>county roll</small></div>
+          <div class="exchange-cell"><span>Cases qualified</span><b>12</b><small>evidence + deadline</small></div>
+          <div class="exchange-cell active"><span>Capital allocated</span><b data-cases>0</b><small>$18.40 agent cost</small></div>
+          <div class="exchange-cell recovered"><span>Potential recovery</span><b>$1,018</b><small>annual savings</small></div>
+          <i class="exchange-runner" aria-hidden="true"></i>
+        </div>
+        <figcaption class="wrap">
+          <span>Live recovery tape</span>
+          <span>The coordinator converts public records into funded cases.</span>
+          <span class="hero-readout">one case admitted · one required human act</span>
+        </figcaption>
+      </figure>
+    </header>
+
+    <section class="section" id="problem">
+      <div class="wrap section-grid">
+        <div class="section-key reveal"><span class="number">01</span><span>Problem</span></div>
+        <div class="section-body">
+          <h2 class="section-title reveal" data-split>Most recoveries die between discovery and follow-up.</h2>
+          <ol class="rule-list reveal">
+            <li><span class="index">a</span><strong>People do not know they are owed money.</strong><code>opportunity → invisible</code></li>
+            <li><span class="index">b</span><strong>Evidence and deadlines break valid claims.</strong><code>claim → incomplete</code></li>
+            <li><span class="index">c</span><strong>Follow-up stops before recovery.</strong><code>filed → forgotten</code></li>
+          </ol>
+          <p class="source-note reveal">The company treats recovery as an operating loop, not a one-time form.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section mechanism-section" id="mechanism">
+      <div class="wrap section-grid">
+        <div class="section-key reveal"><span class="number">02</span><span>Mechanism</span></div>
+        <div class="section-body">
+          <h2 class="section-title reveal" data-split>Evidence becomes operating state.</h2>
+          <p class="body-large reveal">Every fact keeps its source. Every deadline keeps its clock. Agents inherit the case state and continue from the exact next move.</p>
+        </div>
+      </div>
+
+      <figure class="mechanism reveal" id="mechanism-figure">
+        <div class="mechanism-stage wrap">
+          <article class="source-document">
+            <header><span>Forwarded notice</span><span class="mono">mail_7f2</span></header>
+            <p>Notice of assessed value for <mark data-field="property">842 Maple Avenue</mark>.</p>
+            <p>Current assessed value: <mark data-field="value">$1,190,000</mark>.</p>
+            <p>Formal appeal deadline: <mark data-field="deadline">December 15, 2026</mark>.</p>
+            <p>Comparable evidence may be submitted with the application.</p>
+          </article>
+
+          <svg class="provenance" aria-hidden="true"></svg>
+
+          <article class="dossier-sheet">
+            <header><span>Claim dossier</span><span class="mono">PT-2026-11847</span></header>
+            <dl>
+              <div data-slot="property"><dt>Property</dt><dd>842 Maple Avenue</dd></div>
+              <div data-slot="value"><dt>Assessed value</dt><dd>$1,190,000</dd></div>
+              <div data-slot="deadline"><dt>Deadline</dt><dd>Dec 15, 2026</dd></div>
+              <div data-slot="recovery"><dt>Potential recovery</dt><dd>$1,018 / year</dd></div>
+              <div data-slot="next"><dt>Next</dt><dd>Verify owner and comparable sales</dd></div>
+            </dl>
+          </article>
+        </div>
+        <figcaption class="wrap">
+          <span>Fig. 2</span>
+          <span>Exact phrases become structured facts with permanent provenance.</span>
+          <button class="mechanism-replay" type="button" data-mechanism-replay>Replay</button>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="section recovery-section" id="recovery">
+      <div class="wrap section-grid recovery-heading">
+        <div class="section-key reveal"><span class="number">03</span><span>Recovery</span></div>
+        <div class="section-body">
+          <h2 class="section-title reveal" data-split>The company prices every next move.</h2>
+        </div>
+      </div>
+
+      <div class="recovery-replay" id="recovery-replay">
+        <div class="recovery-pin">
+          <div class="wrap recovery-inner">
+            <div class="recovery-track" aria-label="Recovery beats"></div>
+            <div class="recovery-grid">
+              <div class="recovery-copy" aria-live="polite">
+                <span class="recovery-number">01</span>
+                <h3></h3>
+                <p class="recovery-summary"></p>
+                <p class="recovery-source"></p>
+              </div>
+
+              <div class="recovery-scene">
+                <div class="scene-label"><span>CLAIM</span><b data-beat-state>possible</b></div>
+                <article class="case-plate">
+                  <header><span>PT-2026-11847</span><span data-case-actor>Opportunity Agent</span></header>
+                  <div class="money-trail-mini"><i></i><b></b></div>
+                  <dl>
+                    <div><dt>Claimant</dt><dd>Jordan Lee</dd></div>
+                    <div><dt>Assessed</dt><dd>$1,190,000</dd></div>
+                    <div><dt>Recovery</dt><dd data-case-value>—</dd></div>
+                    <div><dt>Deadline</dt><dd>Dec 15, 2026</dd></div>
+                  </dl>
+                  <div class="artifact-stack" aria-live="polite"></div>
+                </article>
+                <div class="agent-strip"><span class="status-dot live"></span><b data-agent-name>Opportunity Agent</b><span data-agent-status>working</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="proof">
+      <div class="wrap section-grid">
+        <div class="section-key reveal"><span class="number">04</span><span>Proof</span></div>
+        <div class="section-body">
+          <h2 class="section-title reveal" data-split>One case. Every decision accounted for.</h2>
+          <div class="proof-stage reveal">
+            <div class="proof-outcome"><span class="mono">CASE PT-2026-11847</span><strong>$1,018</strong><p>potential annual recovery</p><small>filing-ready · claimant authorized · follow-up scheduled</small></div>
+            <div class="proof-ledger" role="list" aria-label="Case proof">
+              <button class="proof-row" data-proof="scan"><span>Source records</span><b>218,431</b><i>county roll scanned</i></button>
+              <button class="proof-row" data-proof="time"><span>Delivery</span><b>4m 12s</b><i>to filing-ready packet</i></button>
+              <button class="proof-row" data-proof="autonomy"><span>Governance</span><b>31 : 1</b><i>agent decisions : human act</i></button>
+              <button class="proof-row" data-proof="revenue"><span>Revenue now</span><b>$49</b><i>$178 contingent on recovery</i></button>
+            </div>
+          </div>
+          <aside class="proof-detail" aria-live="polite">
+            <span class="mono">Select a result.</span>
+            <p>Every claim links to its case events, external receipts, agent spend and human interventions.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section end-section">
+      <div class="wrap end-inner reveal">
+        <p class="eyebrow">One complete operating loop</p>
+        <h2>Found. Proved. Authorized. Delivered.</h2>
+        <p>Now watch the company operate the case itself.</p>
+        <a class="btn recovery" href="/live">Open the live recovery <span class="arrow">→</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-in">
+      <span>Claim OS · coded motion prototype</span>
+      <span><a href="/app">Product</a> · <a href="/intake">Intake</a> · <a href="/proof">Proof</a> · Story data: deterministic replay</span>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/story.js"></script>
+</body>
+</html>
