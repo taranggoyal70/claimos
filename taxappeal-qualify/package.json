@@ -13,7 +13,7 @@
     "qualify": "dist/src/cli.js"
   },
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run --exclude 'dist/**'",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "qualify": "tsx src/cli.ts",

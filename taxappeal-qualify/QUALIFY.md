@@ -300,6 +300,10 @@ priority = EV × urgency × (0.5 + 0.5 × confidence)
 
 A lead that failed a hard rule never reaches the queue, so reviewers can't approve around the rules. Every action stamps `audit.review` (who, what, when, note) and appends to the audit log. Reviewer decisions are the labels for tuning thresholds and evaluating the LLM (section 10).
 
+On the next batch, an approval survives only when its normalized input hash and config version match. Fresh suppression, eligibility, valuation, economics and deadline checks still run; changed inputs or a new config require review again. The ordinary capacity ranker assigns the approved case's release date. When exporting without a config, both filing fee and case cost are unknown (`null`).
+
+The Claim OS `/case` page runs the engine through `/api/qualify` and shows the synthetic batch, per-property economics, stage log and decision record. This public demonstration pins its evaluation date to 2026-11-05 and uses the offline reviewer; it does not call paid models or contact owners. The presentation dossier below is separately labelled illustrative. Production builds publish only HTML and browser assets from `public/`; step packages remain server-side.
+
 ---
 
 ## 5. Inputs

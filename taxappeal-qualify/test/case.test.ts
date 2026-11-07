@@ -5,6 +5,10 @@ import { naiveCredentialsFromEnv } from "../src/llm/naive.js";
 import { candidate, config, ctx, NOW } from "./helpers.js";
 
 describe("Claim OS UI adapters", () => {
+  it("leaves cost unknown when the filing fee cannot be resolved", async () => {
+    const r = await qualify(candidate(), ctx(), { now: NOW });
+    expect(toCaseRecord(r)).toMatchObject({ caseCost: null, filingFee: null });
+  });
   it("maps a QUALIFIED result onto the prototype caseRecord fields", async () => {
     const cand = candidate();
     const r = await qualify(cand, ctx(), { now: NOW });

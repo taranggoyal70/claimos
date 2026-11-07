@@ -84,7 +84,7 @@ export function toCaseRecord(r: QualifyResult, opts: CaseRecordOptions = {}): Ca
     probability: priced && e ? e.pWin : null,
     expectedValue: priced && e ? e.ev : null,
     estimatedFee: priced && e ? e.fee : null,
-    caseCost: priced && e ? Math.round((e.maxLoss - (filingFee ?? 0)) * 100) / 100 : null,
+    caseCost: priced && e && filingFee !== null ? Math.round((e.maxLoss - filingFee) * 100) / 100 : null,
     filingFee,
     deadline: r.route ? formatDeadline(r.route.deadline) : null,
     status: r.status,

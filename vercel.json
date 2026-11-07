@@ -1,20 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
+  "outputDirectory": "public",
   "functions": {
     "api/**/*.mjs": {
       "maxDuration": 60
     }
-  },
-  "rewrites": [
-    { "source": "/", "destination": "/prototype" },
-    { "source": "/live", "destination": "/prototype/live" },
-    { "source": "/app", "destination": "/prototype/app" },
-    { "source": "/case", "destination": "/prototype/case" },
-    { "source": "/desks", "destination": "/prototype/desks" },
-    { "source": "/intake", "destination": "/prototype/intake" },
-    { "source": "/proof", "destination": "/prototype/proof" },
-    { "source": "/assets/:path*", "destination": "/prototype/assets/:path*" }
-  ]
+  }
 }
 

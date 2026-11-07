@@ -10,7 +10,7 @@ import { economics } from "./stages/s4-economics.js";
 import { timing } from "./stages/s5-timing.js";
 import { llmReview } from "./stages/s6-llm.js";
 import { decide, priority, summarize } from "./stages/s7-decision.js";
-import { STATUS_ORDER, type QualifyResult, type StageLogEntry } from "./types.js";
+import { isoDate, STATUS_ORDER, type QualifyResult, type StageLogEntry } from "./types.js";
 import { sha256, stableStringify } from "./util.js";
 
 export interface QualifyOptions {
@@ -36,6 +36,7 @@ export function runS3toS5(d: Draft): void {
 
 export async function qualify(raw: unknown, ctx: QualifyContext, opts: QualifyOptions = {}): Promise<QualifyResult> {
   const { config: cfg, today } = ctx;
+  isoDate.parse(today);
   const now = opts.now ?? new Date().toISOString();
 
   // S0 · Intake
@@ -81,9 +82,13 @@ export async function qualify(raw: unknown, ctx: QualifyContext, opts: QualifyOp
     stage();
   }
 
-  // S6 · LLM review (only on survivors)
+  const prior = ctx.priorResults.get(d.caseId);
+  const approved = prior?.status === "QUALIFIED" && prior.audit.review?.action === "approve"
+    && prior.audit.inputHash === d.inputHash && prior.audit.configVersion === cfg.version;
+
+  // Fresh hard rules always run; unchanged human approvals need no second model review.
   if (!d.stopped) {
-    if (opts.skipLlm) {
+    if (opts.skipLlm || approved) {
       d.llm = { ran: false, skippedReason: "skipped (human review in progress)", checks: [] };
       d.stageLog.push({ stage: "S6", outcome: "skip", detail: "human review in progress" });
     } else {
@@ -92,7 +97,12 @@ export async function qualify(raw: unknown, ctx: QualifyContext, opts: QualifyOp
   }
 
   // S7 · Decision
-  const status = decide(d);
+  let status = decide(d);
+  if (approved && (status === "QUALIFIED" || status === "NEEDS_REVIEW")) {
+    status = "QUALIFIED";
+    d.decidedBy = prior.audit.decidedBy;
+    d.stageLog.push({ stage: "S7", outcome: "pass", detail: "Unchanged human approval retained after fresh rule checks" });
+  }
   const result: QualifyResult = {
     caseId: d.caseId,
     parcelId: d.cand.parcelId,
@@ -110,7 +120,8 @@ export async function qualify(raw: unknown, ctx: QualifyContext, opts: QualifyOp
     releaseDate: null,
     requalifyOn: d.requalifyOn,
     ...(d.llm ? { llm: d.llm } : {}),
-    audit: { configVersion: cfg.version, inputHash: d.inputHash, decidedAt: now, decidedBy: d.decidedBy },
+    audit: { configVersion: cfg.version, inputHash: d.inputHash, decidedAt: now, decidedBy: d.decidedBy,
+      ...(approved && status === "QUALIFIED" ? { review: prior.audit.review } : {}) },
   };
   return result;
 }

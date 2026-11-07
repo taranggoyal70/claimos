@@ -139,6 +139,10 @@ async function serveStatic(request, response) {
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url, `http://${request.headers.host}`);
+    if (request.method === 'GET' && url.pathname === '/api/qualify') {
+      const { runQualifyDemo } = await import('../lib/qualify-demo.mjs');
+      return json(response, 200, await runQualifyDemo());
+    }
     if (request.method === 'GET' && url.pathname === '/api/voice/status') {
       const status = await hasCliProfile();
       return json(response, 200, { provider: 'naive', ...status, fallback: 'browser' });

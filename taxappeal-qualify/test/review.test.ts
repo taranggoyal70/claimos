@@ -1,11 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { qualify } from "../src/pipeline.js";
+import { qualify, qualifyAll } from "../src/pipeline.js";
 import { applyReview, ReviewError } from "../src/review.js";
 import { NOW, candidate, comps, ctx } from "./helpers.js";
 
 const flagged = () => candidate({ owner: { names: ["A Trust"], type: "trust", mailingAddress: "x" }, assessment: { assessedValue: 1_150_000 } });
 
 describe("human review", () => {
+  it("releases unchanged approvals but rechecks changed inputs, rules and deadlines", async () => {
+    const c = ctx();
+    const raw = flagged();
+    const r = await qualify(raw, c, { now: NOW });
+    const approved = await applyReview(r, { type: "approve" }, "sam", { now: NOW });
+    c.priorResults.set(approved.caseId, approved);
+    const batch = await qualifyAll([raw], c, { now: NOW });
+    expect(batch.results[0]).toMatchObject({ status: "QUALIFIED", releaseDate: c.today, audit: { decidedBy: "human:sam" } });
+    expect((await qualify(flagged(), { ...c, config: { ...c.config, version: "new" } })).status).toBe("NEEDS_REVIEW");
+    expect((await qualify({ ...raw, situsAddress: "Changed" }, c)).status).toBe("NEEDS_REVIEW");
+    expect((await qualify(raw, { ...c, suppression: { ...c.suppression, dncParcels: ["T-1"] } })).status).toBe("REJECTED");
+    const late = { ...c, today: "2026-12-31", config: { ...c.config, thresholds: { ...c.config.thresholds, maxSourceAgeDays: 365 } } };
+    expect((await qualify(raw, late)).status).toBe("NEXT_CYCLE");
+  });
   it("approve turns NEEDS_REVIEW into QUALIFIED and records who", async () => {
     const r = await qualify(flagged(), ctx(), { now: NOW });
     expect(r.status).toBe("NEEDS_REVIEW");
