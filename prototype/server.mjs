@@ -13,6 +13,16 @@ const API_BASE = process.env.VETTA_API_BASE_URL || 'https://api.vetta.sh';
 const API_KEY = process.env.VETTA_API_KEY || '';
 const audioCache = new Map();
 let cliStatus = { checkedAt: 0, configured: false };
+let workflowInstance;
+async function localWorkflow() {
+  if (!workflowInstance) {
+    const { WorkflowService } = await import('../workflow/service.mjs');
+    const token = process.env.CLAIMOS_OPERATOR_TOKEN || '';
+    if (token && token.length < 24) throw new Error('CLAIMOS_OPERATOR_TOKEN must contain at least 24 characters');
+    workflowInstance = new WorkflowService({ path:process.env.CLAIMOS_DB_PATH || resolve(ROOT,'../.claimos-data/cases.sqlite') });
+  }
+  return workflowInstance;
+}
 const ROUTES = new Map([
   ['/', 'index.html'],
   ['/live', 'live.html'],
@@ -21,6 +31,7 @@ const ROUTES = new Map([
   ['/desks', 'desks.html'],
   ['/intake', 'intake.html'],
   ['/proof', 'proof.html'],
+  ['/workflow', 'workflow.html'],
 ]);
 
 const TYPES = {
@@ -139,6 +150,11 @@ async function serveStatic(request, response) {
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url, `http://${request.headers.host}`);
+    if (url.pathname === '/api/workflow') {
+      const service = await localWorkflow();
+      const { workflowHttp } = await import('../workflow/http.mjs');
+      return await workflowHttp(request,response,service,process.env.CLAIMOS_OPERATOR_TOKEN || '');
+    }
     if (request.method === 'GET' && url.pathname === '/api/qualify') {
       const { runQualifyDemo } = await import('../lib/qualify-demo.mjs');
       return json(response, 200, await runQualifyDemo());
@@ -173,4 +189,5 @@ const server = createServer(async (request, response) => {
 server.listen(PORT, '127.0.0.1', () => {
   console.log(`Claim OS prototype: http://127.0.0.1:${PORT}`);
   console.log(`Naive voice: ${API_KEY ? 'VETTA_API_KEY' : 'CLI profile (vetta login)'}`);
+  console.log(`Real local workflow: http://127.0.0.1:${PORT}/workflow`);
 });

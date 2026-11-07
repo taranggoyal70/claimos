@@ -86,6 +86,7 @@ def build(case, hearing=None):
         "reduction": s["just_value"] - requested if requested else None,
         "annual_savings_estimate": case.get("annual_savings"),  # Find's number; it knows caps and exemptions
         "subject": s,
+        "authorization": case.get("authorization"),
         "sales_approach": sales,
         "equity_approach": equity,
         "deadlines": {

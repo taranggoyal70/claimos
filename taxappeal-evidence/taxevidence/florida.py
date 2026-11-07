@@ -1,5 +1,6 @@
 """Florida desk: what a Value Adjustment Board petition needs as evidence, and by when."""
 from datetime import date, timedelta
+import re
 
 # s. 194.011(4)(a), F.S., as amended effective 2025-09-01 (DOR bulletin PTO BUL 25-02): petitioner and
 # property appraiser each send their evidence at least 15 calendar days before the hearing, counted back
@@ -28,6 +29,15 @@ def checklist(case, sales, equity, own_sale_note):
     """Every item the packet needs: where it comes from and whether we have it."""
     county = case["county"]
     site = APPRAISER_SITE.get(county, f"the {county} County Property Appraiser's site")
+    authorization = case.get("authorization") or {}
+    reviewed_authorization = (
+        authorization.get("reviewed") is True
+        and authorization.get("case_id") == case["case_id"]
+        and authorization.get("parcel_id") == case["subject"]["parcel_id"]
+        and authorization.get("roll_year") == case["roll_year"]
+        and re.fullmatch(r"[0-9a-f]{64}", str(authorization.get("document_sha256", ""))) is not None
+        and bool(authorization.get("signer"))
+    )
     return [
         _item("County record for the home", "public", "have",
               "Just value, assessed value, exemptions, size and year built from the county roll."),
@@ -48,8 +58,10 @@ def checklist(case, sales, equity, own_sale_note):
         _item("Corrections to the county record", "owner", "ask_owner",
               "Living area, bedrooms, pool, garage. The roll's size is the county's effective area and can "
               "include garages and porches, so confirm it with the owner before quoting it."),
-        _item("Signed authorization (DR-486A) or owner-signed petition", "sign_up", "blocks_filing",
-              "Required before filing when we act as an unlicensed agent."),
+        _item("Signed authorization (DR-486A) or owner-signed petition", "sign_up", "have" if reviewed_authorization else "blocks_filing",
+              ("Existing signed document attached and reviewed by the operator for this parcel and tax year; "
+               f"SHA-256 {authorization['document_sha256']}. This is not independent signature verification.")
+              if reviewed_authorization else "Required before filing when we act as an unlicensed agent."),
     ]
 
 

@@ -11,3 +11,8 @@ npm-debug.log*
 .vercel
 .env*
 public/
+.claimos-data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+!.env.example

@@ -2,6 +2,7 @@
 import html
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 CHROMES = ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -70,7 +71,10 @@ def to_pdf(html_path: Path):
     if not chrome:
         return None
     pdf = html_path.with_suffix(".pdf")
-    subprocess.run([chrome, "--headless", "--disable-gpu", "--no-pdf-header-footer",
-                    f"--print-to-pdf={pdf}", html_path.resolve().as_uri()],
-                   check=True, capture_output=True, timeout=60)
+    # Never reuse or lock the operator's interactive Chrome profile.
+    with tempfile.TemporaryDirectory(prefix="claimos-pdf-profile-") as profile:
+        subprocess.run([chrome, "--headless", "--disable-gpu", "--no-pdf-header-footer",
+                        "--no-first-run", f"--user-data-dir={profile}",
+                        f"--print-to-pdf={pdf}", html_path.resolve().as_uri()],
+                       check=True, capture_output=True, timeout=60)
     return pdf

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Real workflow — Claim OS</title>
+  <script>try{if(localStorage.getItem('gcm-theme')==='dark')document.documentElement.dataset.theme='dark'}catch{}</script>
+  <link rel="stylesheet" href="assets/base.css"><link rel="stylesheet" href="assets/product.css"><link rel="stylesheet" href="assets/polish.css"><link rel="stylesheet" href="assets/workflow.css">
+</head><body class="product-body">
+  <nav class="product-nav"><div class="nav-in"><a class="brand" href="/"><i class="brand-mark"></i><span>Claim OS</span></a><div class="nav-links"><a href="/workflow" class="active">Real workflow</a><a href="/app">Sample workspace</a><a href="/live">Replay</a></div><div class="nav-end"><button class="theme-btn" data-theme-toggle>Dark</button></div></div></nav>
+  <main class="product-main">
+    <header class="product-head"><div><span class="eyebrow">Lee County, Florida · connected modules</span><h1>The work behind the replay.</h1><p>Import a sourced property record and reviewed desk rules. Run the connected backends, inspect the actual decisions, and download the documents they produce.</p></div><span class="workflow-local-pill">Private local workbench</span></header>
+    <div class="workflow-notice" data-workflow-capabilities role="status">Checking the local workflow service…</div>
+    <div class="workflow-module-strip" data-workflow-modules></div>
+    <form data-workflow-login class="workflow-login" hidden><label>Local operator token <input type="password" name="token" autocomplete="off" required></label><button class="btn primary">Unlock workbench</button><small>Kept in this page’s memory only.</small></form>
+    <p data-workflow-message class="workflow-message" role="status" aria-live="polite"></p>
+    <div class="workflow-layout" data-workflow-workspace hidden>
+      <aside class="workflow-sidebar">
+        <div class="workflow-sidebar-head"><h2>Your cases</h2><button type="button" class="btn" data-workflow-refresh>Refresh</button></div>
+        <div data-workflow-cases class="workflow-case-list"></div>
+        <details class="workflow-import"><summary>Import a real case</summary>
+          <p>Use the Qualify candidate handoff and the operator-reviewed Lee County config. Sample and placeholder configs are rejected.</p>
+          <form data-workflow-import>
+            <label>Property candidate JSON<input name="candidate" type="file" accept="application/json,.json" required></label>
+            <label>Reviewed desk config JSON<input name="config" type="file" accept="application/json,.json" required></label>
+            <label>County just value ($)<input name="justValue" type="number" min="1" step="any" required></label>
+            <label>Measured county level (ratio)<input name="countyLevel" type="number" min="0.001" max="2" step="any" placeholder="From the county-level analysis" required></label>
+            <label>Rules reviewed by<input name="reviewedBy" type="text" maxlength="100" required></label>
+            <label>Rules reviewed on<input name="reviewedOn" type="date" required></label>
+            <label>Rule sources (one HTTPS URL per line)<textarea name="sources" rows="3" required></textarea></label>
+            <label>Hearing date, if assigned<input name="hearingDate" type="date"></label>
+            <p class="workflow-help">Recorded areas must use the same county area basis. Capped/exempt properties with different assessed and just values need a specialist adapter.</p>
+            <button class="btn primary" type="submit">Import and run connected steps →</button>
+          </form>
+        </details>
+      </aside>
+      <section class="workflow-case-panel" data-workflow-detail aria-live="polite"><div class="workflow-empty"><span class="eyebrow">No simulated cases here</span><h2>Start with a real record.</h2><p>Import a property candidate and reviewed rules, or select a saved case. Every result shown here comes from a connected backend or an operator-uploaded document.</p></div></section>
+    </div>
+  </main>
+  <script type="module" src="assets/product.js"></script><script type="module" src="assets/polish.js"></script><script type="module" src="assets/workflow.js"></script>
+</body></html>
