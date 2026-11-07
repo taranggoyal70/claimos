@@ -404,7 +404,7 @@ async function playBeat(index) {
   if (index === beats.length - 1) {
     setReady(false);
     if (!reducedMotion) await wait(2200);
-    if (run === app.run) finale(true);
+    if (run === app.run && app.beat === index) finale(true);
   } else setReady(!beat.approval || app.answered === 'approve');
   renderDetails();
 }
@@ -483,12 +483,12 @@ function restart() {
 }
 
 function next() {
-  if (app.busy || app.beat >= beats.length - 1 || (app.beat === 4 && app.answered !== 'approve')) return;
+  if ($('#finale').classList.contains('on') || app.busy || app.beat >= beats.length - 1 || (app.beat === 4 && app.answered !== 'approve')) return;
   playBeat(app.beat + 1);
 }
 
 function previous() {
-  if (app.busy || app.beat <= 0) return;
+  if ($('#finale').classList.contains('on') || app.busy || app.beat <= 0) return;
   if (app.beat <= 5) app.answered = null;
   $('#approval-card').classList.remove('on');
   playBeat(app.beat - 1);
