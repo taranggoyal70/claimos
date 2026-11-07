@@ -6,8 +6,9 @@
   "description": "Claim OS — an autonomous recovery company built with Naive.",
   "scripts": {
     "build": "npm ci --prefix taxappeal-qualify && npm run build --prefix taxappeal-qualify && node scripts/build-site.mjs",
-    "dev": "node prototype/server.mjs",
-    "check": "node --check prototype/server.mjs && node --check prototype/assets/story.js && node --check prototype/assets/live.js && node --check prototype/assets/product.js && node --check prototype/assets/polish.js && node --check prototype/assets/motion.js && node --check prototype/assets/demo-data.js"
+    "dev": "node --env-file-if-exists=.env prototype/server.mjs",
+    "test:workflow": "node --test workflow/test/*.test.mjs",
+    "check": "node --check prototype/server.mjs && node --check prototype/assets/story.js && node --check prototype/assets/live.js && node --check prototype/assets/product.js && node --check prototype/assets/polish.js && node --check prototype/assets/motion.js && node --check prototype/assets/demo-data.js && node --check prototype/assets/workflow.js && node --check workflow/service.mjs && node --check workflow/http.mjs && node --check workflow/evidence.mjs && node --check workflow/store.mjs"
   },
   "engines": {
     "node": "24.x"

@@ -3,6 +3,9 @@ const nav = document.querySelector('.nav-in');
 if (nav) {
   const links = nav.querySelector('.nav-links');
   if (links) {
+    if (!links.querySelector('[href="/workflow"]')) {
+      const real = document.createElement('a'); real.href='/workflow'; real.textContent='Real workflow'; links.append(real);
+    }
     links.id = 'site-navigation';
     const menu = document.createElement('button');
     menu.className = 'menu-toggle';
