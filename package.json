@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Claim OS — an autonomous recovery company built with Naive.",
   "scripts": {
+    "build": "npm ci --prefix taxappeal-qualify && npm run build --prefix taxappeal-qualify && node scripts/build-site.mjs",
     "dev": "node prototype/server.mjs",
     "check": "node --check prototype/server.mjs && node --check prototype/assets/story.js && node --check prototype/assets/live.js && node --check prototype/assets/product.js"
   },

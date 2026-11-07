@@ -123,3 +123,17 @@
   .intake-stage { grid-template-columns: 1fr; }
   .proof-page-grid { grid-template-columns: 1fr; }
 }
+/* The qualification console shares the dossier's spacing and evidence hierarchy. */
+.qualify-panel { margin: 2rem 0; }
+.qualify-body { padding: clamp(18px, 3vw, 28px); }
+.qualify-body h3 { margin: 1.5rem 0 .75rem; }
+.qualify-body p { line-height: 1.6; }
+.qualify-body .dossier-summary { margin: 1.5rem 0; }
+.qualify-panel .dossier-page-head { flex-wrap: wrap; gap: 1.5rem; }
+.qualify-panel .dossier-page-head p { max-width: 62ch; margin-top: .75rem; }
+.qualify-counts { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.5rem 0; }
+.qualify-counts span { border: 1px solid var(--rule); padding: .6rem .9rem; border-radius: 6px; }
+.qualify-panel select { display: block; width: 100%; margin: .6rem 0 1.5rem; padding: .8rem; background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; font: inherit; }
+.qualify-stages { padding-left: 1.25rem; }
+.qualify-stages li { padding: .5rem 0; line-height: 1.5; }
+.qualify-panel pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem; }
