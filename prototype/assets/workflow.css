@@ -28,6 +28,7 @@
 .workflow-import input[type="file"], .workflow-auth-form input[type="file"] { font-size:10px; }
 .workflow-help { font-size:10px; color:var(--muted); line-height:1.8; }
 .workflow-case-panel { padding:26px; }
+.workflow-case-panel, .workflow-case-list, .workflow-notice { overflow-wrap:anywhere; }
 .workflow-empty { padding:45px 10px; }
 .workflow-empty h2 { font-size:30px; font-weight:500; letter-spacing:-.04em; }
 .workflow-empty p { max-width:480px; color:var(--muted); font-size:13px; line-height:1.9; }
