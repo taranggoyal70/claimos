@@ -318,11 +318,12 @@ function artifactsFor(index) {
   const rows = [
     ['SOURCE', 'Assessment roll scanned', '218,431 records'],
     ['DECISION', 'Eligibility and expected value', '$713 EV'],
-    ['VOICE', 'Claimant consent and facts', '05:27 call'],
+    ['CONSENT', 'Engagement and owner facts', 'Sample call'],
     ['E-01', 'Assessment + comparable evidence', '4 exhibits'],
-    ['CAPITAL', 'Case funded; weak case rejected', '$18.40 cost'],
-    ['APPROVAL', 'Filing-ready packet held', '1 human act'],
-    ['RECEIPT', 'Packet delivered; follow-up active', '$49 revenue'],
+    ['RECEIPT', 'Owner-authorized packet delivered', 'Sample receipt'],
+    ['FOLLOW-UP', 'Response deadline and reminders', 'Clock running'],
+    ['APPEAL', 'Denial reviewed; reply prepared', 'Next remedy'],
+    ['OUTCOME', 'Savings verified; invoice prepared', 'Sample invoice'],
   ];
   return rows.slice(0, index + 1);
 }

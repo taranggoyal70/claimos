@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="assets/base.css">
   <link rel="stylesheet" href="assets/story.css">
   <link rel="stylesheet" href="assets/polish.css">
+  <link rel="stylesheet" href="assets/motion.css">
 </head>
 <body>
   <a class="skip" href="#problem">Skip to content</a>
@@ -46,7 +47,8 @@
         </div>
         <div class="hero-note reveal"><span class="mini-check">✓</span> Built with Naïve <i></i> Human control where it matters</div>
       </div>
-      <div class="recovery-model reveal" aria-label="Interactive preview of a sample recovery">
+      <div class="recovery-model reveal" aria-label="Animated preview of a sample recovery">
+        <canvas class="opportunity-field" data-opportunity-field aria-hidden="true"></canvas>
         <div class="model-backdrop"></div>
         <div class="model-label"><span class="status-dot live"></span> THE COMPANY AT WORK <span>Sample case</span></div>
         <div class="model-document"><span class="document-icon">↳</span><div><b>Assessment notice.pdf</b><small>San Francisco · received just now</small></div><span class="model-check">✓</span></div>
@@ -132,11 +134,19 @@
       </figure>
     </section>
 
+    <section class="section engine-section" id="engine">
+      <div class="wrap"><div class="engine-heading reveal"><span class="eyebrow">The operating system</span><h2>One engine.<br><em>Every step of the recovery.</em></h2><p>The workflow stays the same. Each desk brings its own sources, eligibility rules, evidence requirements and filing routes.</p></div>
+      <div class="engine-board reveal"><div class="engine-path" role="group" aria-label="Explore the eight recovery steps" data-engine-path></div>
+      <div class="engine-projection"><article class="engine-core"><div class="engine-core-head"><span class="engine-symbol">↗</span><span>SHARED ENGINE</span><span class="engine-running"><i class="status-dot live"></i> <span data-engine-name>Find</span></span></div><div class="engine-core-content"><span class="engine-step-no" data-engine-number>01</span><h3 data-engine-shared></h3><div class="engine-output"><i></i><span data-engine-output></span></div></div></article>
+      <div class="engine-adapter"><div class="adapter-plug" aria-hidden="true">+</div><span class="eyebrow">Property tax desk adds</span><h3 data-engine-desk></h3><span class="adapter-note">Same engine. Rules from the desk.</span></div></div>
+      <div class="engine-board-footer"><span><i class="status-dot live"></i> Coordinator tracks return, cost and recovery rate across desks.</span><button type="button" data-engine-pause aria-pressed="false">Pause flow Ⅱ</button></div></div></div>
+    </section>
+
     <section class="section recovery-section" id="recovery">
       <div class="wrap section-grid recovery-heading">
         <div class="section-key reveal"><span class="number">03</span><span>Recovery</span></div>
         <div class="section-body">
-          <h2 class="section-title reveal" data-split>The company prices every next move.</h2>
+          <h2 class="section-title reveal" data-split>Watch the whole company follow through.</h2>
         </div>
       </div>
 
@@ -214,5 +224,6 @@
 
   <script type="module" src="assets/story.js"></script>
   <script type="module" src="assets/polish.js"></script>
+  <script type="module" src="assets/motion.js"></script>
 </body>
 </html>

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="assets/base.css">
   <link rel="stylesheet" href="assets/live.css">
   <link rel="stylesheet" href="assets/polish.css">
+  <link rel="stylesheet" href="assets/motion.css">
 </head>
 <body class="live-body">
   <main class="live-shell">
@@ -24,8 +25,8 @@
       <div class="live-stat"><span>Revenue</span><b>$49</b></div>
     </header>
 
-    <div class="demo-heading"><div><a href="/app" class="demo-back">← Workspace</a><h1>A recovery, from the inside.</h1><p>One property. A team of agents. Follow every decision as it happens.</p></div><span class="demo-disclosure">Sample case · simulated actions</span></div>
-    <div class="demo-steps" aria-label="Recovery progress"><span data-demo-step="0">01 <b>Discover</b></span><span data-demo-step="1">02 <b>Qualify</b></span><span data-demo-step="2">03 <b>Connect</b></span><span data-demo-step="3">04 <b>Build evidence</b></span><span data-demo-step="4">05 <b>Fund</b></span><span data-demo-step="5">06 <b>Authorize</b></span></div>
+    <div class="demo-heading"><div><a href="/app" class="demo-back">← Workspace</a><h1>A recovery, from the inside.</h1><p>One shared engine. Eight steps. Follow the company all the way through.</p></div><span class="demo-disclosure">Simulated case · time compressed</span></div>
+    <div class="demo-steps" aria-label="Recovery progress"><span data-demo-step="0">01 <b>Find</b></span><span data-demo-step="1">02 <b>Qualify</b></span><span data-demo-step="2">03 <b>Sign up</b></span><span data-demo-step="3">04 <b>Evidence</b></span><span data-demo-step="4">05 <b>File</b></span><span data-demo-step="5">06 <b>Chase</b></span><span data-demo-step="6">07 <b>Escalate</b></span><span data-demo-step="7">08 <b>Collect</b></span></div>
 
     <section class="live-main">
       <div class="flow-layer" id="flow-layer" aria-hidden="true"></div>
@@ -38,7 +39,7 @@
           <span class="panel-sub">Voice & verified facts</span>
         </header>
         <div class="channel-stage">
-          <div class="call-empty"><div class="call-preview"><div class="contact-orbit"><span class="contact-avatar">JL</span><i></i><i></i></div><span class="eyebrow">Your claimant</span><h2>Meet Jordan.</h2><p>One home. One overlooked assessment.<br>The Voice Agent will explain the opportunity and confirm the facts.</p><div class="contact-detail"><span>⌂</span><div><b>842 Maple Avenue</b><small>San Francisco, California</small></div></div><span class="call-waiting"><i class="status-dot"></i> Call begins at the Connect stage</span></div></div>
+          <div class="call-empty"><div class="call-preview"><div class="contact-orbit"><span class="contact-avatar">JL</span><i></i><i></i></div><span class="eyebrow">Your claimant</span><h2>Meet Jordan.</h2><p>One home. One overlooked assessment.<br>The Voice Agent will explain the opportunity and confirm the facts.</p><div class="contact-detail"><span>⌂</span><div><b>842 Maple Avenue</b><small>San Francisco, California</small></div></div><span class="call-waiting"><i class="status-dot"></i> Call begins at the Sign up stage</span></div></div>
           <div class="call-live">
             <div class="call-summary">
               <div class="call-summary-top"><strong>Live call — Jordan Lee</strong><span class="call-clock" data-call-clock>00:00</span></div>
@@ -60,13 +61,14 @@
           <section class="money-header">
             <div class="money-header-top"><h2>Money Trail</h2><p>possible recovery → company revenue</p></div>
             <div class="money-line" id="money-line">
-              <i class="money-node" data-label="Found" style="left:3%"></i>
-              <i class="money-node" data-label="Qualified" style="left:20%"></i>
-              <i class="money-node" data-label="Contacted" style="left:38%"></i>
-              <i class="money-node" data-label="Proved" style="left:56%"></i>
-              <i class="money-node" data-label="Funded" style="left:72%"></i>
-              <i class="money-node" data-label="Authorized" style="left:86%"></i>
-              <i class="money-node" data-label="Filed" style="left:98%"></i>
+              <i class="money-node" data-label="Find" style="left:3%"></i>
+              <i class="money-node" data-label="Qualify" style="left:16.57%"></i>
+              <i class="money-node" data-label="Sign up" style="left:30.14%"></i>
+              <i class="money-node" data-label="Evidence" style="left:43.71%"></i>
+              <i class="money-node" data-label="File" style="left:57.29%"></i>
+              <i class="money-node" data-label="Chase" style="left:70.86%"></i>
+              <i class="money-node" data-label="Escalate" style="left:84.43%"></i>
+              <i class="money-node" data-label="Collect" style="left:98%"></i>
             </div>
           </section>
 
@@ -78,6 +80,7 @@
                   <span class="eyebrow">Living claim dossier</span>
                   <h2>San Francisco property-tax appeal</h2>
                 </header>
+                <section class="stage-theatre" data-stage-theatre aria-label="Current agent action"><div class="theatre-idle">The company is ready.</div></section>
                 <dl class="dossier-facts">
                   <div class="dossier-fact" data-fact="claimant"><dt>Claimant</dt><dd>Jordan Lee</dd></div>
                   <div class="dossier-fact" data-fact="apn"><dt>Parcel</dt><dd>1234/056</dd></div>
@@ -97,6 +100,9 @@
                   <div class="work-row" data-work="voice"><i></i><div><b>Voice Agent</b><span>Explain the case and confirm claimant facts.</span></div></div>
                   <div class="work-row" data-work="evidence"><i></i><div><b>Evidence Agent</b><span>Build the comparable-sales and assessment packet.</span></div></div>
                   <div class="work-row" data-work="filing"><i></i><div><b>Filing Agent</b><span>Prepare the official filing and wait for authorization.</span></div></div>
+                  <div class="work-row" data-work="chase"><i></i><div><b>Follow-up Agent</b><span>Track the response clock and attach replies.</span></div></div>
+                  <div class="work-row" data-work="escalate"><i></i><div><b>Appeal Agent</b><span>Review a denial and prepare the next step.</span></div></div>
+                  <div class="work-row" data-work="collect"><i></i><div><b>Recovery Agent</b><span>Verify savings and reconcile the agreed fee.</span></div></div>
                   <div class="decision-card" id="decision-card"><b>$713 expected value</b><span>Funded: 70% probability · $18.40 agent cost · $120 filing fee</span></div>
                 </div>
               </section>
@@ -132,7 +138,7 @@
       <span class="mono">1 CLAIMANT · 8 AGENTS · 4 EXHIBITS · 1 REQUIRED HUMAN ACT</span>
       <h2 id="finale-title">One case, carried forward.</h2>
       <p id="finale-sub">Filing-ready packet delivered · $49 revenue collected · $1,018 potential annual savings</p>
-      <div class="finale-metrics"><span><b>$49</b> revenue now</span><span><b>$1,018</b> annual savings</span><span><b>96%</b> autonomous</span></div>
+      <div class="finale-metrics"><span><b>$178</b> sample success fee</span><span><b>$1,018</b> sample annual savings</span><span><b>8 / 8</b> workflow stages</span></div>
       <div class="finale-actions">
         <button class="btn primary" type="button" data-restart>Replay</button>
         <a class="btn" href="/">Back to the story</a>
@@ -142,5 +148,6 @@
 
   <script type="module" src="assets/live.js"></script>
   <script type="module" src="assets/polish.js"></script>
+  <script type="module" src="assets/motion.js"></script>
 </body>
 </html>

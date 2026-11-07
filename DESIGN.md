@@ -14,7 +14,7 @@ All seven screens load `prototype/assets/polish.css` after their structural styl
 
 ## Motion
 
-The landing notice-to-dossier preview cycles through Find, Prove and Prepare. The mechanism draws source-to-fact provenance, and the recovery story advances through scroll-linked beats. The presenter uses explicit next-stage controls and retains natural voice pacing. Reduced-motion users receive immediate state transitions.
+The landing notice-to-dossier preview cycles through Find, Prove and Prepare, with a visibility-paused canvas field that converges source records into the dossier. The mechanism draws source-to-fact provenance. The shared-engine explorer and scroll-linked story both follow Find, Qualify, Sign up, Evidence, File, Chase, Escalate, Collect. The presenter gives each stage a distinct animated business artifact in `motion.js` / `motion.css`, uses explicit next-stage controls, and retains natural voice pacing. The File stage holds for owner approval; approval unlocks the remaining stages, while rejection ends without filing. Reduced-motion users receive immediate state transitions and complete artifacts.
 
 ## Demonstration boundaries
 

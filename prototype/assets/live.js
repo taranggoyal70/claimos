@@ -1,68 +1,17 @@
-import { caseRecord, evidence, transcript, receipts, money } from './demo-data.js';
+import { caseRecord, evidence, transcript, claimBeats, money } from './demo-data.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const beats = [
-  {
-    title: 'The company finds one claim.',
-    caption: '218,431 parcels narrow to one recoverable case.',
-    facts: ['claimant', 'apn', 'assessed', 'recovery'],
-    work: ['find'],
-    evidence: 0,
-    money: 3,
-  },
-  {
-    title: 'Eligibility clears the case.',
-    caption: 'Deadline, ownership, evidence and economics all pass.',
-    facts: ['claimant', 'apn', 'assessed', 'recovery'],
-    work: ['find', 'qualify'],
-    evidence: 1,
-    money: 20,
-    decision: true,
-  },
-  {
-    title: 'The voice agent calls Jordan.',
-    caption: 'Every confirmed sentence becomes a sourced case fact.',
-    facts: ['claimant', 'apn', 'assessed', 'recovery'],
-    work: ['find', 'qualify', 'voice'],
-    evidence: 1,
-    money: 38,
-    call: true,
-  },
-  {
-    title: 'Evidence assembles itself.',
-    caption: 'Four exhibits turn the opportunity into a defensible claim.',
-    facts: ['claimant', 'apn', 'assessed', 'recovery'],
-    work: ['find', 'qualify', 'voice', 'evidence'],
-    evidence: 4,
-    money: 56,
-    call: true,
-  },
-  {
-    title: 'The coordinator funds the case.',
-    caption: 'Positive expected value wins the budget. A weaker case is rejected.',
-    facts: ['claimant', 'apn', 'assessed', 'recovery'],
-    work: ['find', 'qualify', 'voice', 'evidence'],
-    evidence: 4,
-    money: 72,
-    decision: true,
-    call: true,
-  },
-  {
-    title: 'The filing agent needs one authorization.',
-    caption: 'Agents propose. The claimant authorizes the consequential act.',
-    facts: ['claimant', 'apn', 'assessed', 'recovery'],
-    work: ['find', 'qualify', 'voice', 'evidence', 'filing'],
-    evidence: 4,
-    money: 86,
-    decision: true,
-    call: true,
-    approval: true,
-  },
-];
+const workOrder = ['find', 'qualify', 'voice', 'evidence', 'filing', 'chase', 'escalate', 'collect'];
+const beats = claimBeats.map((stage, index) => ({
+  ...stage, caption: stage.summary,
+  facts: ['claimant', 'apn', 'assessed', 'recovery'],
+  work: workOrder.slice(0, index + 1), evidence: index < 2 ? index : index === 2 ? 1 : 4,
+  money: 3 + index * (95 / 7), decision: index >= 1, call: index >= 2, approval: index === 4,
+}));
 
 const app = {
   beat: -1,
@@ -76,6 +25,7 @@ const app = {
   callStartedAt: 0,
   callClockTimer: 0,
   events: [],
+  run: 0,
 };
 
 const naiveAudioCache = new Map();
@@ -276,12 +226,14 @@ function flowFact(row, target) {
 
 function moment(kicker, title, sub, duration = 1650) {
   if (reducedMotion) return Promise.resolve();
+  const run = app.run;
   const overlay = $('#moment-overlay');
   $('#moment-kicker').textContent = kicker;
   $('#moment-title').textContent = title;
   $('#moment-sub').textContent = sub;
   overlay.classList.add('on');
   return wait(duration).then(() => {
+    if (run !== app.run) return;
     overlay.classList.remove('on');
     return wait(480);
   });
@@ -336,8 +288,8 @@ function setReady(ready) {
   const button = $('[data-next]');
   button.classList.toggle('ready', ready);
   button.disabled = !ready;
-  const names = ['Discover opportunity', 'Check eligibility', 'Connect with Jordan', 'Build the evidence', 'Allocate the budget', 'Prepare authorization'];
-  button.replaceChildren(document.createTextNode(!ready ? (app.beat === beats.length - 1 && !app.busy ? 'Owner decision required' : 'Company working…') : app.beat < 0 ? 'Start the recovery' : names[app.beat + 1] || 'Owner decision required'));
+  const names = ['Find opportunity', 'Check eligibility', 'Sign up Jordan', 'Build the evidence', 'Prepare filing', 'Follow up on the case', 'Review the denial', 'Verify and collect'];
+  button.replaceChildren(document.createTextNode(!ready ? (app.beat === 4 && !app.busy ? 'Owner decision required' : app.beat === 7 ? 'Recovery reconciled' : 'Company working…') : app.beat < 0 ? 'Start the recovery' : names[app.beat + 1] || 'Recovery reconciled'));
   const arrow = document.createElement('span'); arrow.textContent = '→'; button.append(arrow);
   const prev = $('[data-previous]');
   prev.disabled = app.busy || app.beat <= 0;
@@ -353,25 +305,25 @@ function setReady(ready) {
 function renderMoney(progress) {
   const line = $('#money-line');
   line.style.setProperty('--money-progress', `${progress}%`);
-  const positions = [3, 20, 38, 56, 72, 86, 98];
+  const positions = beats.map(beat => beat.money);
   $$('.money-node', line).forEach((node, index) => {
     node.classList.toggle('done', positions[index] < progress);
-    node.classList.toggle('current', positions[index] === progress);
+    node.classList.toggle('current', Math.abs(positions[index] - progress) < .01);
   });
 }
 
 function renderWork(active) {
-  const names = ['find', 'qualify', 'voice', 'evidence', 'filing'];
+  const names = workOrder;
   names.forEach((name) => {
     const row = $(`[data-work="${name}"]`);
     const visible = active.includes(name);
     row.classList.toggle('visible', visible);
-    row.classList.toggle('done', visible && name !== 'filing');
-    row.classList.toggle('wait', visible && name === 'filing');
+    row.classList.toggle('done', visible && !(name === 'filing' && !app.answered));
+    row.classList.toggle('wait', visible && name === 'filing' && !app.answered);
   });
 }
 
-async function revealCall() {
+async function revealCall(run) {
   $('#channel').classList.add('has-call');
   if (app.voiceMode === 'naive') {
     $('[data-speaker-state]').textContent = 'Preparing Naïve voices';
@@ -385,9 +337,11 @@ async function revealCall() {
       cue('Naïve voice could not be prepared. Continuing with the browser fallback.');
     }
   }
+  if (run !== app.run) return;
   startCallClock();
   renderTranscript(0);
   for (let index = 1; index <= transcript.length; index++) {
+    if (run !== app.run) return;
     renderTranscript(index);
     const item = transcript[index - 1];
     const row = $$('.transcript-row.visible').at(-1);
@@ -397,6 +351,7 @@ async function revealCall() {
     $('[data-speaker-state]').textContent = `${item.who} speaking`;
     if (!reducedMotion) await wait(app.voiceOn ? 380 : 120);
     await speak(item.text, item.who);
+    if (run !== app.run) return;
     if (item.fact) {
       const target = item.fact.includes('address') ? $('[data-fact="apn"]')
         : item.fact.includes('Assessed') ? $('[data-fact="assessed"]')
@@ -414,17 +369,19 @@ async function revealCall() {
 async function playBeat(index) {
   if (app.busy || index < 0 || index >= beats.length) return;
   app.busy = true;
+  const run = app.run;
   setReady(false);
   const beat = beats[index];
   app.beat = index;
+  $('.dossier-left').scrollTop = 0;
   setReady(false);
   $('#dossier-live').classList.add('has-case');
   $('.dossier-empty').hidden = true;
   cue(beat.caption);
   log(`Beat ${index + 1}: ${beat.title}`, beat.caption);
-
-  if (index === 0) await moment('CASE FOUND', '$1,018', 'Potential annual recovery · San Francisco');
-  if (index === 4) await moment('CAPITAL ALLOCATED', '38.7×', 'Expected value divided by agent cost');
+  dispatchEvent(new CustomEvent('claimos:stage', { detail: { index, phase: 'working' } }));
+  if (index === 0) await moment('OPPORTUNITY FOUND', '$1,018', 'Potential annual savings · sample property', 1200);
+  if (run !== app.run) return;
 
   renderMoney(beat.money);
   $$('[data-fact]').forEach((fact) => fact.classList.toggle('visible', beat.facts.includes(fact.dataset.fact)));
@@ -432,17 +389,23 @@ async function playBeat(index) {
   renderEvidence(beat.evidence);
   $('#decision-card').classList.toggle('visible', Boolean(beat.decision));
 
-  if (beat.call && !$('#channel').classList.contains('has-call')) await revealCall();
+  if (beat.call && !$('#channel').classList.contains('has-call')) await revealCall(run);
   else if (beat.call) renderTranscript(transcript.length);
 
   if (!reducedMotion) await wait(950);
+  if (run !== app.run) return;
   $('#approval-card').classList.toggle('on', Boolean(beat.approval) && !app.answered);
   if (beat.approval) {
-    cue('The packet is complete. One legally required authorization remains.');
+    cue('The packet is complete. Owner authorization is required before this sample filing proceeds.');
     log('Approval requested', 'Filing-ready packet held for claimant authorization.');
   }
   app.busy = false;
-  setReady(!beat.approval);
+  dispatchEvent(new CustomEvent('claimos:stage', { detail: { index, phase: 'ready' } }));
+  if (index === beats.length - 1) {
+    setReady(false);
+    if (!reducedMotion) await wait(2200);
+    if (run === app.run) finale(true);
+  } else setReady(!beat.approval || app.answered === 'approve');
   renderDetails();
 }
 
@@ -450,27 +413,42 @@ function finale(approved) {
   const overlay = $('#finale');
   $('#finale-title').textContent = approved ? 'One case, carried forward.' : 'One accountable decision.';
   $('#finale-sub').textContent = approved
-    ? 'Sample packet delivered · payment simulated · $1,018 potential annual savings'
+    ? 'Eight stages completed · $1,018 sample annual savings · invoice and payment simulated'
     : 'Nothing was submitted · the decision and evidence remain preserved in the case ledger';
+  const metrics = $('.finale-metrics');
+  metrics.replaceChildren();
+  for (const [value, label] of approved
+    ? [[money(caseRecord.estimatedFee), 'sample success fee'], ['$1,018', 'sample annual savings'], ['8 / 8', 'workflow stages']]
+    : [['$0', 'payment processed'], ['Owner declined', 'filing held'], ['4 / 8', 'stages completed']]) {
+    const item = document.createElement('span'), amount = document.createElement('b');
+    amount.textContent = value; item.append(amount, document.createTextNode(label)); metrics.append(item);
+  }
   overlay.classList.add('on');
 }
 
 async function decide(option) {
-  if (app.answered || app.beat !== beats.length - 1) return;
+  if (app.answered || app.beat !== 4 || app.busy) return;
+  const run = app.run;
+  app.busy = true;
   app.answered = option;
   $('#approval-card').classList.remove('on');
   cue(option === 'approve' ? 'Authorized. The company delivers the packet and starts the response clock.' : 'Rejected. Nothing was submitted.');
   log(option === 'approve' ? 'Authorization approved' : 'Authorization rejected', option === 'approve'
     ? 'Filing-ready packet delivered; receipt saved; follow-up scheduled.'
     : 'No filing action taken; case remains closed with evidence preserved.');
-  renderMoney(option === 'approve' ? 98 : 86);
+  renderMoney(beats[4].money);
   $('[data-work="filing"]').classList.remove('wait');
   $('[data-work="filing"]').classList.toggle('done', option === 'approve');
-  if (!reducedMotion) await wait(2400);
-  finale(option === 'approve');
+  dispatchEvent(new CustomEvent('claimos:stage', { detail: { index: 4, phase: option === 'approve' ? 'filed' : 'rejected' } }));
+  if (!reducedMotion) await wait(1400);
+  if (run !== app.run) return;
+  app.busy = false;
+  if (option === 'approve') { renderDetails(); setReady(true); }
+  else finale(false);
 }
 
 function restart() {
+  app.run++;
   app.beat = -1;
   app.busy = false;
   app.answered = null;
@@ -501,16 +479,17 @@ function restart() {
   cue('');
   setReady(true);
   renderDetails();
+  dispatchEvent(new CustomEvent('claimos:stage', { detail: { index: -1, phase: 'reset' } }));
 }
 
 function next() {
-  if (app.beat >= beats.length - 1) return;
+  if (app.busy || app.beat >= beats.length - 1 || (app.beat === 4 && app.answered !== 'approve')) return;
   playBeat(app.beat + 1);
 }
 
 function previous() {
   if (app.busy || app.beat <= 0) return;
-  app.answered = null;
+  if (app.beat <= 5) app.answered = null;
   $('#approval-card').classList.remove('on');
   playBeat(app.beat - 1);
 }
