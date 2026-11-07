@@ -73,8 +73,9 @@ Per case in `<out>/<case_id>/`: `packet.pdf` and `packet.html` (for the appraise
   hearing, counted back from the hearing day (s. 194.011(4)(a), F.S., as amended 2025-09-01; DOR PTO BUL 25-02).
   Late evidence can be excluded. `owner_items_by` is 5 days earlier.
 - **What boards weigh:** comparable sales. Zillow/Redfin estimates are Find's false-positive filter, not evidence.
-- **Authorization:** as an unlicensed agent we need the owner's signature on the petition or a DR-486A
-  (Rules 12D-9.015, 12D-9.018, F.A.C.). That's Sign up's job; the checklist marks it `blocks_filing`.
+- **Authorization:** we're paid and unlicensed, so the owner must give us a power of attorney (DR-486POA),
+  filed with the petition. DR-486A is only for unpaid helpers (Rules 12D-9.015, 12D-9.018, F.A.C.).
+  That's Sign up's job; the checklist marks it `blocks_filing`.
 - **Owner messages** say we're a private company not affiliated with any government agency.
 
 ## On Naïve

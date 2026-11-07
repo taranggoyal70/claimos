@@ -13,8 +13,8 @@ RULES = [
     "Evidence exchange: send our evidence to the property appraiser at least 15 calendar days before the "
     "hearing (s. 194.011(4)(a), F.S., effective 2025-09-01; DOR PTO BUL 25-02). Late evidence can be excluded.",
     "Boards weigh nearby comparable sales most; online estimates (Zillow/Redfin) are not evidence.",
-    "An unlicensed agent needs the owner's signature on the petition or a written authorization "
-    "(DR-486A), one taxpayer, one year, listed parcels (Rules 12D-9.015, 12D-9.018, F.A.C.).",
+    "We are a paid, unlicensed agent, so the owner must give us a power of attorney (DR-486POA) filed with "
+    "the petition; the DR-486A written authorization is only for unpaid helpers (Rules 12D-9.015, 12D-9.018, F.A.C.).",
 ]
 
 DISCLAIMER = "We are a private company and are not affiliated with any government agency."
@@ -48,8 +48,8 @@ def checklist(case, sales, equity, own_sale_note):
         _item("Corrections to the county record", "owner", "ask_owner",
               "Living area, bedrooms, pool, garage. The roll's size is the county's effective area and can "
               "include garages and porches, so confirm it with the owner before quoting it."),
-        _item("Signed authorization (DR-486A) or owner-signed petition", "sign_up", "blocks_filing",
-              "Required before filing when we act as an unlicensed agent."),
+        _item("Owner's power of attorney (DR-486POA)", "sign_up", "blocks_filing",
+              "Required with the petition because we are a paid, unlicensed agent."),
     ]
 
 
