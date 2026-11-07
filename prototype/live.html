@@ -9,6 +9,7 @@
   </script>
   <link rel="stylesheet" href="assets/base.css">
   <link rel="stylesheet" href="assets/live.css">
+  <link rel="stylesheet" href="assets/polish.css">
 </head>
 <body class="live-body">
   <main class="live-shell">
@@ -17,11 +18,14 @@
         <a class="brand" href="/"><i class="brand-mark" aria-hidden="true"></i><span>Claim OS</span></a>
         <span class="case-id">PT-2026-11847</span>
       </div>
-      <div class="live-indicator"><span class="status-dot live"></span><span>LIVE REPLAY</span></div>
+      <div class="live-indicator"><span class="status-dot live"></span><span>Interactive replay</span></div>
       <button class="voice-toggle" type="button" data-voice>Voice off</button>
       <div class="live-stat"><span>Autonomy</span><b>96%</b></div>
       <div class="live-stat"><span>Revenue</span><b>$49</b></div>
     </header>
+
+    <div class="demo-heading"><div><a href="/app" class="demo-back">← Workspace</a><h1>A recovery, from the inside.</h1><p>One property. A team of agents. Follow every decision as it happens.</p></div><span class="demo-disclosure">Sample case · simulated actions</span></div>
+    <div class="demo-steps" aria-label="Recovery progress"><span data-demo-step="0">01 <b>Discover</b></span><span data-demo-step="1">02 <b>Qualify</b></span><span data-demo-step="2">03 <b>Connect</b></span><span data-demo-step="3">04 <b>Build evidence</b></span><span data-demo-step="4">05 <b>Fund</b></span><span data-demo-step="5">06 <b>Authorize</b></span></div>
 
     <section class="live-main">
       <div class="flow-layer" id="flow-layer" aria-hidden="true"></div>
@@ -31,12 +35,10 @@
       <section class="channel" id="channel">
         <header class="panel-head">
           <div class="panel-label"><b>A</b><span>Claimant channel</span></div>
-          <span class="panel-sub">What the customer says.</span>
+          <span class="panel-sub">Voice & verified facts</span>
         </header>
         <div class="channel-stage">
-          <div class="call-empty">
-            <p>No conversation yet.<br>Press → to let the company work the case.</p>
-          </div>
+          <div class="call-empty"><div class="call-preview"><div class="contact-orbit"><span class="contact-avatar">JL</span><i></i><i></i></div><span class="eyebrow">Your claimant</span><h2>Meet Jordan.</h2><p>One home. One overlooked assessment.<br>The Voice Agent will explain the opportunity and confirm the facts.</p><div class="contact-detail"><span>⌂</span><div><b>842 Maple Avenue</b><small>San Francisco, California</small></div></div><span class="call-waiting"><i class="status-dot"></i> Call begins at the Connect stage</span></div></div>
           <div class="call-live">
             <div class="call-summary">
               <div class="call-summary-top"><strong>Live call — Jordan Lee</strong><span class="call-clock" data-call-clock>00:00</span></div>
@@ -69,7 +71,7 @@
           </section>
 
           <section class="dossier-stage">
-            <p class="dossier-empty">Waiting for the opportunity agent.</p>
+            <div class="dossier-empty"><span class="empty-document">↗</span><h3>The next good claim starts here.</h3><p>Start the replay to watch an opportunity become a sourced, filing-ready dossier.</p><div class="empty-checks"><span>✓ Sources attached</span><span>✓ Decisions explained</span><span>✓ Owner authorization</span></div></div>
             <article class="dossier-card">
               <section class="dossier-left">
                 <header class="dossier-title">
@@ -114,21 +116,21 @@
             </div>
           </section>
 
-          <button class="next-cue ready" type="button" aria-label="Next beat" data-next>→</button>
-
           <section class="details-panel" id="details-panel">
-            <section><h2>Agent event stream</h2><pre id="event-stream"></pre></section>
-            <section><h2>Case state</h2><pre id="case-state"></pre></section>
+            <button class="details-close" data-details-close aria-label="Close activity">×</button>
+            <section><span class="eyebrow">Company activity</span><h2>Every step leaves a trail.</h2><div id="event-stream"></div></section>
+            <section><span class="eyebrow">The current picture</span><h2>Case overview</h2><div id="case-state"></div></section>
           </section>
         </div>
       </section>
     </section>
+    <footer class="demo-controls"><div><span class="demo-current" data-demo-current>Ready when you are.</span><small data-demo-description>Start with the opportunity. Follow it through to authorization.</small></div><div class="demo-control-actions"><button class="demo-detail-button" data-details>Activity <span class="kbd">D</span></button><button class="demo-prev" data-previous aria-label="Previous stage">←</button><button class="next-cue ready" type="button" aria-label="Next beat" data-next>Start the recovery <span>→</span></button></div></footer>
   </main>
 
   <section class="finale" id="finale" aria-live="polite">
     <div class="finale-card">
       <span class="mono">1 CLAIMANT · 8 AGENTS · 4 EXHIBITS · 1 REQUIRED HUMAN ACT</span>
-      <h2 id="finale-title">One complete recovery.</h2>
+      <h2 id="finale-title">One case, carried forward.</h2>
       <p id="finale-sub">Filing-ready packet delivered · $49 revenue collected · $1,018 potential annual savings</p>
       <div class="finale-metrics"><span><b>$49</b> revenue now</span><span><b>$1,018</b> annual savings</span><span><b>96%</b> autonomous</span></div>
       <div class="finale-actions">
@@ -139,5 +141,6 @@
   </section>
 
   <script type="module" src="assets/live.js"></script>
+  <script type="module" src="assets/polish.js"></script>
 </body>
 </html>

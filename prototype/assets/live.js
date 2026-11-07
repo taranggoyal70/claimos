@@ -245,7 +245,7 @@ function renderTranscript(visibleCount) {
     <time>${line.at}</time><strong>${line.who}</strong><div><p>${line.text}</p>${line.fact ? `<span class="fact-chip">${line.fact}</span>` : ''}</div>
   </article>`).join('');
   const last = $$('.transcript-row.visible', root).at(-1);
-  last?.scrollIntoView({ block: 'nearest' });
+  if (last) root.scrollTop = root.scrollHeight;
 }
 
 function flowFact(row, target) {
@@ -300,14 +300,30 @@ function log(event, detail) {
 }
 
 function renderDetails() {
-  $('#event-stream').textContent = app.events.map((entry) => `${entry.at}  ${entry.event}\n          ${entry.detail}`).join('\n\n') || 'No events yet.';
-  $('#case-state').textContent = JSON.stringify({
-    mode: 'deterministic replay',
-    case: caseRecord,
-    currentBeat: app.beat,
-    approval: app.answered,
-    visibleEvidence: Math.min(evidence.length, beats[Math.max(0, app.beat)]?.evidence ?? 0),
-  }, null, 2);
+  const text = (tag, value) => { const el = document.createElement(tag); el.textContent = value; return el; };
+  const stream = $('#event-stream');
+  stream.replaceChildren();
+  if (!app.events.length) stream.append(text('p', 'Start the recovery to see the company’s decisions here.'));
+  for (const entry of app.events) {
+    const row = document.createElement('article');
+    row.className = 'activity-event';
+    row.append(text('time', entry.at), text('b', entry.event), text('p', entry.detail));
+    stream.append(row);
+  }
+  const facts = document.createElement('dl');
+  facts.className = 'activity-state';
+  for (const [label, value] of [
+    ['Property', caseRecord.address], ['Claimant', caseRecord.claimant], ['Potential annual savings', money(caseRecord.potentialRecovery)],
+    ['Current stage', app.beat < 0 ? 'Ready to start' : beats[app.beat].title],
+    ['Owner decision', app.answered === 'approve' ? 'Authorized in this replay' : app.answered === 'reject' ? 'Declined in this replay' : 'Awaiting authorization'],
+    ['Evidence exhibits', `${Math.min(evidence.length, app.beat < 0 ? 0 : beats[app.beat].evidence)} of ${evidence.length} available`],
+    ['Mode', 'Illustrative replay · simulated filing and payment'],
+  ]) {
+    const row = document.createElement('div');
+    row.append(text('dt', label), text('dd', value));
+    facts.append(row);
+  }
+  $('#case-state').replaceChildren(facts);
 }
 
 function cue(text) {
@@ -317,8 +333,21 @@ function cue(text) {
 }
 
 function setReady(ready) {
-  $('[data-next]').classList.toggle('ready', ready);
-  $('[data-next]').disabled = !ready;
+  const button = $('[data-next]');
+  button.classList.toggle('ready', ready);
+  button.disabled = !ready;
+  const names = ['Discover opportunity', 'Check eligibility', 'Connect with Jordan', 'Build the evidence', 'Allocate the budget', 'Prepare authorization'];
+  button.replaceChildren(document.createTextNode(!ready ? (app.beat === beats.length - 1 && !app.busy ? 'Owner decision required' : 'Company working…') : app.beat < 0 ? 'Start the recovery' : names[app.beat + 1] || 'Owner decision required'));
+  const arrow = document.createElement('span'); arrow.textContent = '→'; button.append(arrow);
+  const prev = $('[data-previous]');
+  prev.disabled = app.busy || app.beat <= 0;
+  $('[data-demo-current]').textContent = app.beat < 0 ? 'Ready when you are.' : beats[app.beat].title;
+  $('[data-demo-description]').textContent = app.beat < 0 ? 'Start with the opportunity. Follow it through to authorization.' : beats[app.beat].caption;
+  $$('[data-demo-step]').forEach((step, i) => {
+    step.classList.toggle('active', i === app.beat);
+    step.classList.toggle('done', i < app.beat);
+    if (i === app.beat) step.setAttribute('aria-current', 'step'); else step.removeAttribute('aria-current');
+  });
 }
 
 function renderMoney(progress) {
@@ -388,6 +417,7 @@ async function playBeat(index) {
   setReady(false);
   const beat = beats[index];
   app.beat = index;
+  setReady(false);
   $('#dossier-live').classList.add('has-case');
   $('.dossier-empty').hidden = true;
   cue(beat.caption);
@@ -412,15 +442,15 @@ async function playBeat(index) {
     log('Approval requested', 'Filing-ready packet held for claimant authorization.');
   }
   app.busy = false;
-  if (!beat.approval) setReady(true);
+  setReady(!beat.approval);
   renderDetails();
 }
 
 function finale(approved) {
   const overlay = $('#finale');
-  $('#finale-title').textContent = approved ? 'One complete recovery.' : 'One accountable decision.';
+  $('#finale-title').textContent = approved ? 'One case, carried forward.' : 'One accountable decision.';
   $('#finale-sub').textContent = approved
-    ? 'Filing-ready packet delivered · $49 revenue collected · $1,018 potential annual savings'
+    ? 'Sample packet delivered · payment simulated · $1,018 potential annual savings'
     : 'Nothing was submitted · the decision and evidence remain preserved in the case ledger';
   overlay.classList.add('on');
 }
@@ -502,6 +532,7 @@ function onKey(event) {
   else if (key === 'c') { app.captions = !app.captions; $('#caption').classList.toggle('on', app.captions && Boolean($('#caption').textContent)); }
   else if (key === 'd') toggleDetails();
   else if (key === 'v') cycleVoice();
+  else if (key === 'escape' && app.details) toggleDetails();
 }
 
 setupThemeShortcut();
@@ -519,4 +550,7 @@ $('[data-approve]').addEventListener('click', () => decide('approve'));
 $('[data-reject]').addEventListener('click', () => decide('reject'));
 $('[data-restart]').addEventListener('click', restart);
 $('[data-voice]').addEventListener('click', cycleVoice);
+$('[data-details]').addEventListener('click', toggleDetails);
+$('[data-details-close]').addEventListener('click', toggleDetails);
+$('[data-previous]').addEventListener('click', previous);
 addEventListener('keydown', onKey);

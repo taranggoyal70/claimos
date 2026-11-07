@@ -67,7 +67,7 @@ function setupChrome() {
   }, { rootMargin: '0px 0px -8% 0px' });
   $$('.reveal').forEach((element) => reveal.observe(element));
 
-  const links = $$('.nav-links a');
+  const links = $$('.nav-links a').filter(link => link.getAttribute('href').startsWith('#'));
   const sections = links.map((link) => $(link.getAttribute('href')));
   let queued = false;
   const update = () => {
@@ -405,7 +405,7 @@ function setupProof() {
     scan: ['218,431 source records', 'The scanner ranked properties by over-assessment, filing eligibility, available evidence and expected return. Every candidate keeps the source row and calculation.'],
     time: ['4 minutes 12 seconds', 'From confirmed claimant facts to a filing-ready dossier with four verified exhibits, valuation math and the owner authorization boundary.'],
     autonomy: ['31 decisions · 1 human act', 'Agents selected the case, gathered sources, called the claimant, built evidence, allocated budget and prepared filing. The owner authorized the consequential action.'],
-    revenue: ['$49 collected', 'Stripe recorded the paid analysis deposit. A $178 success fee is created only after recovery is verified.'],
+    revenue: ['$49 sample deposit', 'The replay illustrates an analysis deposit. No payment is processed here. A success fee would depend on verified recovery.'],
   };
   $$('.proof-row').forEach((button) => {
     const show = () => {

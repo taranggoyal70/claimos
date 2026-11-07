@@ -10,6 +10,7 @@
   </script>
   <link rel="stylesheet" href="assets/base.css">
   <link rel="stylesheet" href="assets/story.css">
+  <link rel="stylesheet" href="assets/polish.css">
 </head>
 <body>
   <a class="skip" href="#problem">Skip to content</a>
@@ -20,10 +21,9 @@
         <i class="brand-mark" aria-hidden="true"></i><span>Claim OS</span>
       </a>
       <div class="nav-links" aria-label="Story navigation">
-        <a href="#problem">Problem</a>
-        <a href="#mechanism">Mechanism</a>
-        <a href="#recovery">Recovery</a>
-        <a href="#proof">Proof</a>
+        <a href="#mechanism">How it works</a>
+        <a href="#recovery">The recovery loop</a>
+        <a href="/app">Workspace ↗</a>
       </div>
       <div class="nav-end">
         <button class="theme-btn" type="button" data-theme-toggle>Dark</button>
@@ -34,26 +34,32 @@
 
   <main>
     <header class="hero" id="top">
-      <div class="market-field" aria-hidden="true">
-        <span class="market-case case-a"><b>RF-08312</b><em>+$246</em><small>carrier refund</small></span>
-        <span class="market-case case-b"><b>UP-00291</b><em>+$180</em><small>evidence missing</small></span>
-        <span class="market-case case-c rejected"><b>PT-11832</b><em>−$31</em><small>deadline expired</small></span>
-        <span class="market-case case-d selected"><b>PT-11847</b><em>+$713 EV</em><small>fund this case</small></span>
-        <span class="market-case case-e"><b>RF-08324</b><em>+$92</em><small>awaiting reply</small></span>
-        <i class="market-scan"></i>
-      </div>
-      <div class="wrap hero-copy">
-        <h1 class="hero-title reveal" data-split>
-          A company that turns forgotten claims into recovered cash.
-        </h1>
+      <div class="wrap hero-layout"><div class="hero-copy">
+        <div class="hero-eyebrow reveal"><span class="status-dot live"></span> An autonomous recovery company</div>
+        <h1 class="hero-title reveal">Money left behind.<br>A company that<br><em>brings it back.</em></h1>
         <div class="hero-foot reveal" style="--delay:.14s">
-          <p>It discovers opportunities, prices the work, builds the case, and keeps pursuing recovery with one human checkpoint.</p>
+          <p>From an overlooked assessment to a claim worth pursuing. Claim OS finds the opportunity, builds the evidence, and keeps the work moving.</p>
           <div class="hero-actions">
-            <a class="btn primary" href="/live">See the company operate <span class="arrow">→</span></a>
-            <a class="btn" href="#recovery">Watch the recovery</a>
+            <a class="btn primary" href="/live"><span class="play-icon">▶</span> Watch it work <span class="arrow">↗</span></a>
+            <a class="btn text-btn" href="/app">Explore the workspace →</a>
           </div>
         </div>
+        <div class="hero-note reveal"><span class="mini-check">✓</span> Built with Naïve <i></i> Human control where it matters</div>
       </div>
+      <div class="recovery-model reveal" aria-label="Interactive preview of a sample recovery">
+        <div class="model-backdrop"></div>
+        <div class="model-label"><span class="status-dot live"></span> THE COMPANY AT WORK <span>Sample case</span></div>
+        <div class="model-document"><span class="document-icon">↳</span><div><b>Assessment notice.pdf</b><small>San Francisco · received just now</small></div><span class="model-check">✓</span></div>
+        <div class="model-connection"><i></i><span>Opportunity identified</span></div>
+        <article class="model-case">
+          <header><span class="model-case-icon">⌂</span><div><small>PROPERTY TAX APPEAL</small><h2>842 Maple Avenue</h2></div><span class="model-status" data-model-status>Qualified</span></header>
+          <div class="model-money"><span>Potential annual savings</span><strong>$1,018<span>.00</span></strong><small><span class="mini-check">↗</span> 10.2% above comparable value</small></div>
+          <div class="model-comps"><div><span>Current assessment</span><b>$1,190,000</b><i style="--bar:100%"></i></div><div><span>Comparable value</span><b>$1,068,333</b><i style="--bar:89.8%"></i></div></div>
+          <div class="model-agent"><span class="agent-avatar">E</span><div><b data-model-agent>Eligibility Agent</b><small data-model-action>Evidence and economics verified</small></div><span class="model-check">✓</span></div>
+        </article>
+        <div class="model-bottom"><span class="model-step active" data-model-step="0">Find</span><i></i><span class="model-step" data-model-step="1">Prove</span><i></i><span class="model-step" data-model-step="2">Prepare</span></div>
+        <div class="model-receipt"><span class="receipt-seal">✓</span><div><b>Every decision, accounted for.</b><small>Sources linked. Budget tracked. Owner in control.</small></div></div>
+      </div></div>
 
       <figure class="hero-figure reveal" style="--delay:.2s">
         <div class="exchange-tape" aria-label="Recovery exchange state">
@@ -64,9 +70,9 @@
           <i class="exchange-runner" aria-hidden="true"></i>
         </div>
         <figcaption class="wrap">
-          <span>Live recovery tape</span>
-          <span>The coordinator converts public records into funded cases.</span>
-          <span class="hero-readout">one case admitted · one required human act</span>
+          <span>ONE SAMPLE RECOVERY</span>
+          <span>From discovery to a filing-ready packet.</span>
+          <span class="hero-readout">Illustrative replay · no real filing or payment</span>
         </figcaption>
       </figure>
     </header>
@@ -201,11 +207,12 @@
 
   <footer class="footer">
     <div class="wrap footer-in">
-      <span>Claim OS · coded motion prototype</span>
-      <span><a href="/app">Product</a> · <a href="/intake">Intake</a> · <a href="/proof">Proof</a> · Story data: deterministic replay</span>
+      <span class="footer-brand">Claim OS <small>A company that follows through.</small></span>
+      <span><a href="/app">Workspace</a> · <a href="/intake">Intake</a> · <a href="/proof">Proof</a><br>Hackathon prototype · illustrative data</span>
     </div>
   </footer>
 
   <script type="module" src="assets/story.js"></script>
+  <script type="module" src="assets/polish.js"></script>
 </body>
 </html>
