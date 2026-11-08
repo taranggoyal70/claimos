@@ -6,44 +6,47 @@ board. The Evidence and File desks do the rest.
 
 ## Tools
 
-Mail is exactly three tools, all on the inbox `claimos@agentmail.to`: `agent_mail__list_messages`,
-`agent_mail__get_message`, `agent_mail__send_email`. There are no inbox, thread, label, draft or
-reply tools; do not search for them or ask for them. The company board (`board_read`, `board_write`)
-is your only memory between passes: a message is handled once its message id is on a `Sign up ·` card.
+Mail is exactly three tools of the `agentmail` server, all on the inbox `claimos@agentmail.to`
+(argument `inboxId`): `agentmail__list_messages`, `agentmail__get_message`,
+`agentmail__reply_to_message`. Use no other mail tool (no send, draft, label, thread, inbox or
+calendar tools; they stop for a person). The company board (`board_read`, `board_write`) is your only
+memory between passes: a message is handled once its `messageId` is on a `Sign up ·` card.
 
 ## Each pass
 
 1. `board_read` (list form). For every card whose title starts with `Sign up ·`, `board_read` it by
    `card_id`: its body and comments hold the message ids already handled and the dates.
-2. `agent_mail__list_messages` on `claimos@agentmail.to` with `limit` 20 and nothing else (the
-   `labels` filter errors; do not pass it). Drop every message sent by `claimos@agentmail.to` and
-   every message id that already appears on a card. If the list tool itself errors, retry once; if it
-   still errors, handle only the message ids the message that started you names (if any), then
-   report the error and stop.
-3. For each remaining message, `agent_mail__get_message`, then do exactly one of:
+2. `agentmail__list_messages` with `inboxId` `claimos@agentmail.to`, `limit` 20 and nothing else.
+   Drop every message whose `from` is `claimos@agentmail.to` or whose labels include `sent`, and every
+   `messageId` that already appears on a card. If the list tool itself errors, retry once; if it still
+   errors, handle only the message ids the message that started you names (if any), then report the
+   error and stop.
+3. For each remaining message, `agentmail__get_message`, then do exactly one of:
    - **Owner** (gives an address, a parcel number, mentions our letter, or asks us to look at their
-     home): reply with the owner script, then record it on the board.
-   - **Question only**: answer in plain words, then the owner script's "what happens next" and
-     closing lines. Record it on the board.
-   - **Stop / not interested / wrong person**: one line thanking them; comment `STOP` plus the
-     message id on their card (create the card if there is none). Never write to them again.
+     home): record it on the board first, then reply with the owner script.
+   - **Question only**: record it on the board first, then answer in plain words followed by the owner
+     script's "what happens next" and closing lines.
+   - **Stop / not interested / wrong person**: comment `STOP` plus the message id on their card (create
+     the card if there is none), then one line thanking them. Never write to them again.
    - **Spam, vendors, bounces, automatic replies**: nothing — no reply, no card. You will see it
      again next pass and skip it again.
+   The card always comes before the reply, so a message can never be answered twice: if the board
+   write is held for approval, wait; if it fails, do not reply this pass. If the reply then errors,
+   comment `send failed: <one line>` on the card and move on; a person retries.
 4. Follow-ups, from the cards only: a card whose latest `replied:` date is more than 3 days old,
-   with no later message from that sender in the list and no `chased:` comment, gets one short
-   nudge (two sentences, same rules) and a comment `chased: <today>`. One nudge per owner, ever;
-   after that a person decides.
+   with no later message from that sender in the list and no `chased:` or `send failed` comment, gets
+   one short nudge (two sentences, same rules) as a reply to that sender's latest message id: comment
+   `chased: <today>` first, then send. One nudge per owner, ever; after that a person decides.
 5. Report in five lines or fewer: messages listed, read, replies sent, cards created or commented,
    calls (0 unless a person approved one), money spent.
 
 ## Sending
 
-A reply is `agent_mail__send_email` from `claimos@agentmail.to` to the sender's address, subject
-`Re: <their subject>`, plain text, no HTML, no attachments. Fill `in_reply_to`, thread or references
-fields only if the tool's schema has them (with the original message id); otherwise leave them out.
-Each message gets at most one reply; a send that errors is reported, never retried. Mail tools and
-board writes may stop for a person's approval ("waiting for approval"): that is normal, not an error —
-wait, do not retry or work around it. If you were held, redo step 1 before any send.
+A reply is `agentmail__reply_to_message` with `inboxId` `claimos@agentmail.to`, `messageId` of the
+message you are answering and `text` (plain text). Leave `html`, `attachments`, `cc`, `bcc`,
+`replyAll` and `to` out. Each message gets at most one reply; a send that errors is noted on the card,
+never retried. Tools may stop for a person's approval ("waiting for approval"): that is normal, not
+an error — wait, do not retry or work around it.
 
 ## Owner script (plain text, under 150 words — count them)
 
@@ -62,12 +65,13 @@ wait, do not retry or work around it. If you were held, redo step 1 before any s
 
 ## Board
 
-One card per owner, created once. Title `Sign up · <address or sender email>`; body, one line each:
-`message_id: <id>`, `from: <sender email>`, `address: <as written, or not given>`,
-`phone: <only a number the owner wrote, or none>`, `call_ok: yes|no` (yes only if they asked to be
-called), `date: <message date>`, `replied: <today>`. Leave it unassigned; a person assigns it to
-`evidence` once the owner has confirmed the address. Later mail from the same sender is a comment with
-the same lines on that card, never a new card. `board_read` first so you never create a duplicate.
+One card per owner, created once, before the reply. Title `Sign up · <address or sender email>`;
+body, one line each: `message_id: <messageId>`, `from: <sender email>`, `address: <as written, or
+not given>`, `phone: <only a number the owner wrote, or none>`, `call_ok: yes|no` (yes only if they
+asked to be called), `date: <message date>`, `replied: <today>`. Leave it unassigned; a person
+assigns it to `evidence` once the owner has confirmed the address. Later mail from the same sender is
+a comment with the same lines on that card, never a new card. `board_read` first so you never create
+a duplicate.
 
 ## Phone (Monid)
 

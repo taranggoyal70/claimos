@@ -1,50 +1,46 @@
 #!/usr/bin/env bash
 # One-time setup of the Sign up agent on Naive. Run from anywhere after `naive login` (org: Claim OS).
-#   ./setup.sh                      # identity, AgentMail Connect Link, agent, paused schedule
-#   MONID_API_KEY=… ./setup.sh      # same, plus the Monid bearer into the vault (read from env, never argv)
-# Re-running is safe: every resource is looked up by name first.
+#   ./setup.sh     # identity, vault with the AgentMail and Monid bearers (from .env), agent, paused schedule
+# Keys are read from .env (git-ignored): AGENTMAIL_API_KEY, MONID_API_KEY. Never passed on argv, never printed.
+# Re-running is safe: every resource is looked up first; a bearer already stored for a URL is kept.
 set -euo pipefail
 cd "$(dirname "$0")"
-[ -f .env ] && { set -a; . ./.env; set +a; }   # keys live in .env (git-ignored), not in argv
+[ -f .env ] && { set -a; . ./.env; set +a; }
 command -v naive >/dev/null || { echo "install the CLI: npm i -g @usenaive-sdk/cli"; exit 1; }
 command -v jq >/dev/null || { echo "needs jq"; exit 1; }
 echo "org: $(naive whoami | jq -r '.organization.name')"
 
-echo "1/5 identity"
+echo "1/4 identity"
 IDN=$(naive identity list --limit 50 | jq -r '.data[] | select(.name=="Claim OS Desk") | .id' | head -1)
 [ -n "$IDN" ] || IDN=$(naive identity create --name "Claim OS Desk" \
   --description "Outreach persona: the Claim OS AgentMail inbox and Monid phone" | jq -r .id)
 echo "  $IDN"
 
-echo "2/5 AgentMail connection (the key is pasted on the hosted form, never here)"
-AC=$(naive connections configs | jq -r '.data[] | select(.connector=="agent_mail") | .id' | head -1)
-[ -n "$AC" ] || AC=$(naive connections config-add --connector agent_mail --auth api_key \
-  --tool AGENT_MAIL_LIST_MESSAGES --tool AGENT_MAIL_GET_MESSAGE --tool AGENT_MAIL_SEND_EMAIL | jq -r .id)
-CA=$(naive connections list --identity "$IDN" | jq -r '.data[] | select(.status=="active" or .status=="initiated") | "\(.id) \(.status) \(.connect_link // "")"' | head -1)
-if [ -n "$CA" ]; then echo "  connection $CA"; else
-  naive identity connect --identity "$IDN" --auth-config "$AC" \
-    | jq -r '"  connection \(.id): open this link and paste the AgentMail key (am_…):\n  \(.connect_link)"'
-fi
+echo "2/4 vault: static bearers injected server-side, matched to each MCP server URL"
+VLT=$(naive vault list --limit 50 | jq -r '.data[] | select(.display_name=="Claim OS Desk") | .id' | head -1)
+[ -n "$VLT" ] || VLT=$(naive vault create --name "Claim OS Desk" --identity "$IDN" | jq -r .id)
+bearer() {  # bearer <mcp url> <env var name>
+  local url=$1 var=$2
+  if [ -z "${!var:-}" ]; then echo "  $url: skipped, $var not set"; return; fi
+  if naive vault credentials "$VLT" | jq -e --arg u "$url" '.data[] | select(.mcp_server_url==$u)' >/dev/null; then
+    echo "  $url: already stored"; else
+    printf '%s' "${!var}" | naive vault set --vault "$VLT" --mcp-bearer "$url" >/dev/null && echo "  $url: stored"; fi
+}
+bearer https://mcp.agentmail.to/mcp AGENTMAIL_API_KEY
+bearer https://mcp.monid.ai/v1 MONID_API_KEY
+echo "  $VLT"
 
-echo "3/5 Monid bearer -> vault (injected server-side for mcp.monid.ai)"
-if [ -n "${MONID_API_KEY:-}" ]; then
-  VLT=$(naive vault list --limit 50 | jq -r '.data[] | select(.name=="Claim OS Desk") | .id' | head -1)
-  [ -n "$VLT" ] || VLT=$(naive vault create --name "Claim OS Desk" --identity "$IDN" | jq -r .id)
-  printf '%s' "$MONID_API_KEY" | naive vault set --vault "$VLT" --mcp-bearer https://mcp.monid.ai/v1 >/dev/null
-  echo "  stored in $VLT"
-else echo "  skipped: MONID_API_KEY not set (phone tools will report mcp_server_unavailable until it is)"; fi
-
-echo "4/5 agent"
+echo "3/4 agent"
 AGENT=$(naive agent list --limit 100 | jq -r '.data[] | select(.name=="signup") | .id' | head -1)
 if [ -n "$AGENT" ]; then naive agent update "$AGENT" -f signup.agent.yaml >/dev/null; else
   AGENT=$(naive agent create -f signup.agent.yaml | jq -r .id); fi
 naive identity attach --agent "$AGENT" --identity "$IDN" >/dev/null
 echo "  $AGENT"
 
-echo "5/5 schedule: every 15 minutes, created paused"
+echo "4/4 schedule: every 15 minutes, created paused"
 DEP=$(naive deploy list | jq -r --arg a "$AGENT" '.data[] | select(.agent_id==$a and .cron=="*/15 * * * *") | .id' | head -1)
 [ -n "$DEP" ] || DEP=$(naive deploy create --agent "$AGENT" --cron "*/15 * * * *" --budget-usd 0.30 \
-  --window immediate --identity "$IDN" --prompt "Run your Sign up pass now." | jq -r .id)
-naive deploy pause "$DEP" >/dev/null && echo "  $DEP (paused)"
+  --window immediate --identity "$IDN" --prompt "Run your Sign up pass now on the inbox claimos@agentmail.to." | jq -r .id)
+echo "  $DEP ($(naive deploy show "$DEP" | jq -r .schedule_status))"
 
-echo "done. When 'naive connections show --connection <id>' says active: naive deploy resume $DEP"
+echo "done. After one good pass (naive session create --agent $AGENT --identity $IDN --message 'Run your Sign up pass now on the inbox claimos@agentmail.to.' --budget-usd 0.30 --window immediate): naive deploy resume $DEP"

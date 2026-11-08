@@ -15,8 +15,9 @@ budget:
 
 system_file: signup.system.md
 
-# Monid (phone). The bearer lives in the vault, matched to this URL and injected server-side.
+# Both bearers live in the identity's vault, matched to these URLs and injected server-side (setup.sh stores them).
 mcp_servers:
+  - { type: url, name: agentmail, url: "https://mcp.agentmail.to/mcp" }
   - { type: url, name: monid, url: "https://mcp.monid.ai/v1" }
 
 tools:
@@ -27,14 +28,17 @@ tools:
     board_write: { enabled: true, permission: allow }
     ask_operator: { enabled: true, permission: ask }
     session_spend: { enabled: true, permission: allow }
-    # AgentMail, through the org's agent_mail connection; the key lives on the connection, not here.
-    # Naive exposes only these three operations and governs them as <connector>.<short name> (seen in a
-    # session's tool.confirm event); the model calls them agent_mail__list_messages etc. No thread, label
-    # or reply tools exist, so state lives on the board.
-    # Sends go out without approval (Francesco's call, 2026-11-07); the prompt's content rules are the only gate.
-    agent_mail.list_messages: { enabled: true, permission: allow }
-    agent_mail.get_message: { enabled: true, permission: allow }
-    agent_mail.send_email: { enabled: true, permission: allow }
+    # AgentMail through its hosted MCP server. Policy keys are <server>.<tool>; the model calls them
+    # agentmail__list_messages etc. Its other ~50 tools stay at ask. Replies go out without approval
+    # (Francesco's call, 2026-11-07); the prompt's content rules are the only gate.
+    agentmail.list_messages: { enabled: true, permission: allow }
+    agentmail.get_message: { enabled: true, permission: allow }
+    agentmail.reply_to_message: { enabled: true, permission: allow }
+    # Naive's own agent_mail connection is broken server-side (every op: "execute() got an unexpected
+    # keyword argument 'request'", 2026-11-07); kept out of the model's reach until Naive fixes it.
+    agent_mail.list_messages: { enabled: false, permission: deny }
+    agent_mail.get_message: { enabled: false, permission: deny }
+    agent_mail.send_email: { enabled: false, permission: deny }
     # Monid: reads are free to run, the call itself is approved. Names from Monid's MCP tools/list.
     monid.monid_discover: { enabled: true, permission: allow }
     monid.monid_inspect: { enabled: true, permission: allow }
