@@ -65,3 +65,11 @@ A case with `cases.owner_email` set (the portal demo seed `taxappeal-site/db/see
 real sign-ups later) is the owner's: the upsert skips it (`where cases.owner_email is null`) and reports
 the count as `skipped_owner_rows`. On 2026-11-08 a mirror pass had reset three of the five demo rows
 (won → find, stopped → find, evidence → file) and the dashboard read "$0 won"; this is why.
+
+The same pass also carries website sign-ups to the board (`mirror_signups`): every `signups` row with
+consent and no `card_id` gets a `Sign up · <address>` card in `blocked` (body: email, address, phone,
+call_ok, consent, verdict, case_id, claim_code, source: website, date) and the card id is written to
+`signups.card_id` (`taxappeal-site/db/migrations/004_signup_card.sql`), so a second pass adds nothing.
+When the sign-up matched a case, the case's Find card gets the comment
+`owner signed up via the website: <email> · <date>` and `cases.owner_email` is set (only when empty).
+The `Sign up` card is then the owner's conversation, like the ones `signup` opens from mail.
