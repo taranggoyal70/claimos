@@ -1,49 +1,40 @@
-# Sign up + Chase desk on Naive. Apply with: naive agent update <agent-id> -f outreach.agent.yaml  (setup.sh does it)
+# Outreach desk on Naive: contacts county offices, or an owner who asked for a call, when a board card
+# assigned to "outreach" asks for it. No schedule: assigning the card is what starts it. setup.sh applies it.
 name: outreach
 description: >
-  Outreach desk. Answers homeowners who write to the Claim OS inbox (the Sign up step: collects what
-  Evidence needs, sends the authorization form, follows up once, puts each owner on the company board)
-  and asks county offices, by email or phone, for the facts other desks need. Never cold-contacts owners.
+  Outreach desk. Takes a board card from another desk and gets what it asks for from the outside world:
+  a county office's deadline, hearing date or filing rule (by email, then phone), or a call back to an
+  owner who asked for one. Never contacts an owner first. Answers go on the card.
 model: anthropic/claude-haiku-5.5
 harness: pi
-window: immediate   # owners are waiting for a reply
+window: immediate
 
 budget:
   cap_usd: 5          # per day
-  max_task_usd: 0.50  # one 15-minute pass; each approval resumes the session and re-reads context
+  max_task_usd: 0.50  # one card
   period: day
 
 system_file: outreach.system.md
 
-# Both bearers live in the identity's vault, matched to these URLs and injected server-side (setup.sh stores them).
 mcp_servers:
   - { type: url, name: agentmail, url: "https://mcp.agentmail.to/mcp" }
   - { type: url, name: monid, url: "https://mcp.monid.ai/v1" }
 
 tools:
   default_config:
-    permission: ask   # anything not named below stops for a person
+    permission: ask
   configs:
     board_read: { enabled: true, permission: allow }
     board_write: { enabled: true, permission: allow }
     ask_operator: { enabled: true, permission: ask }
     session_spend: { enabled: true, permission: allow }
-    # AgentMail through its hosted MCP server. Policy keys are <server>.<tool>; the model calls them
-    # agentmail__list_messages etc. Its other ~50 tools stay at ask. Replies go out without approval
-    # (Francesco's call, 2026-11-07); the prompt's content rules are the only gate.
     agentmail.list_messages: { enabled: true, permission: allow }
     agentmail.get_message: { enabled: true, permission: allow }
-    agentmail.reply_to_message: { enabled: true, permission: allow }
-    agentmail.send_message: { enabled: true, permission: allow }   # county offices only (prompt rule)
-    # Naive's own agent_mail connection is broken server-side (every op: "execute() got an unexpected
-    # keyword argument 'request'", 2026-11-07); kept out of the model's reach until Naive fixes it.
-    agent_mail.list_messages: { enabled: false, permission: deny }
-    agent_mail.get_message: { enabled: false, permission: deny }
-    agent_mail.send_email: { enabled: false, permission: deny }
-    # Monid: reads are free to run, the call itself is approved. Names from Monid's MCP tools/list.
+    agentmail.send_message: { enabled: true, permission: allow }      # new email to a county office
+    agentmail.reply_to_message: { enabled: true, permission: allow }  # continue an office or owner thread
     monid.monid_discover: { enabled: true, permission: allow }
     monid.monid_inspect: { enabled: true, permission: allow }
-    monid.monid_run: { enabled: true, permission: ask }
+    monid.monid_run: { enabled: true, permission: ask }               # a phone call always asks
     monid.monid_get_run: { enabled: true, permission: allow }
 
 metadata:

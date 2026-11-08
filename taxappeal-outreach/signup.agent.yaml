@@ -1,0 +1,38 @@
+# Sign up desk on Naive: owner conversations from the inbox, on a 15-minute schedule. setup.sh applies it.
+name: signup
+description: >
+  Sign up desk. Answers homeowners who write to the Claim OS inbox, collects what Evidence needs, sends
+  the authorization form, follows up once, and puts each owner on the company board. Replies only;
+  never writes to anyone first, never calls. County offices and call-backs are the outreach agent's job.
+model: anthropic/claude-haiku-5.5
+harness: pi
+window: immediate   # owners are waiting for a reply
+
+budget:
+  cap_usd: 5          # per day
+  max_task_usd: 0.50  # one 15-minute pass; each approval resumes the session and re-reads context
+  period: day
+
+system_file: signup.system.md
+
+# AgentMail's hosted MCP server; the bearer lives in the vault, matched to this URL, injected server-side.
+mcp_servers:
+  - { type: url, name: agentmail, url: "https://mcp.agentmail.to/mcp" }
+
+tools:
+  default_config:
+    permission: ask   # anything not named below stops for a person
+  configs:
+    board_read: { enabled: true, permission: allow }
+    board_write: { enabled: true, permission: allow }
+    ask_operator: { enabled: true, permission: ask }
+    session_spend: { enabled: true, permission: allow }
+    # Three mail operations. Naive still holds every send for approval once a session has read mail.
+    agentmail.list_messages: { enabled: true, permission: allow }
+    agentmail.get_message: { enabled: true, permission: allow }
+    agentmail.reply_to_message: { enabled: true, permission: allow }
+
+metadata:
+  desk: property_tax
+  step: signup
+  company: Claim OS
