@@ -1,12 +1,12 @@
-/* Shared by every /portal page (index, property, messages, book, account). Load after the page's markup:
+/* Portal runtime for /portal (the overview). The other portal pages inline their own copy of the token flow.
      <script src="/portal/portal.js"></script> then Portal.load(render)
    Portal.load(render): reads ?t= (moves it into sessionStorage.claimos_t and off the address bar), calls
      GET /api/portal?t=, then render(data) with {email, cases, signups, meetings}. No token or a 401 shows the
      "sign in by email" card; any other failure shows the "could not reach our records" card. Both go into [data-portal].
-   Markup the pages share: nav with <span class="nav-user">Signed in as <b data-email></b></span> and
-     <a href="/track" data-signout>Sign out</a>; <main class="wrap portal" data-portal aria-live="polite">.
-   Helpers (all return elements or strings, never HTML): money date when title addr place closed chip nextAction
-     tracker docRow msgRow emptyCard sortCases el mailto PROP. */
+   Page markup it expects: <span class="nav-who" hidden>Signed in as <b data-email></b></span>,
+     <a href="/track" data-signout hidden>Sign out</a>, <main class="wrap portal" data-portal aria-live="polite">.
+   Helpers (elements or strings, never HTML): money date when title addr place closed chip nextAction emptyCard
+     sortCases el mailto PROP. */
 window.Portal = (() => {
   const KEY = 'claimos_t';
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -25,14 +25,11 @@ window.Portal = (() => {
   const PROP = (c) => '/portal/property?id=' + encodeURIComponent(c.case_id);
   const mailto = (subject) => 'mailto:claimos@agentmail.to?subject=' + encodeURIComponent(subject);
 
-  const STAGES = ['find', 'qualify', 'signup', 'evidence', 'file', 'waiting', 'appeal', 'won'];
-  const NAMES = ['Find', 'Qualify', 'Sign up', 'Evidence', 'File', 'Waiting on county', 'Appeal again', 'Won and paid'];
   const CHIP = { find: ['Checking', 'gray'], qualify: ['Checking', 'gray'], signup: ['Signed up', 'amber'], evidence: ['Evidence', 'amber'], file: ['Filing', 'amber'],
     waiting: ['Waiting on county', ''], appeal: ['Second round', ''], won: ['Won', 'green'], stopped: ['Closed', 'gray'] };
   const NEXT = { find: 'We are checking the parcel.', qualify: 'We are checking the parcel.', signup: 'We confirm the parcel and send the agreement.',
     evidence: 'We assemble the evidence packet.', file: "We file the petition before the county's deadline.", waiting: 'Nothing to do. The county sets the hearing; we attend.',
     appeal: 'We decide the second round with you.', won: "Our invoice follows the county's corrected bill.", stopped: 'Nothing. You owe nothing.' };
-  const KINDS = { agreement: 'Agreement', dr486poa: 'DR-486POA', evidence: 'Evidence', petition: 'Petition', notice: 'Hearing notice', decision: 'Decision' };
 
   const chip = (c) => {
     const [text, tone] = c.needs_from_owner && !closed(c) ? ['Needs you', 'amber'] : CHIP[closed(c) ? 'stopped' : c.stage] || CHIP.find;
@@ -41,29 +38,6 @@ window.Portal = (() => {
     return b;
   };
   const nextAction = (c) => (c.needs_from_owner && !closed(c) ? c.needs_from_owner : NEXT[closed(c) ? 'stopped' : c.stage] || NEXT.find);
-
-  const tracker = (c) => {
-    const ol = el('ol', 'tracker' + (closed(c) ? ' is-closed' : '')), i = closed(c) ? -1 : STAGES.indexOf(c.stage);
-    NAMES.forEach((n, k) => { const li = el('li', k < i ? 'is-done' : k === i ? 'is-current' : '', n); if (k === i) li.setAttribute('aria-current', 'step'); ol.append(li); });
-    return ol;
-  };
-
-  const docRow = (d) => {
-    const row = el('div', 'doc'), main = el('div'), name = el(d.url ? 'a' : 'strong', null, d.name);
-    if (d.url) Object.assign(name, { href: d.url, target: '_blank', rel: 'noopener' });
-    main.append(name, el('span', 'caption', [KINDS[d.kind] || d.kind, date(d.at)].filter(Boolean).join(' · ')));
-    row.append(main);
-    if (d.url) { const p = el('a', 'pill', 'Open'); Object.assign(p, { href: d.url, target: '_blank', rel: 'noopener' }); row.append(p); }
-    else row.append(el('span', 'doc-note', 'On file. Ask us for a copy.'));
-    return row;
-  };
-
-  const msgRow = (m) => {
-    const row = el('div', 'msg' + (m.from === 'owner' ? ' me' : '')), head = el('div', 'msg-head');
-    head.append(el('span', 'label', m.from === 'owner' ? 'You' : 'Claim OS'), el('time', null, date(m.at)));
-    row.append(head, el('p', null, m.text));
-    return row;
-  };
 
   // Needs you first, then active by freshness, won, stopped last
   const rank = (c) => (closed(c) ? 3 : c.stage === 'won' ? 2 : c.needs_from_owner ? 0 : 1);
@@ -103,12 +77,12 @@ window.Portal = (() => {
     if (!r || !r.ok) return show(notice('We could not reach our records.', 'Please reload to try again, or email claimos@agentmail.to and we answer by hand.', 'Reload', location.href));
     const d = await r.json();
     document.querySelectorAll('[data-email]').forEach((e) => { e.textContent = d.email; });
-    document.body.classList.add('is-signed');
+    document.querySelectorAll('.nav-who, [data-signout]').forEach((e) => { e.hidden = false; });
     render(d);
     main.removeAttribute('aria-busy');
     main.classList.add('rise');
   }
   document.addEventListener('click', (e) => { if (e.target.closest('[data-signout]')) store.clear(); });
 
-  return { load, el, money, date, when, title, addr, place, closed, chip, nextAction, tracker, docRow, msgRow, emptyCard, sortCases, mailto, PROP, STAGES, NAMES };
+  return { load, el, money, date, when, title, addr, place, closed, chip, nextAction, emptyCard, sortCases, mailto, PROP };
 })();

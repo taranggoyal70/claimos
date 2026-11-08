@@ -24,8 +24,8 @@
       <a href="/about">About</a>
     </nav>
     <div class="nav-actions">
-      <span class="nav-user">Signed in as <b data-email></b></span>
-      <a class="pill" href="/track" data-signout>Sign out</a>
+      <span class="nav-who" hidden>Signed in as <b data-email></b></span>
+      <a class="pill" href="/track" data-signout hidden>Sign out</a>
       <a class="btn" href="/check">Check my property</a>
     </div>
     <details class="menu">
@@ -37,7 +37,7 @@
         <a href="/pricing">How we get paid</a>
         <a href="/faq">FAQ</a>
         <a href="/about">About</a>
-        <a href="/track" data-signout>Sign out</a>
+        <a href="/track" data-signout hidden>Sign out</a>
       </nav>
     </details>
   </header>
@@ -159,7 +159,7 @@
     totals.append(left, right);
 
     // Needs you
-    const needs = live.filter((c) => c.needs_from_owner), need = el('section', 'card need');
+    const needs = live.filter((c) => c.needs_from_owner), need = el('section', 'card need-card');
     if (needs.length) {
       need.append(el('h2', null, 'We need something from you'));
       for (const c of needs) { const row = el('div', 'need-row'); row.append(el('strong', null, addr(c)), el('p', null, c.needs_from_owner), pills(...actions(c))); need.append(row); }
