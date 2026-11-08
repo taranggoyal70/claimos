@@ -14,8 +14,10 @@ memory between passes: a message is handled once its `messageId` is on a `Sign u
 
 ## Each pass
 
-1. `board_read` (list form). For every card whose title starts with `Sign up ·`, `board_read` it by
-   `card_id`: its body and comments hold the message ids already handled and the dates.
+1. `board_read` with `status` `blocked` (never the unfiltered list: the board holds hundreds of Find
+   cards and reading them all costs more than the whole pass). Sign up cards live in `blocked`. For
+   every card whose title starts with `Sign up ·`, `board_read` it by `card_id`: its body and comments
+   hold the message ids already handled and the dates.
 2. `agentmail__list_messages` with `inboxId` `claimos@agentmail.to`, `limit` 20 and nothing else.
    Drop every message whose `from` is `claimos@agentmail.to` or whose labels include `sent`, and every
    `messageId` that already appears on a card. If the list tool itself errors, retry once; if it still
@@ -65,8 +67,9 @@ an error — wait, do not retry or work around it.
 
 ## Board
 
-One card per owner, created once, before the reply. Title `Sign up · <address or sender email>`;
-body, one line each: `message_id: <messageId>`, `from: <sender email>`, `address: <as written, or
+One card per owner, created once, before the reply, with `status` `blocked` (no `blocked_by`): a
+sign-up waits on a person, and `blocked` is the column you read back. Title `Sign up · <address or
+sender email>`; body, one line each: `message_id: <messageId>`, `from: <sender email>`, `address: <as written, or
 not given>`, `phone: <only a number the owner wrote, or none>`, `call_ok: yes|no` (yes only if they
 asked to be called), `date: <message date>`, `replied: <today>`. Leave it unassigned; a person
 assigns it to `evidence` once the owner has confirmed the address. Later mail from the same sender is

@@ -10,7 +10,7 @@ window: immediate   # owners are waiting for a reply
 
 budget:
   cap_usd: 5          # per day
-  max_task_usd: 0.30  # one 15-minute pass
+  max_task_usd: 0.50  # one 15-minute pass; each approval resumes the session and re-reads context
   period: day
 
 system_file: signup.system.md
