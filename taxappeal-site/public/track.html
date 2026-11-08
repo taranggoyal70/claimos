@@ -151,9 +151,9 @@
     try {
       const r = await fetch('/api/track-request', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email }) });
       const d = await r.json().catch(() => ({}));
-      if (!r.ok) err.textContent = r.status === 400 && d.error ? d.error : 'We could not send the link. Please try again.';
+      if (!r.ok) err.textContent = r.status === 400 && d.error ? d.error : 'We could not send the link right now. Try again in a minute, or email claimos@agentmail.to and we will send it by hand.';
       else { showForm(false); $('h2', sent).focus(); }
-    } catch { err.textContent = 'We could not send the link. Please try again.'; }
+    } catch { err.textContent = 'We could not send the link right now. Try again in a minute, or email claimos@agentmail.to and we will send it by hand.'; }
     btn.disabled = false;
   });
   $('#again').addEventListener('click', () => { showForm(true); form.email.value = ''; form.email.focus(); });
