@@ -26,7 +26,7 @@ yourself is the two statements quoted below; every other statement comes from `s
 
 2. **Cases.** First seed every case Find considers mail-ready, straight from the database (these are
    exactly the cards Find posts, so no board read is needed for them):
-   `insert into cases (case_id, address, county, county_value, requested_value, annual_savings, stage, status, updated_at) select case_id, address, county, just_value, defensible_value, annual_savings, 'find', 'todo', imported_at from candidates where tier in ('strong', 'possible') on conflict (case_id) do nothing`
+   `with ins as (insert into cases (case_id, address, county, county_value, requested_value, annual_savings, stage, status, updated_at) select case_id, address, county, just_value, defensible_value, annual_savings, 'find', 'todo', imported_at from candidates where tier in ('strong', 'possible') on conflict (case_id) do nothing returning 1) select count(*) as seeded from ins`
    Then mirror what moved on the board: `board_read({status: "doing", limit: 100})`, then the same
    for `blocked` and `done`. Never read the board unfiltered: it is hundreds of cards, each with its
    whole body, and does not fit in your context. A card whose body has no ```json block with a
