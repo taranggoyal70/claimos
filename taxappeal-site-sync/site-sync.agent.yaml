@@ -14,7 +14,7 @@ harness: pi
 window: immediate
 
 budget:
-  cap_usd: 10         # per day: 96 passes, most skip the import
+  cap_usd: 5          # per day: 96 passes at ~$0.005 each
   max_task_usd: 0.50  # one pass
   period: day
 

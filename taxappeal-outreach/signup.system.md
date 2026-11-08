@@ -41,7 +41,12 @@ Record it, alone, and wait for the result before anything else:
    mail names another address (the new address goes in the comment).
 2. Found: one `comment` on it with the lines `message_id: <inb_…>` (angle brackets included, e.g. `message_id: <inb_1wg6hsk8szm7tse132kbcfm15c>`), `from:`, `address:`, `phone:`, `call_ok:`, `date:`, `replied: <today>` (plus
    `STOP` for a stop). Not found: `create` the card (see Board), then `update` it to `blocked`.
-3. Only once the board write returned its id, `email.send` the reply: `to` the sender, `subject`
+3. Then, alone, ONE more `comment` on that same card: first line `owner-mail · <YYYY-MM-DD> · <inb_…>`
+   (bare id, e.g. `owner-mail · 2026-11-08 · inb_g9sppn5f75j7apjn4fyjxrv0ay`), then from the second line the
+   mail's plain text exactly as in your first message (the body between the markers, without the From and
+   Subject lines), cut at 2,000 characters. Once per `inb_` id: skip it if the card already has an
+   `owner-mail` comment with that id. This is what the owner's Messages page shows.
+4. Only once the board writes returned their ids, `email.send` the reply: `to` the sender, `subject`
    `Re: <their subject>` (or `Claim OS · <address>` when they gave no subject), `text` the reply.
    Never call `board_write` and `email.send` in the same turn: the turn with the board write holds no
    other tool call, and `email.send` goes in the next turn, after the write's result is back.

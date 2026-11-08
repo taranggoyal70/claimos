@@ -15,7 +15,7 @@ window: immediate   # owners are waiting for a reply
 
 budget:
   cap_usd: 10         # per day (live value since 2026-11-08; 5 had no room left on the demo day)
-  max_task_usd: 1.00  # one wake or one sweep; no approvals, so no resumed sessions re-sending context
+  max_task_usd: 4.00  # live value since 2026-11-08
   period: day
 
 system_file: signup.system.md
