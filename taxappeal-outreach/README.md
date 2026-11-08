@@ -50,3 +50,26 @@ someone approves in the dashboard; a pass with nothing new ends on its own (abou
   `owner signed up via the website` / `claim-link` comment or the address in its title) to `evidence`,
   never the Sign up card: Evidence reads Find's ```json block, which Sign up cards do not carry.
   The Sign up card itself goes to `outreach` only when the owner should be called.
+
+## Autonomy on native inboxes (2026-11-08, supersedes the AgentMail notes above)
+
+No agent here waits for a person. Mail runs on Naïve's own inboxes, which wake the owning agent with the
+mail fenced in its first message. `email.read` is denied everywhere: calling it, or any MCP tool, flags the
+session `read_people`, and every later send or board write then parks for approval. Live test
+ses_82kyrz832gyptw7wrbq8zshy9r had zero `tool.confirm` events: card, reply, $0.014.
+
+| inbox | id | wakes |
+|---|---|---|
+| hello@claim-os-d4myby.usenaive.ai | eml_bc7cadsvz9z02bsrpm44fj26pt | signup (owners) |
+| records@claim-os-d4myby.usenaive.ai | eml_d92j7qam0k6na3pfd3krzw3s3w | chase (county replies) |
+| outreach@claim-os-d4myby.usenaive.ai | eml_fp45hkkgzyps61vrbyyjv8b4vv | outreach (answers to its questions) |
+
+Schedules: signup sweep dep_9b17gg2k1sqr8z315tjqc0478p daily 09:00 ET. Chase dep_3jhj1wpqdzmst03vss1hd5j39j
+runs daily 09:30 ET but stays paused until a person resumes it. Outreach has no phone: Monid is an MCP
+server, and its discover, inspect and run sequence parks on the second call.
+
+A person runs, once:
+
+```bash
+naive deploy resume dep_3jhj1wpqdzmst03vss1hd5j39j   # chase starts mailing county offices from records@
+```
