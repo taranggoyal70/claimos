@@ -1,0 +1,208 @@
+{
+ "schema_version": 2,
+ "case_id": "FL-13-2026-30166034000",
+ "desk": "property_tax",
+ "status": "candidate",
+ "jurisdiction": {
+  "state": "FL",
+  "county": "Bay",
+  "county_code": "13",
+  "tax_year": 2026,
+  "roll_stage": "final",
+  "county_check": {
+   "flagged_sold": 100,
+   "flagged_sold_below_value": 0.16,
+   "others_sold": 3189,
+   "others_sold_below_value": 0.08748824082784572,
+   "lift": 1.8288172043010753,
+   "status": "validated"
+  }
+ },
+ "property": {
+  "parcel_id": "30166034000",
+  "alt_key": null,
+  "address": "7903 NORTH LAGOON DR",
+  "unit": null,
+  "unit_source": null,
+  "city": "PANAMA CITY BEACH",
+  "zip": "32408",
+  "use": "single_family",
+  "sqft": 4260.0,
+  "effective_year_built": 2023.0,
+  "neighborhood": "124900",
+  "homestead": false
+ },
+ "values": {
+  "just_value": 1770859.0,
+  "assessed_value": 1770859.0,
+  "taxable_value": 1770859.0,
+  "land_value": 419845.0
+ },
+ "signals": {
+  "neighbor_ratio": 1.4471206784079216,
+  "neighbor_count": 8,
+  "sales_ratio": 1.5341177291074237,
+  "comp_count": 5,
+  "own_sale_ratio": 1.0002155107151425,
+  "peer_basis": "neighborhood",
+  "own_sale_contradicts": false,
+  "later_sale": null,
+  "peer_group": "124900",
+  "level_factor_now": 0.997064393380445,
+  "own_sale": {
+   "price": 2080000.0,
+   "month": "2025-05"
+  },
+  "avm_ratio": null,
+  "avm": null,
+  "county_level": 0.8609006039469795,
+  "county_level_source": "measured on 4384 sales"
+ },
+ "estimate": {
+  "defensible_value": 1223712.0417270558,
+  "value_cut": 547146.9582729442,
+  "taxable_cut": 547146.9582729442,
+  "taxable_cut_school": 547146.9582729442,
+  "annual_savings": 8207,
+  "annual_savings_range": [
+   6018,
+   12037
+  ],
+  "millage": 0.015,
+  "millage_band": [
+   0.011,
+   0.022
+  ],
+  "is_estimate": true,
+  "millage_source": "ASSUMED, not billed: 5.5 mills school (on school assessed value) + 9.5 other (on non-school assessed value). Actual rates vary by county and district."
+ },
+ "tier": "strong",
+ "avm_check": "no_estimate",
+ "evidence": {
+  "neighbors": [
+   {
+    "parcel_id": "30166044030",
+    "address": "8127 NORTH LAGOON DR",
+    "sqft": 4256.0,
+    "just_value": 1228140.0,
+    "value_per_sqft": 288.57
+   },
+   {
+    "parcel_id": "30166036000",
+    "address": "7905 NORTH LAGOON DR",
+    "sqft": 4301.0,
+    "just_value": 868324.0,
+    "value_per_sqft": 201.89
+   },
+   {
+    "parcel_id": "30166043005",
+    "address": "8017 NORTH LAGOON DR",
+    "sqft": 4302.0,
+    "just_value": 1047345.0,
+    "value_per_sqft": 243.46
+   },
+   {
+    "parcel_id": "30197740000",
+    "address": "8729 NORTH LAGOON DR",
+    "sqft": 4197.0,
+    "just_value": 817776.0,
+    "value_per_sqft": 194.85
+   },
+   {
+    "parcel_id": "30197715000",
+    "address": "8707 NORTH LAGOON DR",
+    "sqft": 4195.0,
+    "just_value": 1048935.0,
+    "value_per_sqft": 250.04
+   },
+   {
+    "parcel_id": "30180000000",
+    "address": "7319 EMERSON DR",
+    "sqft": 4346.0,
+    "just_value": 749953.0,
+    "value_per_sqft": 172.56
+   },
+   {
+    "parcel_id": "30217000000",
+    "address": "8837 NORTH LAGOON DR",
+    "sqft": 4365.0,
+    "just_value": 849184.0,
+    "value_per_sqft": 194.54
+   },
+   {
+    "parcel_id": "30197765000",
+    "address": "8749 NORTH LAGOON DR",
+    "sqft": 4375.0,
+    "just_value": 1037810.0,
+    "value_per_sqft": 237.21
+   }
+  ],
+  "sales": [
+   {
+    "parcel_id": "30166043005",
+    "address": "8017 NORTH LAGOON DR",
+    "sale_month": "2025-06",
+    "price": 1275000.0,
+    "price_adjusted_to_valuation_date": 1258349.0,
+    "sqft": 4302.0,
+    "record": "528527"
+   },
+   {
+    "parcel_id": "30217000000",
+    "address": "8837 NORTH LAGOON DR",
+    "sale_month": "2025-02",
+    "price": 1050000.0,
+    "price_adjusted_to_valuation_date": 968547.0,
+    "sqft": 4365.0,
+    "record": "329641"
+   },
+   {
+    "parcel_id": "30181000000",
+    "address": "7311 EMERSON DR",
+    "sale_month": "2025-11",
+    "price": 1800000.0,
+    "price_adjusted_to_valuation_date": 1714885.0,
+    "sqft": 4519.0,
+    "record": "536612"
+   },
+   {
+    "parcel_id": "30197770000",
+    "address": "8753 NORTH LAGOON DR",
+    "sale_month": "2025-09",
+    "price": 1250000.0,
+    "price_adjusted_to_valuation_date": 1230716.0,
+    "sqft": 3490.0,
+    "record": "533525"
+   },
+   {
+    "parcel_id": "30197770000",
+    "address": "8753 NORTH LAGOON DR",
+    "sale_month": "2025-05",
+    "price": 1111000.0,
+    "price_adjusted_to_valuation_date": 1098470.0,
+    "sqft": 3490.0,
+    "record": "525914"
+   }
+  ]
+ },
+ "filing_window": {
+  "opens": "2026-08-15",
+  "closes": "2026-09-09",
+  "status": "closed",
+  "verified": false,
+  "source": null,
+  "checked": null,
+  "statute": "Fla. Stat. 194.011(3) \u2014 25 days after the county mails its TRIM notice",
+  "basis": "UNVERIFIED estimate: 25 days after an assumed mid-August TRIM mailing, applied statewide. Counties mail on their own dates and a 7-day spread is confirmed for 2026, so this can be wrong by weeks. Read the county VAB's posted deadline before relying on it."
+ },
+ "source": {
+  "roll_file": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/Tax%20Roll%20Data%20Files/NAL/2026F/Bay%2013%20Final%20NAL%202026.zip",
+  "sales_file": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/Tax%20Roll%20Data%20Files/SDF/2026F/Bay%2013%20Final%20SDF%202026.zip",
+  "run_id": "FL-20261108T012116Z",
+  "found_at": "2026-11-08T01:21:26Z",
+  "roll_published": "2026-10-16T18:24:04Z",
+  "sales_published": "2026-10-16T18:25:21Z",
+  "roll_stage": "final",
+  "data_vintage": "2026 final roll"
+ }
+}

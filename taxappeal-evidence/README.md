@@ -26,7 +26,8 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 taxevidence demo                                                   # fake case → data/demo/<case_id>/packet.pdf
 taxevidence build cases.jsonl --out data/out --hearing 2026-10-20  # a file, a JSON list, JSONL or a folder
-pytest -q                                                          # 8 tests, no network
+taxevidence adapt candidates.jsonl --case-id FL-36-2026-…          # one Find hand-off line -> a case for build
+pytest -q                                                          # 11 tests, no network
 ```
 
 Per case in `<out>/<case_id>/`: `packet.pdf` and `packet.html` (for the appraiser and the board), `packet.json`
@@ -48,7 +49,10 @@ Per case in `<out>/<case_id>/`: `packet.pdf` and `packet.html` (for the appraise
 }
 ```
 
-`taxevidence/sample_case.json` is a full example (fake data).
+`taxevidence/sample_case.json` is a full example (fake data). `taxevidence adapt` builds this from a line of Find's
+`candidates.jsonl` (`taxevidence/find_adapter.py`: `evidence.sales` → `sales` with `sale_month` as the 1st of the
+month, `evidence.neighbors` → `peers`, `signals.county_level`, `estimate.annual_savings`, `filing_window.closes`,
+`signals.own_sale` → `subject.last_sale`; Find's comps are already arm's-length sales before Jan 1).
 
 ## How the requested value is set
 
@@ -80,21 +84,25 @@ Per case in `<out>/<case_id>/`: `packet.pdf` and `packet.html` (for the appraise
 
 ## On Naïve
 
-`naive/` holds the agent (`evidence.agent.yaml`), its instructions (`evidence.system.md`), its skill (`SKILL.md`)
-and `setup.sh`, built like Find's. After `naive login`:
+`naive/` holds the agent (`evidence.agent.yaml`), its instructions (`evidence.system.md`) and `setup.sh`, built like
+site-sync's. It has no schedule: assigning a company-board card (Find's "FL Hendry 2026 · …" cards, owner `CEO`
+`agt_84kdvn48drb35vhrpnzd71ex21`) to `evidence` starts a session on it. Find's cards carry the case JSON without the
+`evidence` block, so the agent fetches both code zips from the org file library, runs
+`taxfind run --counties <county> --no-avm --include-closed --handoff file` in its sandbox, takes the case's line from
+that run's `candidates.jsonl` with `taxevidence adapt`, builds the packet, publishes `packet.json` + `packet.pdf`
+(`packet.html` when the sandbox has no browser), writes the result on the card (`done`, or `blocked` for `thin` /
+`no_case`) and creates the hand-off card `File · <address> · <case_id>` assigned to `File`, which wakes Tarang's agent.
 
 ```bash
-FILE_AGENT=agt_… ./naive/setup.sh     # Tarang's File agent id; prints the agent and deployment ids
-naive deploy run <deployment id>      # run a pass now
+./naive/setup.sh                                                   # uploads taxappeal-evidence.zip, creates/updates the agent
+naive board assign agt_84kdvn48drb35vhrpnzd71ex21 <crd_…> evidence # one real card; watch with naive session list --agent <agt>
 ```
-
-Each hourly pass reads open cards on Evidence's board, builds packets, publishes each PDF, posts `ready` cases to
-File's board (card key = case_id, so nothing posts twice) and marks `thin` / `no_case` cards blocked.
 
 ## Known limitations
 
-- **Find's hand-off format isn't mapped yet.** The input above is Evidence's own; an adapter for Find's
-  `candidates.jsonl` comes once we have taxappeal-find's `docs/HANDOFF.md`.
+- **Find's sales carry the month only**, so every comp is dated the 1st of its month; the time-adjusted price is
+  Find's. The county screen is re-run per card because Find's cards omit the `evidence` block (Hendry ≈ 1 min;
+  Bay is slower).
 - **Only price per sq ft.** No separate adjustments for age, pool, lot or condition; Find's peer groups already
   match those roughly. Owner photos and repair quotes are the condition evidence.
 - **Sizes are the county's effective area** (can include garages and porches): fine for like-for-like comparison,
@@ -102,5 +110,4 @@ File's board (card key = case_id, so nothing posts twice) and marks `thin` / `no
 - **County level** defaults to 1.0 (no reduction) when the case doesn't carry one.
 - **Hearing date** comes from the card; the board sets it after filing, so the exchange deadline is empty until then.
 - **Permits and county photos** are a manual `check` item.
-- **Not run on Naïve yet:** the agent files copy Find's documented shapes; confirm at the event.
 - **PDF needs Chrome or Chromium**; without it you get the HTML only.

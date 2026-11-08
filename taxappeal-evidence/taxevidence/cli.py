@@ -1,11 +1,12 @@
-"""taxevidence build <cases> --out <dir> [--hearing YYYY-MM-DD] · taxevidence demo"""
+"""taxevidence build <cases> --out <dir> [--hearing YYYY-MM-DD] · taxevidence adapt <candidates.jsonl> --case-id <id> · taxevidence demo"""
 import argparse
 import json
 import re
+import sys
 from importlib import resources
 from pathlib import Path
 
-from . import packet, render
+from . import find_adapter, packet, render
 
 
 def load_cases(text):
@@ -52,11 +53,19 @@ def main(argv=None):
     b.add_argument("--out", default="data/out")
     b.add_argument("--hearing", help="hearing date, YYYY-MM-DD; sets the evidence-exchange deadline")
     b.add_argument("--no-pdf", action="store_true")
+    f = sub.add_parser("adapt", help="one case from Find's candidates.jsonl -> the case JSON `build` reads (stdout)")
+    f.add_argument("candidates")
+    f.add_argument("--case-id", required=True)
     d = sub.add_parser("demo", help="build the packet for the bundled sample case (fake data)")
     d.add_argument("--out", default="data/demo")
     a = ap.parse_args(argv)
     if a.cmd == "build":
         run(read_cases(a.cases), a.out, a.hearing, not a.no_pdf)
+    elif a.cmd == "adapt":
+        line = next((p for p in read_cases(a.candidates) if p.get("case_id") == a.case_id), None)
+        if line is None:
+            sys.exit(f"case {a.case_id} is not in {a.candidates}")
+        print(json.dumps(find_adapter.adapt(line), indent=1))
     else:
         sample = resources.files("taxevidence").joinpath("sample_case.json").read_text()
         run(load_cases(sample), a.out, "2026-10-20", True)
