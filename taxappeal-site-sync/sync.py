@@ -21,10 +21,28 @@ CAST = {"tax_year": "int", "homestead": "boolean", "just_value": "numeric", "ass
 CHUNK = 200          # ~40 KB of SQL: the model passes each chunk as one tool argument
 TAG = "$tsv$"        # dollar-quote tag; asserted absent from the data
 ADDR_KEY = "upper(regexp_replace(trim(address), '\\s+', ' ', 'g')) || '|' || coalesce(zip, '')"  # the brief's rule
-CARD_COLS = ["case_id", "address", "county", "just_value", "defensible_value", "annual_savings", "status", "assignee", "updated_at"]
-STAGE = ("case when status = 'blocked' then 'stopped' when status = 'done' then 'file' "
-         "when lower(coalesce(assignee, '')) = 'evidence' then 'evidence' "
-         "when lower(coalesce(assignee, '')) = 'file' then 'file' else 'find' end")
+CARD_COLS = ["case_id", "title", "address", "county", "just_value", "defensible_value", "annual_savings", "status", "assignee", "updated_at"]
+RANK = {"find": 0, "qualify": 1, "signup": 2, "evidence": 3, "file": 4, "waiting": 5, "appeal": 6, "won": 7, "stopped": -1}
+
+
+def stage(title, status, assignee):
+    """The loop step a card stands for: the title prefix says which desk wrote it, the status how far it got."""
+    t, a = title.strip().lower(), (assignee or "").strip().lower()
+    if t.startswith("waiting on"):
+        return "waiting"
+    if t.startswith("sign up"):
+        return "signup"
+    if t.startswith("file"):
+        return "waiting" if status == "done" else "file"   # File closed its card = the petition went in
+    if status == "done":
+        return "file"                                      # Find's card done = Evidence handed it to File
+    if a == "evidence":
+        return "evidence"
+    if a == "file":
+        return "file"
+    if status == "blocked":
+        return "stopped"                                   # parked by the board, nobody holds it
+    return "find"
 
 
 def q(s):
@@ -91,13 +109,16 @@ def cases(tsv_path):
             if parts == [""] or parts[0] == "case_id":   # blank or a header the model added anyway
                 continue
             assert len(parts) == len(CARD_COLS), f"expected {len(CARD_COLS)} tab-separated fields, got {len(parts)}: {line!r}"
-            rows[parts[0]] = parts
+            st = stage(parts[1], parts[7].strip(), parts[8])
+            prev = rows.get(parts[0])
+            if prev is None or RANK[st] > RANK[prev[1]]:   # several cards share a case (Find's, the File hand-off): keep the furthest step
+                rows[parts[0]] = (parts, st)
     assert rows, "no card lines"
-    vals = ",\n".join("(" + ", ".join(q(p.strip()) for p in r) + ")" for r in rows.values())
-    print(f"with raw ({', '.join(CARD_COLS)}) as (values\n{vals}),\n"
+    vals = ",\n".join("(" + ", ".join(q(p.strip()) for p in r) + ", " + q(st) + ")" for r, st in rows.values())
+    print(f"with raw ({', '.join(CARD_COLS)}, stage) as (values\n{vals}),\n"
           f"ins as (insert into cases (case_id, address, county, county_value, requested_value, annual_savings, stage, status, updated_at)\n"
           f"  select case_id, nullif(address, ''), nullif(county, ''), nullif(just_value, '')::numeric, nullif(defensible_value, '')::numeric,\n"
-          f"    nullif(annual_savings, '')::numeric, {STAGE}, status, updated_at::timestamptz from raw\n"
+          f"    nullif(annual_savings, '')::numeric, stage, status, updated_at::timestamptz from raw\n"
           f"  on conflict (case_id) do update set address = excluded.address, county = excluded.county, county_value = excluded.county_value,\n"
           f"    requested_value = excluded.requested_value, annual_savings = excluded.annual_savings, stage = excluded.stage,\n"
           f"    status = excluded.status, updated_at = excluded.updated_at returning 1)\n"
