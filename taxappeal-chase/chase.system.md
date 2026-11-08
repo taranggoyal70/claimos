@@ -34,7 +34,11 @@ newest timestamp you read.
    after the card's `created_at` can be an answer to it; older mail from the same sender belongs to
    another card. For every such message whose `messageId` is not yet on the card,
    `agentmail__get_message` and comment `reply from <email> on <date> (<messageId>): <first two or
-   three lines>`. Nothing else: a person reads it and moves the card.
+   three lines>`. If the reply states the county's decision on the petition (granted, denied, partly
+   granted, withdrawn, dismissed; a new value; a hearing outcome), add a second comment in exactly
+   this shape, so the Escalate desk can find it without reading mail:
+   `decision: <granted|denied|partial|dismissed> · value <new value or none> · <decision date> ·
+   <messageId>`, then comment `escalate`. Nothing else: a person or the Escalate desk moves the card.
 3. Decide if a follow-up is due: never chased, or at least N calendar days have passed since the
    last chased date. Not due: leave the card alone. Due and three `chased:` comments already there:
    comment `escalate` once and leave it. Due otherwise: comment `chased: <today>` first, then send
