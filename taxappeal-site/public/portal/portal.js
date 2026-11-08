@@ -32,13 +32,16 @@ window.Portal = (() => {
     evidence: 'We assemble the evidence packet.', file: "We file the petition before the county's deadline.", waiting: 'Nothing to do. The county sets the hearing; we attend.',
     appeal: 'We decide the second round with you.', won: "Our invoice follows the county's corrected bill.", stopped: 'Nothing. You owe nothing.' };
 
+  // On a won case the board mirror puts Collect's note in status: 'invoice' once sent, 'paid' once Stripe confirms.
+  const BILL = { invoice: ['Invoice sent', "Pay the invoice; it follows the county's corrected bill."], paid: ['Paid', 'Nothing. Paid in full, thank you.'] };
+  const bill = (c) => (c.stage === 'won' && BILL[c.status]) || null;
   const chip = (c) => {
-    const [text, tone] = c.needs_from_owner && !closed(c) ? ['Needs you', 'amber'] : CHIP[closed(c) ? 'stopped' : c.stage] || CHIP.find;
+    const [text, tone] = c.needs_from_owner && !closed(c) ? ['Needs you', 'amber'] : bill(c) ? [bill(c)[0], 'green'] : CHIP[closed(c) ? 'stopped' : c.stage] || CHIP.find;
     const b = el('span', 'badge', text);
     if (tone) b.dataset.tone = tone;
     return b;
   };
-  const nextAction = (c) => (c.needs_from_owner && !closed(c) ? c.needs_from_owner : NEXT[closed(c) ? 'stopped' : c.stage] || NEXT.find);
+  const nextAction = (c) => (c.needs_from_owner && !closed(c) ? c.needs_from_owner : bill(c) ? bill(c)[1] : NEXT[closed(c) ? 'stopped' : c.stage] || NEXT.find);
 
   // Needs you first, then active by freshness, won, stopped last
   const rank = (c) => (closed(c) ? 3 : c.stage === 'won' ? 2 : c.needs_from_owner ? 0 : 1);
