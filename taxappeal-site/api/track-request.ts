@@ -13,6 +13,7 @@ export async function POST(req: Request) {
     const [s, c] = await Promise.all([db(`signups?select=id&email=ilike.${enc}&limit=1`), db(`cases?select=case_id&owner_email=ilike.${enc}&limit=1`)]);
     // Unknown emails get the same answer and no mail, so the form cannot be used to email strangers.
     if (s.length || c.length) {
+      if (!process.env.AGENTMAIL_API_KEY) throw new Error('AGENTMAIL_API_KEY is not set on the app (naive app secrets)');
       const link = `${new URL(req.url).origin}/track?t=${sign(email)}`;
       const text = `Here is the link to your Claim OS case page:\n\n${link}\n\nIt works for 24 hours. If you did not ask for it, you can ignore this email.\n\nClaim OS is a private company and is not affiliated with any government agency, county property appraiser or value adjustment board. Nothing here is a promise of a lower bill; the county decides.\n\nClaim OS\nclaimos@agentmail.to`;
       const r = await fetch('https://api.agentmail.to/v0/inboxes/claimos@agentmail.to/messages/send', {
