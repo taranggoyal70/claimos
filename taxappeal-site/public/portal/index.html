@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your properties — Claim OS</title>
+<meta name="description" content="Where each of your properties stands with Claim OS: the county's value against ours, the estimated saving, what we need from you, and what comes up next.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/portal/portal.css">
+</head>
+<body>
+
+<div class="top">
+  <header class="nav wrap">
+    <a class="wordmark" href="/">Claim OS</a>
+    <nav class="nav-links" aria-label="Site">
+      <a href="/how-it-works">How it works</a>
+      <a href="/pricing">How we get paid</a>
+      <a href="/faq">FAQ</a>
+      <a href="/about">About</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="nav-user">Signed in as <b data-email></b></span>
+      <a class="pill" href="/track" data-signout>Sign out</a>
+      <a class="btn" href="/check">Check my property</a>
+    </div>
+    <details class="menu">
+      <summary>Menu</summary>
+      <nav aria-label="Site">
+        <a href="/portal" aria-current="page">Your properties</a>
+        <a href="/check">Check my property</a>
+        <a href="/how-it-works">How it works</a>
+        <a href="/pricing">How we get paid</a>
+        <a href="/faq">FAQ</a>
+        <a href="/about">About</a>
+        <a href="/track" data-signout>Sign out</a>
+      </nav>
+    </details>
+  </header>
+
+  <section class="hero compact wrap">
+    <div>
+      <h1>Your properties</h1>
+      <p class="sub">Where each one stands, what the county says, and what we need from you.</p>
+      <nav class="tabs" aria-label="Portal">
+        <a class="pill" href="/portal" aria-current="page">Overview</a>
+        <a class="pill" href="/portal/messages">Messages</a>
+        <a class="pill" href="/portal/book">Book a meeting</a>
+        <a class="pill" href="/portal/account">Account</a>
+      </nav>
+    </div>
+  </section>
+</div>
+
+<main class="wrap portal" data-portal aria-live="polite" aria-busy="true"></main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <span class="label">Product</span>
+        <ul>
+          <li><a href="/check">Check my property</a></li>
+          <li><a href="/track">Track my claim</a></li>
+          <li><a href="/how-it-works">How it works</a></li>
+          <li><a href="/pricing">How we get paid</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Company</span>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="mailto:claimos@agentmail.to">claimos@agentmail.to</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Legal</span>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-note">Claim OS is a private company and is not affiliated with any government agency, county property appraiser or value adjustment board. Claim OS is not a law firm and does not give legal advice. Estimates come from public county records and may be out of date; only the county decides your value, and nothing here is a promise of a lower bill.</p>
+    <p class="foot-copy">© 2026 Claim OS</p>
+  </div>
+</footer>
+
+<script src="/portal/portal.js"></script>
+<script>
+(() => {
+  const P = Portal, { el, money, date, addr, place, closed } = P;
+  const main = document.querySelector('[data-portal]');
+  const link = (cls, text, href, blank) => { const a = el('a', cls, text); a.href = href; if (blank) { a.target = '_blank'; a.rel = 'noopener'; } return a; };
+  const sum = (xs) => xs.reduce((n, c) => n + (Number(c.annual_savings) || 0), 0);
+  const pills = (...as) => { const d = el('div', 'pills'); d.append(...as); return d; };
+
+  // Action pills for a case that needs something: open the POA draft when there is one to sign, else plain email
+  const actions = (c) => {
+    const poa = (c.documents || []).filter((d) => d.kind === 'dr486poa'), signed = poa.some((d) => /signed/i.test(d.name)), draft = poa.find((d) => d.url && !/signed/i.test(d.name));
+    const out = [];
+    if (poa.length && !signed) {
+      if (draft) out.push(link('pill', 'Open the DR-486POA', draft.url, true));
+      out.push(link('pill', 'Send the signed copy', P.mailto(`Signed DR-486POA · ${addr(c)} · ${c.case_id}`)));
+    } else out.push(link('pill', 'Send it by email', P.mailto(`${addr(c)} · ${c.case_id}`)));
+    out.push(link('pill', 'Open property', P.PROP(c)));
+    return out;
+  };
+
+  const cell = (label, value, suffix) => {
+    const d = el('div'), dd = el('dd', null, value);
+    if (suffix) dd.append(' ', el('small', null, suffix));
+    d.append(el('dt', 'label', label), dd);
+    return d;
+  };
+  const propCard = (c) => {
+    const card = el('article', 'card step prop'), head = el('div', 'prop-head'), facts = el('dl', 'facts');
+    head.append(el('h3', null, addr(c)), P.chip(c));
+    if (c.stage === 'won') facts.append(cell("County's value", money(c.county_value)), cell('Decided value', money(c.decided_value)), cell('Saving', money(c.annual_savings), '/ yr'));
+    else if (closed(c)) facts.append(cell("County's value", money(c.county_value)), cell('Our value', '—'), cell('Est. saving', '$0'));
+    else facts.append(cell("County's value", money(c.county_value)), cell('Our value', money(c.requested_value)), cell('Est. saving', money(c.annual_savings), '/ yr'));
+    card.append(head, el('p', 'caption', place(c)), facts, el('p', 'next', P.nextAction(c)), pills(link('pill', 'Open', P.PROP(c))));
+    return card;
+  };
+
+  // Dated items in the next 120 days: booked calls and hearings
+  const upcoming = (d, cases) => {
+    const now = Date.now(), horizon = now + 120 * 864e5, byId = Object.fromEntries(cases.map((c) => [c.case_id, c])), items = [];
+    for (const m of d.meetings || []) {
+      const at = new Date(m.slot).getTime(), c = byId[m.case_id];
+      if (m.status === 'cancelled' || !(at >= now && at <= horizon)) continue;
+      items.push({ at, time: P.when(m.slot), text: `Call with a licensed tax professional about ${c ? addr(c) : m.address || 'a general question'}`, pill: link('pill', 'Details', '/portal/book') });
+    }
+    for (const c of cases) {
+      if (!c.hearing_date) continue;
+      const at = new Date(c.hearing_date + 'T00:00:00').getTime();
+      if (at >= now - 864e5 && at <= horizon) items.push({ at, time: date(c.hearing_date), text: `Hearing before a special magistrate, ${addr(c)} (${c.county} County VAB)`, pill: link('pill', 'Open', P.PROP(c)) });
+    }
+    return items.sort((a, b) => a.at - b.at);
+  };
+
+  function render(d) {
+    const cases = P.sortCases(d.cases || []);
+    if (!cases.length) { main.replaceChildren(P.emptyCard(d)); return; }
+    const live = cases.filter((c) => !closed(c)), won = cases.filter((c) => c.stage === 'won');
+
+    // Totals
+    const totals = el('div', 'card stat dual'), left = el('div'), right = el('div');
+    const fig = (n, unit) => { const s = el('strong', 'figure', money(n)); if (unit) s.append(el('small', null, ' / yr')); return s; };
+    left.append(el('span', 'label', 'Savings identified'), fig(sum(live), true),
+      el('span', 'stat-sub', `Across ${live.length} of your ${cases.length} ${cases.length === 1 ? 'property' : 'properties'}. Estimates; the county decides.`));
+    right.append(el('span', 'label', 'Won so far'), fig(sum(won), won.length > 0),
+      el('span', 'stat-sub', !won.length ? 'Nothing decided yet.' : won.length === 1 ? `${addr(won[0])}, decided ${date(won[0].updated_at)}` : `${won.length} properties decided`));
+    totals.append(left, right);
+
+    // Needs you
+    const needs = live.filter((c) => c.needs_from_owner), need = el('section', 'card need');
+    if (needs.length) {
+      need.append(el('h2', null, 'We need something from you'));
+      for (const c of needs) { const row = el('div', 'need-row'); row.append(el('strong', null, addr(c)), el('p', null, c.needs_from_owner), pills(...actions(c))); need.append(row); }
+    }
+
+    // Properties
+    const props = el('section'), grid = el('div', 'grid grid-2');
+    grid.append(...cases.map(propCard));
+    props.append(el('h2', null, 'Properties'), grid);
+
+    // Coming up
+    const items = upcoming(d, cases), soon = el('section');
+    if (items.length) {
+      const card = el('div', 'card step'), ul = el('ul', 'upcoming');
+      for (const it of items) { const li = el('li'); li.append(el('time', null, it.time), el('span', null, it.text), it.pill); ul.append(li); }
+      card.append(ul); soon.append(el('h2', null, 'Coming up'), card);
+    }
+
+    main.replaceChildren(totals, ...(needs.length ? [need] : []), props, ...(items.length ? [soon] : []));
+  }
+
+  P.load(render);
+})();
+</script>
+</body>
+</html>
