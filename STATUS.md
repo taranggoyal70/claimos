@@ -71,3 +71,19 @@ The board mirror skips rows whose `owner_email` is set since 2026-11-08, when a 
 5. Lee County has not been run by Find; the demo data is Hendry + Bay.
 6. Fee percentage not fixed by the team; the site and emails quote none.
 7. `TRACK_SECRET` and `NAIVE_API_KEY` are not on app `claimos-site` (the laptop's permission policy denies agents every secret-store write; three attempts on 2026-11-08). Francesco runs `sh taxappeal-site/scripts/set-secrets.sh` once, then `naive app deploy app_nkhc92xe21cyzfd5qakpkcj4g4 taxappeal-site`. Until then `/portal` opens through the `/track` email, which works (AGENTMAIL_API_KEY is on the app; live check 2026-11-08: `/track`, `/portal` 200, bad tokens 401, 2 sign-ups + 5 cases seeded).
+
+## Owner dashboard (added 2026-11-08 ~08:15 UTC)
+
+Built and verified: `/portal` (overview with savings totals and chips), `/portal/property` (8-step tracker,
+values, deadlines, what we need from you, history, documents, messages), `/portal/messages`, `/portal/book`,
+`/portal/account`; `taxappeal-site/WIREFRAMES-PORTAL.md` has the wireframes, `db/migrations/002_portal.sql`
++ `db/seed_francesco.sql` the mock account francesco.rosciano@me.com with five properties (4220 NW 13th St
+waiting on the county · 7969 1st Pl at evidence with the real packet and DR-486 draft · 520 Richard Jackson
+Blvd unit 1203 at sign-up · 2002 Anchor Ln won · 9014 E Mac Ct stopped). The board mirror never overwrites a
+case that has an `owner_email` (sync.py guard), so the demo rows survive site-sync.
+
+Demo path today: open `/track`, enter francesco.rosciano@me.com, click the emailed 24-hour link (proven live
+08:02 UTC). For a 14-day link and live document downloads, a person runs once:
+`cd taxappeal-site && sh scripts/set-secrets.sh && naive app deploy app_nkhc92xe21cyzfd5qakpkcj4g4 .`
+(sets `TRACK_SECRET` and a files:read `NAIVE_API_KEY` on the app), then `sh scripts/demo-link.sh` prints the link.
+Known: until those secrets are set, documents show "On file. Ask us for a copy." and the demo-link script refuses.
