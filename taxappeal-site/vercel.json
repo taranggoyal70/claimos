@@ -2,5 +2,5 @@
   "framework": null,
   "outputDirectory": "public",
   "cleanUrls": true,
-  "functions": { "api/**/*.ts": { "maxDuration": 60 } }
+  "functions": { "api/**/*.ts": { "maxDuration": 60, "includeFiles": "lib/letter.html" } }
 }
