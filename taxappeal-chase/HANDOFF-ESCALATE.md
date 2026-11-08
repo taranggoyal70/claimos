@@ -63,6 +63,7 @@ Escalate acts only on cards that carry a `decision-letter` comment. It records i
 | closed | status `done`, note starts with `STOPPED · ` | `stopped` |
 | appealing again | status `blocked`, note starts with `APPEAL · ` | `appeal` |
 | waiting (hearing scheduled, letter unclear or unreadable) | card left as is, plus an `escalate-result` comment (below) | `waiting` |
+| Collect card (`Collect · <address> · <case_id>`, opened by Escalate after a win) | note starts with `INVOICE · ` once the invoice is issued, `PAID · ` once Stripe shows it paid | `won`, with the owner-facing status `invoice` then `paid` |
 
 When Escalate decides to wait, it posts a comment whose first line is one of
 

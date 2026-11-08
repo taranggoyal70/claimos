@@ -39,6 +39,8 @@ def stage(title, status, assignee, note=""):
         return "waiting"
     if t.startswith("sign up"):
         return "signup"
+    if t.startswith("collect"):                            # Escalate opens a Collect card only after a win
+        return "won"
     if t.startswith("file"):
         return "waiting" if status == "done" else "file"   # File closed its card = the petition went in
     if status == "done":
@@ -54,6 +56,17 @@ def stage(title, status, assignee, note=""):
     if status == "blocked":
         return "stopped"                                   # parked by the board, nobody holds it
     return "find"
+
+
+def substatus(title, status, note=""):
+    """What the owner sees under the step: on a Collect card the note says INVOICE · … or PAID · …; else the card status."""
+    n = (note or "").strip().upper()
+    if title.strip().lower().startswith("collect"):
+        if n.startswith("PAID"):
+            return "paid"
+        if n.startswith("INVOICE"):
+            return "invoice"
+    return status
 
 
 def q(s):
@@ -121,8 +134,10 @@ def cases(tsv_path):
                 continue
             assert len(parts) == len(CARD_COLS), f"expected {len(CARD_COLS)} tab-separated fields, got {len(parts)}: {line!r}"
             st = stage(parts[1], parts[7].strip(), parts[8], parts[10])
+            parts[7] = substatus(parts[1], parts[7].strip(), parts[10])   # the status column carries invoice/paid
             prev = rows.get(parts[0])
-            if prev is None or RANK[st] > RANK[prev[1]]:   # several cards share a case (Find's, the File hand-off): keep the furthest step
+            # several cards share a case (Find's, the File hand-off, Collect): keep the furthest step; on a tie the Collect card wins
+            if prev is None or RANK[st] > RANK[prev[1]] or (RANK[st] == RANK[prev[1]] and parts[1].strip().lower().startswith("collect")):
                 rows[parts[0]] = (parts, st)
     assert rows, "no card lines"
     vals = ",\n".join("(" + ", ".join(q(p.strip()) for p in r) + ", " + q(st) + ")" for r, st in rows.values())
