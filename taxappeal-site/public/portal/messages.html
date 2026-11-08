@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Messages — Claim OS</title>
+<meta name="description" content="Every email Claim OS exchanged with you about your property tax appeals, by property.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/portal/portal.css">
+</head>
+<body>
+
+<div class="top">
+  <header class="nav wrap">
+    <a class="wordmark" href="/">Claim OS</a>
+    <nav class="nav-links" aria-label="Site">
+      <a href="/how-it-works">How it works</a>
+      <a href="/pricing">How we get paid</a>
+      <a href="/faq">FAQ</a>
+      <a href="/about">About</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="nav-who" hidden>Signed in as <b data-email></b></span>
+      <a class="pill" href="/track" data-signout hidden>Sign out</a>
+      <a class="btn" href="/check">Check my property</a>
+    </div>
+    <details class="menu">
+      <summary>Menu</summary>
+      <nav aria-label="Site">
+        <a href="/portal" aria-current="page">Your properties</a>
+        <a href="/check">Check my property</a>
+        <a href="/how-it-works">How it works</a>
+        <a href="/pricing">How we get paid</a>
+        <a href="/faq">FAQ</a>
+        <a href="/about">About</a>
+        <a href="/track" data-signout hidden>Sign out</a>
+      </nav>
+    </details>
+  </header>
+
+  <section class="hero compact wrap">
+    <div>
+      <h1>Messages</h1>
+      <p class="sub">Every email we exchanged, by property. Reply from your own inbox; we read claimos@agentmail.to.</p>
+      <nav class="tabs" aria-label="Portal">
+        <a class="pill" href="/portal">Overview</a>
+        <a class="pill" href="/portal/messages" aria-current="page">Messages</a>
+        <a class="pill" href="/portal/book">Book a meeting</a>
+        <a class="pill" href="/portal/account">Account</a>
+      </nav>
+    </div>
+  </section>
+</div>
+
+<main class="wrap portal" data-portal aria-live="polite" aria-busy="true"></main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <span class="label">Product</span>
+        <ul>
+          <li><a href="/check">Check my property</a></li>
+          <li><a href="/track">Track my claim</a></li>
+          <li><a href="/how-it-works">How it works</a></li>
+          <li><a href="/pricing">How we get paid</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Company</span>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="mailto:claimos@agentmail.to">claimos@agentmail.to</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Legal</span>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-note">Claim OS is a private company and is not affiliated with any government agency, county property appraiser or value adjustment board. Claim OS is not a law firm and does not give legal advice. Estimates come from public county records and may be out of date; only the county decides your value, and nothing here is a promise of a lower bill.</p>
+    <p class="foot-copy">© 2026 Claim OS</p>
+  </div>
+</footer>
+
+<script src="/portal/portal.js"></script>
+<script>
+(() => {
+  const P = Portal, { el, date, addr } = P, main = document.querySelector('[data-portal]');
+  const pill = (text, href) => { const a = el('a', 'pill', text); a.href = href; return a; };
+  const msgRow = (m) => {
+    const row = el('div', 'msg' + (m.from === 'owner' ? ' me' : '')), head = el('div', 'msg-head');
+    head.append(el('span', 'label', m.from === 'owner' ? 'You' : 'Claim OS'), el('time', null, date(m.at)));
+    row.append(head, el('p', null, m.text));
+    return row;
+  };
+
+  // One thread per property that has messages, in the overview's order so /portal/messages#{index} lands right.
+  function render(d) {
+    const threads = P.sortCases(d.cases || []).map((c, i) => [c, i]).filter(([c]) => (c.messages || []).length);
+    if (!threads.length) {
+      const card = el('div', 'card step');
+      card.append(el('h3', null, 'No messages yet.'), el('p', null, 'We write from claimos@agentmail.to; add it to your contacts so nothing is filtered.'));
+      return main.replaceChildren(card);
+    }
+    main.replaceChildren(...threads.map(([c, i]) => {
+      const msgs = [...c.messages].sort((a, b) => String(a.at || '').localeCompare(String(b.at || '')));
+      const card = el('article', 'card case'), head = el('div', 'case-head'), thread = el('div', 'thread'), foot = el('div', 'pills case-foot');
+      card.id = i;
+      head.append(el('h2', null, addr(c)), el('p', 'caption', `${msgs.length} message${msgs.length === 1 ? '' : 's'} · last ${date(msgs[msgs.length - 1].at)}`));
+      thread.append(...msgs.map(msgRow));
+      foot.append(pill('Reply by email', P.mailto(`Re: ${addr(c)} · ${c.case_id}`)), pill('Open property', P.PROP(c)));
+      card.append(head, thread, foot);
+      return card;
+    }));
+    const h = location.hash.slice(1);
+    if (h) document.getElementById(h)?.scrollIntoView();
+  }
+
+  P.load(render);
+})();
+</script>
+</body>
+</html>
