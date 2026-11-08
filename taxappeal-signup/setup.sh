@@ -19,9 +19,7 @@ echo "  $IDN"
 echo "2/5 AgentMail connection (the key is pasted on the hosted form, never here)"
 AC=$(naive connections configs | jq -r '.data[] | select(.connector=="agent_mail") | .id' | head -1)
 [ -n "$AC" ] || AC=$(naive connections config-add --connector agent_mail --auth api_key \
-  --tool AGENT_MAIL_LIST_INBOXES --tool AGENT_MAIL_LIST_THREADS --tool AGENT_MAIL_GET_THREAD \
-  --tool AGENT_MAIL_GET_MESSAGE --tool AGENT_MAIL_UPDATE_THREAD_LABELS \
-  --tool AGENT_MAIL_REPLY_TO_MESSAGE --tool AGENT_MAIL_SEND_MESSAGE | jq -r .id)
+  --tool AGENT_MAIL_LIST_MESSAGES --tool AGENT_MAIL_GET_MESSAGE --tool AGENT_MAIL_SEND_EMAIL | jq -r .id)
 CA=$(naive connections list --identity "$IDN" | jq -r '.data[] | select(.status=="active" or .status=="initiated") | "\(.id) \(.status) \(.connect_link // "")"' | head -1)
 if [ -n "$CA" ]; then echo "  connection $CA"; else
   naive identity connect --identity "$IDN" --auth-config "$AC" \

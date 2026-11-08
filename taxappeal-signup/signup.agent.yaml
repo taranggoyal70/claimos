@@ -1,4 +1,4 @@
-# Sign up + Chase desk on Naive. Apply with: naive agent apply -f signup.agent.yaml  (setup.sh does it)
+# Sign up + Chase desk on Naive. Apply with: naive agent update <agent-id> -f signup.agent.yaml  (setup.sh does it)
 name: signup
 description: >
   Sign up and Chase desk. Answers homeowners who write to the Claim OS inbox, collects what Evidence
@@ -21,21 +21,20 @@ mcp_servers:
 
 tools:
   default_config:
-    permission: ask   # anything not named below stops for a person, including every Monid tool
+    permission: ask   # anything not named below stops for a person
   configs:
     board_read: { enabled: true, permission: allow }
     board_write: { enabled: true, permission: allow }
     ask_operator: { enabled: true, permission: ask }
     session_spend: { enabled: true, permission: allow }
     # AgentMail, through the org's agent_mail connection; the key lives on the connection, not here.
-    # shortcut: tool names assumed to be <connector>.<Composio slug>; confirm on the first session's tool list.
-    agent_mail.AGENT_MAIL_LIST_INBOXES: { enabled: true, permission: allow }
-    agent_mail.AGENT_MAIL_LIST_THREADS: { enabled: true, permission: allow }
-    agent_mail.AGENT_MAIL_GET_THREAD: { enabled: true, permission: allow }
-    agent_mail.AGENT_MAIL_GET_MESSAGE: { enabled: true, permission: allow }
-    agent_mail.AGENT_MAIL_UPDATE_THREAD_LABELS: { enabled: true, permission: allow }
-    agent_mail.AGENT_MAIL_REPLY_TO_MESSAGE: { enabled: true, permission: ask }   # every send is approved
-    agent_mail.AGENT_MAIL_SEND_MESSAGE: { enabled: true, permission: ask }
+    # Naive exposes only these three operations and governs them as <connector>.<short name> (seen in a
+    # session's tool.confirm event); the model calls them agent_mail__list_messages etc. No thread, label
+    # or reply tools exist, so state lives on the board.
+    # Sends go out without approval (Francesco's call, 2026-11-07); the prompt's content rules are the only gate.
+    agent_mail.list_messages: { enabled: true, permission: allow }
+    agent_mail.get_message: { enabled: true, permission: allow }
+    agent_mail.send_email: { enabled: true, permission: allow }
     # Monid: reads are free to run, the call itself is approved. Names from Monid's MCP tools/list.
     monid.monid_discover: { enabled: true, permission: allow }
     monid.monid_inspect: { enabled: true, permission: allow }
