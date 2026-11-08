@@ -73,3 +73,25 @@ call_ok, consent, verdict, case_id, claim_code, source: website, date) and the c
 When the sign-up matched a case, the case's Find card gets the comment
 `owner signed up via the website: <email> · <date>` and `cases.owner_email` is set (only when empty).
 The `Sign up` card is then the owner's conversation, like the ones `signup` opens from mail.
+
+## Letters to owners (laptop, not the agent)
+
+First contact is a paper letter, never a cold email or call. `letters.py` writes one letter per QUALIFIED case
+(every board card whose note starts with Qualify's `QUALIFIED`, one per `case_id`) whose owner of record is an
+individual or a trust (companies, estates, banks, government and associations are skipped), using the mailing
+address from Find's full `candidates.jsonl` in the org file library (the board card only carries the name):
+
+```bash
+python3 taxappeal-site-sync/letters.py    # letters/<date>/<code>.html + .pdf, letters/<date>/letters.csv, claim_codes upserted
+```
+
+Each letter carries a claim code: 8 characters (A-Z and 2-9, no 0/O/1/I) from `sha256(case_id + TRACK_SECRET)`
+(`taxappeal-site/.env`), so re-running gives the same code. `claim_codes(code, case_id, created_at, mailed_at,
+used_at)` in the site database (migration `taxappeal-site/db/migrations/003_claim_codes.sql`) maps it back:
+`/check?code=…` (or the "Have a letter?" field on /check) shows that property's numbers without an address, and a
+sign-up made with the code stores `signups.claim_code` + `case_id` and sets `claim_codes.used_at`.
+
+**People print and mail the letters** (`letters.csv` is the mail merge: name, address lines, property, county
+value, our value, savings a year, code), then mark them: `update claim_codes set mailed_at = now() where code in (…)`.
+Nothing in this folder posts, emails or calls anyone. The `letters/` folder is git-ignored (owner addresses).
+PDFs come from the gstack `browse` binary's headless Chromium; Chrome's own `--print-to-pdf` hangs on this Mac.

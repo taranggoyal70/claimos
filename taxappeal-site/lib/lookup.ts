@@ -36,6 +36,16 @@ export function addrKey(address: string, zip: string) {
 }
 
 const unitKey = (u: string | null | undefined) => (u ?? '').replace(/^\s*(#|unit|apt)\s*/i, '').trim().toUpperCase();
+const SELECT = 'select=case_id,address,unit,city,zip,addr_key,tier,just_value,defensible_value,annual_savings,run_id';
+
+// A letter's claim code (taxappeal-site-sync/letters.py) names the case outright: no address typing, no unit picker.
+export async function findByCode(code: string): Promise<Candidate | null> {
+  if (!/^[A-HJ-NP-Z2-9]{8}$/.test(code)) return null;
+  const [cc] = (await db(`claim_codes?code=eq.${code}&select=case_id`)) as { case_id: string }[];
+  if (!cc) return null;
+  const rows = (await db(`candidates?case_id=eq.${encodeURIComponent(cc.case_id)}&${SELECT}`)) as Candidate[];
+  return rows[0] ?? null;
+}
 
 // zip + house number narrow the rows; exact addr_key wins, else the first street token must appear.
 // Condo buildings share one addr_key with a row per unit: without a unit that pick returns the whole list.
@@ -44,7 +54,7 @@ export async function findCandidate(address: string, zip: string, unit = ''): Pr
   const [house, street] = key.split('|')[0].split(' ');
   if (!/^\d{5}$/.test(zip.trim()) || !/^\d+$/.test(house) || !street) return null;
   const q = [
-    'select=case_id,address,unit,city,zip,addr_key,tier,just_value,defensible_value,annual_savings,run_id',
+    SELECT,
     `zip=eq.${zip.trim()}`,
     `addr_key=like.${encodeURIComponent(house + ' *')}`,
     'order=imported_at.desc',

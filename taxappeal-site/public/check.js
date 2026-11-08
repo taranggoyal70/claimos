@@ -14,6 +14,7 @@
   const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
 
   const form = $('form[data-check]'), bar = $('.bar-err'), result = $('#result');
+  const codeForm = $('form[data-code]'), codeErr = $('.code-err');   // /check only; the home hero has no code bar
   if (!form || !result) return;
 
   // Not in our scan: realistic, deterministic numbers from the same key the API matches on (FNV-1a 32-bit).
@@ -45,12 +46,12 @@
     }, delay);
   }
 
-  const finding = (address, zip) => {
+  const finding = (address, zip, code) => {
     const el = document.createElement('div');
     el.className = 'card finding rise'; el.setAttribute('aria-busy', 'true');
     el.innerHTML = '<span class="label">Finding your property</span><p class="finding-addr"></p><ol>' +
       STEPS.map((s, i) => `<li${i ? '' : ' class="is-current"'}><span class="tick">${CHECK}</span>${s}</li>`).join('') + '</ol>';
-    $('.finding-addr', el).textContent = title(address) + ', ' + zip;
+    $('.finding-addr', el).textContent = code ? 'Claim code ' + code : title(address) + ', ' + zip;
     return el;
   };
   const tick = (el, i) => {
@@ -94,6 +95,7 @@
         <label class="check full"><input name="pro_call" type="checkbox"><span>Request a call with a licensed tax professional</span></label>
         <div class="field full"><label class="check"><input name="consent" type="checkbox" required><span>I own this property or act for the owner, and agree that Claim OS may review its public records and email me about an appeal.</span></label><small class="err" id="err-consent" role="alert"></small></div>
         <div class="field full"><button class="btn" type="submit">Start my review</button><small class="err" id="err-form" role="alert"></small></div>
+        <input type="hidden" name="claim_code">
       </form>
       <div class="thanks" id="thanks" hidden>
         <h2 tabindex="-1">Thanks — we're on it.</h2>
@@ -105,7 +107,7 @@
         <div class="pills"><a class="pill" href="/track">Track my claim</a><a class="pill" href="/check">Check another address</a></div>
       </div>`;
     const f = $('form', el);
-    f.address.value = d.street; f.unit.value = d.unit || ''; f.city.value = d.city || ''; f.zip.value = d.zip;
+    f.address.value = d.street; f.unit.value = d.unit || ''; f.city.value = d.city || ''; f.zip.value = d.zip; f.claim_code.value = d.code || '';
     $('#unit-field', el).hidden = !d.needUnit;
     f.phone.addEventListener('input', () => { f.call_ok.disabled = !f.phone.value.trim(); if (f.call_ok.disabled) f.call_ok.checked = false; });
     f.addEventListener('submit', async (e) => {
@@ -113,7 +115,7 @@
       const btn = $('button', f);
       f.querySelectorAll('.err').forEach((x) => { x.textContent = ''; });
       const body = { address: f.address.value, unit: f.unit.value, city: f.city.value, zip: f.zip.value, email: f.email.value, phone: f.phone.value,
-        call_ok: f.call_ok.checked, pro_call: f.pro_call.checked, consent: f.consent.checked };
+        call_ok: f.call_ok.checked, pro_call: f.pro_call.checked, consent: f.consent.checked, claim_code: f.claim_code.value };
       btn.disabled = true;
       try {
         const r = await fetch('/api/signup', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
@@ -139,21 +141,29 @@
 
   const fmtRun = (iso) => (iso ? new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'recently');
 
-  async function run(address, zip, unit = '') {
+  // With a claim code (from a letter, typed or in ?code=) the records are asked for the case itself, not the address.
+  async function run(address, zip, unit = '', code = '') {
     bar.textContent = '';
+    if (codeErr) codeErr.textContent = '';
     result.hidden = false;
-    const seq = finding(address, zip);
+    const seq = finding(address, zip, code);
     result.replaceChildren(seq);
     if (result.getBoundingClientRect().top > innerHeight * .6) result.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
     const timers = reduced ? [] : TICKS.map((ms, i) => setTimeout(() => tick(seq, i), ms));
     let v;
     try {
       // The sequence takes ~2.5 s and never finishes before the records answer.
-      [v] = await Promise.all([fetch('/api/verdict?' + new URLSearchParams({ address, zip, unit })).then((r) => r.json()), wait(reduced ? 0 : 2500)]);
+      [v] = await Promise.all([fetch('/api/verdict?' + new URLSearchParams(code ? { code } : { address, zip, unit })).then((r) => r.json()), wait(reduced ? 0 : 2500)]);
     } catch {
       timers.forEach(clearTimeout);
       bar.textContent = 'We could not reach our records. Please try again.';
       result.replaceChildren(signupCard({ street: title(address), zip, unit }));
+      return;
+    }
+    if (code && !v.found) {
+      timers.forEach(clearTimeout);
+      result.hidden = true; result.replaceChildren();
+      (codeErr || bar).textContent = "We don't recognise that code. Check the letter, or enter your address above.";
       return;
     }
     if (v.several && v.units && v.units.length) {
@@ -175,7 +185,7 @@
     if (v.found) {
       const [badge, tone] = TIERS[v.tier] || TIERS.review;
       show({ street: title(v.address), address: title(v.address) + (v.unit ? ' #' + v.unit : '') + ', ' + (v.zip || zip), unit: v.unit || unit, city: v.city ? title(v.city) : '', zip: v.zip || zip,
-        value: v.just_value, over: v.just_value - v.defensible_value, savings: v.annual_savings, badge, tone,
+        value: v.just_value, over: v.just_value - v.defensible_value, savings: v.annual_savings, badge, tone, code: v.claim_code || '',
         note: 'Estimate from public county records and recent sales; the county decides.', run: fmtRun(v.run_date) });
     } else {
       const n = illustrative(address, zip);
@@ -192,9 +202,21 @@
     run(address, zip);
   });
 
+  const CODE = /^[A-HJ-NP-Z2-9]{8}$/;   // letters.py's alphabet: no 0/O/1/I
+  const cleanCode = (s) => (s || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (codeForm) codeForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const code = cleanCode(codeForm.code.value);
+    if (!CODE.test(code)) { codeErr.textContent = 'Enter the 8-character code printed on your letter.'; return; }
+    run('', '', '', code);
+  });
+
   const q = new URLSearchParams(location.search);
   if (q.get('address') && /^\d{5}$/.test(q.get('zip') || '')) {
     form.address.value = q.get('address'); form.zip.value = q.get('zip');
     run(q.get('address').trim(), q.get('zip'));
+  } else if (codeForm && CODE.test(cleanCode(q.get('code')))) {
+    codeForm.code.value = cleanCode(q.get('code'));
+    run('', '', '', cleanCode(q.get('code')));
   }
 })();

@@ -1,4 +1,4 @@
-import { db, findCandidate, fail } from '../lib/lookup';
+import { db, findCandidate, findByCode, fail } from '../lib/lookup';
 
 const str = (v: unknown) => (typeof v === 'string' ? v.trim().slice(0, 200) : '');
 
@@ -7,6 +7,7 @@ export async function POST(req: Request) {
   try { b = await req.json(); } catch { return Response.json({ errors: { form: 'Send JSON.' } }, { status: 400 }); }
 
   const address = str(b.address), city = str(b.city), zip = str(b.zip), email = str(b.email), phone = str(b.phone), unit = str(b.unit);
+  const claim_code = str(b.claim_code).toUpperCase();
   const errors: Record<string, string> = {};
   if (!address) errors.address = 'Enter your street address.';
   if (!/^\d{5}$/.test(zip)) errors.zip = 'Enter a 5-digit ZIP.';
@@ -15,7 +16,9 @@ export async function POST(req: Request) {
   if (Object.keys(errors).length) return Response.json({ errors }, { status: 400 });
 
   try {
-    const found = await findCandidate(address, zip, unit);
+    // A letter's claim code names the case; the typed address is the fallback. An unknown code is ignored, not an error.
+    const byCode = claim_code ? await findByCode(claim_code) : null;
+    const found = byCode ?? await findCandidate(address, zip, unit);
     const match = Array.isArray(found) ? null : found;
     const verdict = match ? 'found' : 'not_found';
     const notes = [
@@ -25,8 +28,9 @@ export async function POST(req: Request) {
     ].filter(Boolean).join('; ') || null;
     const [row] = await db('signups', { method: 'POST', body: JSON.stringify({
       address, city: city || null, zip, email, phone: phone || null, call_ok: Boolean(phone) && b.call_ok === true,
-      consent: true, case_id: match?.case_id ?? null, verdict, notes,
+      consent: true, case_id: match?.case_id ?? null, verdict, notes, claim_code: byCode ? claim_code : null,
     }) });
+    if (byCode) await db(`claim_codes?code=eq.${claim_code}`, { method: 'PATCH', body: JSON.stringify({ used_at: new Date().toISOString() }) });
     return Response.json({ id: row.id, verdict }, { status: 201 });
   } catch (e) { return fail(e); }
 }

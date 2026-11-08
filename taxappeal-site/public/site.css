@@ -284,3 +284,7 @@ footer { padding: 56px 0 48px; border-top: 1px solid var(--line); font-size: 14p
   html { scroll-behavior: auto; }
   *, ::before, ::after { animation: none !important; transition: none !important; }
 }
+
+/* /check: the claim-code bar under the address bar (letters.py prints the code on the owner's letter) */
+.code-bar { margin-top: 12px; }
+.bar .code { text-transform: uppercase; letter-spacing: .08em; }
