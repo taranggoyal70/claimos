@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claim OS — Your property tax, appealed</title>
+<meta name="description" content="Claim OS checks public county records for over-assessed Florida homes, files the appeal, and keeps a share of the first year's savings — only if your value goes down.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<div class="top">
+  <header class="nav wrap">
+    <a class="wordmark" href="#">Claim OS</a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#trust">Why trust us</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn" href="#check" data-focus="#check-address">Check my property</a>
+  </header>
+
+  <section class="hero wrap">
+    <div>
+      <h1>Your property tax, appealed.<br>You pay only if it goes down.</h1>
+      <p class="sub">Claim OS checks public county records for over-assessed Florida homes, files the appeal, and keeps a share of the first year's savings — only if your value goes down. Terms in the agreement.</p>
+
+      <form class="bar" id="check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="address" id="check-address" name="address" type="text" placeholder="123 Main St" aria-label="Street address" autocomplete="street-address" required>
+        <input class="zip" name="zip" type="text" placeholder="ZIP" aria-label="ZIP" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" required>
+        <button class="btn" type="submit">Check my property</button>
+      </form>
+      <p class="check-err" id="check-err" role="alert"></p>
+
+      <div class="pills">
+        <a class="pill" href="#how"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>How it works</a>
+        <a class="pill" href="#trust"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"/><path d="m9 12 2 2 4-4"/></svg>Why trust us</a>
+        <a class="pill" href="#faq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7"/><path d="M12 17h.01"/></svg>FAQ</a>
+      </div>
+    </div>
+
+    <div class="verdict-wrap">
+      <aside class="card verdict" id="verdict" aria-live="polite">
+        <div class="v-head">
+          <span class="label" id="v-label">Example</span>
+          <span class="v-addr" id="v-addr">• 123 Example St</span>
+        </div>
+        <div id="v-body">
+          <div class="v-row"><span>County's value</span><strong id="v-just">$420,000</strong></div>
+          <div class="v-row"><span>Our defensible value</span><strong id="v-def">$360,000</strong></div>
+        </div>
+        <p class="v-empty" id="v-empty" hidden>We haven't scanned this address yet. Leave your email and we'll check it by hand.</p>
+        <select class="v-unit" id="v-unit" aria-label="Which unit is yours?" hidden></select>
+        <div class="v-foot" id="v-foot">
+          <div class="v-sav" id="v-sav-wrap"><span class="label">Est. savings / yr</span><strong id="v-sav">$1,100</strong></div>
+          <span class="badge" id="v-badge" data-tone="green">Strong case</span>
+        </div>
+        <p class="v-cap" id="v-cap">Example figures. Check your own address above.</p>
+        <a class="btn v-cta" id="v-cta" href="#signup" data-focus="#f-email" hidden>Leave my email</a>
+      </aside>
+    </div>
+  </section>
+</div>
+
+<section class="band" id="signup">
+  <div class="card form-card">
+    <h2>Start your review</h2>
+    <p class="sub">Tell us where to look. We reply from claimos@agentmail.to.</p>
+    <form class="form-grid" id="signup-form">
+      <div class="field full">
+        <label for="f-address">Street address</label>
+        <input id="f-address" name="address" type="text" autocomplete="street-address" required>
+        <input id="f-unit" name="unit" type="hidden">
+        <small class="err" id="err-address" role="alert"></small>
+      </div>
+      <div class="field">
+        <label for="f-city">City</label>
+        <input id="f-city" name="city" type="text" autocomplete="address-level2">
+      </div>
+      <div class="field">
+        <label for="f-zip">ZIP</label>
+        <input id="f-zip" name="zip" type="text" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" required>
+        <small class="err" id="err-zip" role="alert"></small>
+      </div>
+      <div class="field">
+        <label for="f-email">Email</label>
+        <input id="f-email" name="email" type="email" autocomplete="email" required>
+        <small class="err" id="err-email" role="alert"></small>
+      </div>
+      <div class="field">
+        <label for="f-phone">Phone (optional)</label>
+        <input id="f-phone" name="phone" type="tel" autocomplete="tel">
+      </div>
+      <label class="check full"><input id="f-call-ok" name="call_ok" type="checkbox" disabled><span>You may call me about this property</span></label>
+      <label class="check full"><input name="pro_call" type="checkbox"><span>Request a call with a licensed tax professional</span></label>
+      <div class="field full">
+        <label class="check"><input name="consent" type="checkbox" required><span>I own this property or act for the owner, and agree that Claim OS may review its public records and email me about an appeal.</span></label>
+        <small class="err" id="err-consent" role="alert"></small>
+      </div>
+      <div class="field full">
+        <button class="btn" type="submit">Start my review</button>
+        <small class="err" id="err-form" role="alert"></small>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="block wrap" id="how">
+  <h2>How it works</h2>
+  <div class="grid grid-4">
+    <div class="card step"><span class="num">1</span><h3>We find</h3><p>We scan public county rolls for homes valued above comparable sales.</p></div>
+    <div class="card step"><span class="num">2</span><h3>We check</h3><p>We compare your value with recent sales of similar homes nearby. If the case looks weak, we say so.</p></div>
+    <div class="card step"><span class="num">3</span><h3>We file</h3><p>We prepare the evidence and file the petition with the county before its own deadline. You sign; we do the paperwork.</p></div>
+    <div class="card step"><span class="num">4</span><h3>You save</h3><p>If the county lowers your value, your bill goes down. We keep a share of the first year's savings; terms in the agreement.</p></div>
+  </div>
+</section>
+
+<section class="block wrap" id="trust">
+  <h2>Why trust us</h2>
+  <div class="grid grid-3">
+    <div class="card step"><h3>Paid only on a win</h3><p>No upfront cost. If your value does not go down, you owe nothing.</p></div>
+    <div class="card step"><h3>Every number from county records</h3><p>Our values come from the county's own sales and assessment data, and we show our work.</p></div>
+    <div class="card step"><h3>A licensed professional on request</h3><p>Tick the box on the form and a licensed tax professional will contact you. Claim OS is a private company, not a government agency and not a law firm.</p></div>
+  </div>
+</section>
+
+<section class="block wrap faq" id="faq">
+  <h2>FAQ</h2>
+  <div class="grid">
+    <details>
+      <summary>What does it cost?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+      <p>Nothing upfront. If your value goes down we keep a share of the first year's savings; the exact terms are in the agreement you sign before we file.</p>
+    </details>
+    <details>
+      <summary>How long does it take?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+      <p>The county sets the dates: petitions are heard in the months after filing closes. We email you at every step.</p>
+    </details>
+    <details>
+      <summary>What do you need from me?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+      <p>Your address, an email, and a signed agreement. Everything else comes from public records.</p>
+    </details>
+  </div>
+</section>
+
+<footer class="wrap">
+  <p>Claim OS is a private company and is not affiliated with any government agency, county property appraiser or value adjustment board. Claim OS is not a law firm and does not give legal advice. Estimates come from public county records and may be out of date; only the county decides your value, and nothing here is a promise of a lower bill. © 2026 Claim OS · claimos@agentmail.to</p>
+</footer>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const money = (n) => '$' + Math.round(n).toLocaleString('en-US');
+  const title = (s) => s.trim().replace(/\s+/g, ' ').toLowerCase().replace(/(^|\s)\S/g, (c) => c.toUpperCase());
+  const TIERS = { strong: ['Strong case', 'green'], possible: ['Possible case', 'amber'], review: ['Needs review', 'gray'],
+    cap_absorbs: ['Likely no savings this year', 'gray'], new_build: ['Likely no savings this year', 'gray'] };
+  const card = $('#verdict');
+
+  function render(v, typed) {
+    card.classList.remove('is-live'); void card.offsetWidth; card.classList.add('is-live');
+    const units = v.several ? v.units : [];
+    $('#v-label').textContent = v.found ? 'Your property' : v.several ? 'Several units' : 'Not in our last scan';
+    $('#v-addr').textContent = '• ' + title(v.address || typed) + (v.unit ? ' #' + v.unit : '');
+    for (const id of ['v-body', 'v-foot', 'v-cap']) $('#' + id).hidden = !v.found;
+    $('#v-empty').hidden = v.found; $('#v-cta').hidden = v.found || units.length > 0;
+    $('#v-unit').hidden = !units.length;
+    $('#v-empty').textContent = v.several
+      ? (units.length ? 'Several units share this address. Which one is yours?'
+        : 'Several units share this address and the county roll does not tell them apart. Leave your email and your unit number and we\'ll check by hand.')
+      : 'We haven\'t scanned this address yet. Leave your email and we\'ll check it by hand.';
+    $('#v-unit').replaceChildren(new Option('Choose your unit', '', true, true), ...units.map((u) => new Option('Unit ' + u, u)));
+    if (!v.found) return;
+    const [name, tone] = TIERS[v.tier] || TIERS.review;
+    $('#v-just').textContent = money(v.just_value);
+    $('#v-def').textContent = money(v.defensible_value);
+    $('#v-sav').textContent = money(v.annual_savings);
+    $('#v-sav-wrap').hidden = v.tier === 'cap_absorbs' || v.tier === 'new_build';
+    $('#v-badge').textContent = name; $('#v-badge').dataset.tone = tone;
+    const run = v.run_date ? new Date(v.run_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'recently';
+    $('#v-cap').textContent = 'From county records, run ' + run + '.';
+  }
+
+  async function check(address, zip, unit) {
+    $('#f-address').value = address; $('#f-zip').value = zip; $('#f-unit').value = unit; $('#check-err').textContent = '';
+    card.setAttribute('aria-busy', 'true');
+    try {
+      const v = await (await fetch('/api/verdict?' + new URLSearchParams({ address, zip, unit }))).json();
+      if (v.found && v.city) $('#f-city').value = title(v.city);
+      render(v, address);
+    } catch { $('#check-err').textContent = 'We could not reach our records. Please try again.'; }
+    card.removeAttribute('aria-busy');
+  }
+  $('#check').addEventListener('submit', (e) => {
+    e.preventDefault();
+    check(e.target.address.value.trim(), e.target.zip.value.trim(), '');
+  });
+  $('#v-unit').addEventListener('change', (e) => {
+    if (e.target.value) check($('#f-address').value, $('#f-zip').value, e.target.value);
+  });
+
+  document.querySelectorAll('[data-focus]').forEach((a) => a.addEventListener('click', (e) => {
+    e.preventDefault();
+    const t = $(a.dataset.focus);
+    t.scrollIntoView({ behavior: 'smooth', block: 'center' }); t.focus({ preventScroll: true });
+  }));
+
+  const phone = $('#f-phone'), callOk = $('#f-call-ok');
+  phone.addEventListener('input', () => { callOk.disabled = !phone.value.trim(); if (callOk.disabled) callOk.checked = false; });
+
+  $('#signup-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target, btn = f.querySelector('button');
+    f.querySelectorAll('.err').forEach((el) => { el.textContent = ''; });
+    const body = { address: f.address.value, unit: f.unit.value, city: f.city.value, zip: f.zip.value, email: f.email.value, phone: f.phone.value,
+      call_ok: f.call_ok.checked, pro_call: f.pro_call.checked, consent: f.consent.checked };
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/signup', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+      if (r.status === 201) {
+        f.replaceWith(Object.assign(document.createElement('p'), { className: 'thanks', textContent: 'Thanks — we\'ll email you from claimos@agentmail.to.' }));
+        return;
+      }
+      const errors = (await r.json().catch(() => ({}))).errors || { form: 'Something went wrong. Please try again.' };
+      for (const k in errors) { const el = $('#err-' + k) || $('#err-form'); el.textContent = errors[k]; }
+    } catch { $('#err-form').textContent = 'We could not reach our server. Please try again.'; }
+    btn.disabled = false;
+  });
+})();
+</script>
+</body>
+</html>
