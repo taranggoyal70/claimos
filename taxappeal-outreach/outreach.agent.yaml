@@ -1,9 +1,9 @@
-# Sign up + Chase desk on Naive. Apply with: naive agent update <agent-id> -f signup.agent.yaml  (setup.sh does it)
-name: signup
+# Sign up + Chase desk on Naive. Apply with: naive agent update <agent-id> -f outreach.agent.yaml  (setup.sh does it)
+name: outreach
 description: >
-  Sign up and Chase desk. Answers homeowners who write to the Claim OS inbox, collects what Evidence
-  needs, sends the authorization form, follows up once, and puts each new owner on the company board.
-  Phone only for county offices and owners who asked to be called. Never cold-contacts anyone.
+  Outreach desk. Answers homeowners who write to the Claim OS inbox (the Sign up step: collects what
+  Evidence needs, sends the authorization form, follows up once, puts each owner on the company board)
+  and asks county offices, by email or phone, for the facts other desks need. Never cold-contacts owners.
 model: anthropic/claude-haiku-5.5
 harness: pi
 window: immediate   # owners are waiting for a reply
@@ -13,7 +13,7 @@ budget:
   max_task_usd: 0.50  # one 15-minute pass; each approval resumes the session and re-reads context
   period: day
 
-system_file: signup.system.md
+system_file: outreach.system.md
 
 # Both bearers live in the identity's vault, matched to these URLs and injected server-side (setup.sh stores them).
 mcp_servers:
@@ -34,6 +34,7 @@ tools:
     agentmail.list_messages: { enabled: true, permission: allow }
     agentmail.get_message: { enabled: true, permission: allow }
     agentmail.reply_to_message: { enabled: true, permission: allow }
+    agentmail.send_message: { enabled: true, permission: allow }   # county offices only (prompt rule)
     # Naive's own agent_mail connection is broken server-side (every op: "execute() got an unexpected
     # keyword argument 'request'", 2026-11-07); kept out of the model's reach until Naive fixes it.
     agent_mail.list_messages: { enabled: false, permission: deny }
@@ -47,5 +48,5 @@ tools:
 
 metadata:
   desk: property_tax
-  step: signup
+  step: outreach
   company: Claim OS

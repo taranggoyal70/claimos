@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-time setup of the Sign up agent on Naive. Run from anywhere after `naive login` (org: Claim OS).
+# One-time setup of the outreach agent on Naive. Run from anywhere after `naive login` (org: Claim OS).
 #   ./setup.sh     # identity, vault with the AgentMail and Monid bearers (from .env), agent, paused schedule
 # Keys are read from .env (git-ignored): AGENTMAIL_API_KEY, MONID_API_KEY. Never passed on argv, never printed.
 # Re-running is safe: every resource is looked up first; a bearer already stored for a URL is kept.
@@ -31,17 +31,17 @@ bearer https://mcp.monid.ai/v1 MONID_API_KEY
 echo "  $VLT"
 
 echo "3/4 agent"
-AGENT=$(naive agent list --limit 100 | jq -r '.data[] | select(.name=="signup") | .id' | head -1)
-if [ -n "$AGENT" ]; then naive agent update "$AGENT" -f signup.agent.yaml >/dev/null; else
-  AGENT=$(naive agent create -f signup.agent.yaml | jq -r .id); fi
+AGENT=$(naive agent list --limit 100 | jq -r '.data[] | select(.name=="outreach") | .id' | head -1)
+if [ -n "$AGENT" ]; then naive agent update "$AGENT" -f outreach.agent.yaml >/dev/null; else
+  AGENT=$(naive agent create -f outreach.agent.yaml | jq -r .id); fi
 naive identity attach --agent "$AGENT" --identity "$IDN" >/dev/null
 echo "  $AGENT"
 
 echo "4/4 schedule: every 15 minutes, created paused"
 DEP=$(naive deploy list | jq -r --arg a "$AGENT" '.data[] | select(.agent_id==$a and .cron=="*/15 * * * *") | .id' | head -1)
 [ -n "$DEP" ] || DEP=$(naive deploy create --agent "$AGENT" --cron "*/15 * * * *" --budget-usd 0.30 \
-  --window immediate --identity "$IDN" --prompt "Run your Sign up pass now on the inbox claimos@agentmail.to." | jq -r .id) \
+  --window immediate --identity "$IDN" --prompt "Run your outreach pass now on the inbox claimos@agentmail.to." | jq -r .id) \
   && naive deploy pause "$DEP" >/dev/null   # a new schedule starts enabled; keep it paused until one good pass
 echo "  $DEP ($(naive deploy show "$DEP" | jq -r .schedule_status))"
 
-echo "done. After one good pass (naive session create --agent $AGENT --identity $IDN --message 'Run your Sign up pass now on the inbox claimos@agentmail.to.' --budget-usd 0.30 --window immediate): naive deploy resume $DEP"
+echo "done. After one good pass (naive session create --agent $AGENT --identity $IDN --message 'Run your outreach pass now on the inbox claimos@agentmail.to.' --budget-usd 0.30 --window immediate): naive deploy resume $DEP"

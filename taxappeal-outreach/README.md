@@ -1,6 +1,6 @@
-# taxappeal-signup: the Sign up and Chase desk
+# taxappeal-outreach: the Outreach desk (Sign up + Chase + county offices)
 
-Step 3 (and 6) of the claims engine, for the property-tax desk. One Naïve agent, `signup`, that
+Step 3 (and 6) of the claims engine, for the property-tax desk. One Naïve agent, `outreach`, that
 answers homeowners who write to the company's AgentMail inbox, collects what Evidence needs, sends the
 DR-486POA authorization form, follows up once, and puts each owner on the company board.
 
@@ -8,14 +8,14 @@ It never contacts anyone first. Owners come from letters, posts and the website;
 no emails or phone numbers on purpose.
 
 ```
-owner writes ──► AgentMail inbox ──► signup (every 15 min) ──► board card ──► reply
+owner writes ──► AgentMail inbox ──► outreach (every 15 min) ──► board card ──► reply
                                           └──► county office / owner who asked: one Monid call (approved)
 ```
 
 | Piece | Lives in | Notes |
 |---|---|---|
-| `signup.agent.yaml` | Naïve agent | Haiku 5.5, $0.30 a pass, $5 a day; replies allowed, every phone call stops for approval |
-| `signup.system.md` | its instructions | owner script, board card as state, phone rules |
+| `outreach.agent.yaml` | Naïve agent | Haiku 5.5, $0.30 a pass, $5 a day; replies allowed, every phone call stops for approval |
+| `outreach.system.md` | its instructions | owner script, board card as state, phone rules |
 | AgentMail | MCP server `https://mcp.agentmail.to/mcp` | the `am_…` key sits in the Naïve vault bound to that URL; the agent may use exactly three tools (`list_messages`, `get_message`, `reply_to_message` on `claimos@agentmail.to`) and never sees the key |
 | Monid | MCP server `https://mcp.monid.ai/v1` | the bearer sits in the same vault |
 | `setup.sh` | one-time setup | identity, vault bearers, agent, paused schedule |
@@ -27,7 +27,7 @@ naive login …                                  # the Claim OS org
 printf 'AGENTMAIL_API_KEY=…\nMONID_API_KEY=…\n' > .env   # git-ignored; setup.sh loads it
 ./setup.sh                                     # stores both bearers, applies the agent, keeps the schedule paused
 naive session create --agent agt_69tr31n7bdmpqxdfcyakssds08 --identity idn_rx3tz5e0nyc7mvrb7b9xwnw6dy \
-  --message 'Run your Sign up pass now on the inbox claimos@agentmail.to.' --budget-usd 0.30 --window immediate
+  --message 'Run your outreach pass now on the inbox claimos@agentmail.to.' --budget-usd 0.30 --window immediate
 naive deploy resume dep_9b17gg2k1sqr8z315tjqc0478p   # once that pass replied and carded without a hold
 ```
 
