@@ -72,9 +72,9 @@
         <div class="stat-foot full"><span class="badge" data-tone="${d.tone}">${d.badge}</span><span class="r-note"></span><span class="caption"></span></div>
       </div>`;
     $('.result-head span:last-child', el).textContent = d.address;
-    $('.stat-sub', el).textContent = d.illustrative ? `Illustrative value ${money(d.value)}` : `County's value ${money(d.value)} · Our defensible value ${money(d.value - d.over)}`;
+    $('.stat-sub', el).textContent = d.illustrative ? `Illustrative value ${money(d.value)}` : `${d.estimated ? 'Taxable value, estimated' : "County's value"} ${money(d.value)} · Our defensible value ${money(d.value - d.over)}`;
     $('.r-note', el).textContent = d.note;
-    $('.caption', el).textContent = d.illustrative ? "Illustrative estimate — we'll confirm against the county roll." : `From county records, run ${d.run}.`;
+    $('.caption', el).textContent = d.illustrative ? "Illustrative estimate — we'll confirm against the county roll." : d.estimated ? `Estimates from public filings, ${d.run}.` : `From county records, run ${d.run}.`;
     return el;
   };
 
@@ -186,7 +186,10 @@
       const [badge, tone] = TIERS[v.tier] || TIERS.review;
       show({ street: title(v.address), address: title(v.address) + (v.unit ? ' #' + v.unit : '') + ', ' + (v.zip || zip), unit: v.unit || unit, city: v.city ? title(v.city) : '', zip: v.zip || zip,
         value: v.just_value, over: v.just_value - v.defensible_value, savings: v.annual_savings, badge, tone, code: v.claim_code || '',
-        note: 'Estimate from public county records and recent sales; the county decides.', run: fmtRun(v.run_date) });
+        note: v.use === 'possessory_interest'
+          ? 'Publicly owned land under a long lease: the taxable interest is the leasehold, assessed on the unsecured roll, which the city does not publish. Taxable value estimated from the Port of San Francisco\'s tax-increment filings; defensible value from 2026 office sales. The Assessor decides.'
+          : 'Estimate from public county records and recent sales; the county decides.',
+        estimated: v.use === 'possessory_interest', run: fmtRun(v.run_date) });
     } else {
       const n = illustrative(address, zip);
       show({ street: title(address), address: title(address) + ', ' + zip, unit, zip, illustrative: true, needUnit: Boolean(v.several), value: n.value, over: n.over, savings: n.savings, badge: 'Needs a manual check', tone: 'gray',

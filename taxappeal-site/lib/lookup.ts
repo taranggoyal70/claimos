@@ -3,7 +3,7 @@ const REST = (process.env.DATABASE_REST_URL as string).replace(/\/$/, '');
 const KEY = process.env.DATABASE_SERVICE_KEY as string;
 
 export type Candidate = {
-  case_id: string; address: string; unit: string | null; city: string | null; zip: string; addr_key: string; tier: string;
+  case_id: string; address: string; unit: string | null; city: string | null; zip: string; addr_key: string; tier: string; use: string | null;
   just_value: string | number; defensible_value: string | number; annual_savings: string | number; run_id: string | null;
 };
 
@@ -36,7 +36,7 @@ export function addrKey(address: string, zip: string) {
 }
 
 const unitKey = (u: string | null | undefined) => (u ?? '').replace(/^\s*(#|unit|apt)\s*/i, '').trim().toUpperCase();
-const SELECT = 'select=case_id,address,unit,city,zip,addr_key,tier,just_value,defensible_value,annual_savings,run_id';
+const SELECT = 'select=case_id,address,unit,city,zip,addr_key,tier,use,just_value,defensible_value,annual_savings,run_id';
 
 // A letter's claim code (taxappeal-site-sync/letters.py) names the case outright: no address typing, no unit picker.
 export async function findByCode(code: string): Promise<Candidate | null> {

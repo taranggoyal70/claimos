@@ -13,6 +13,7 @@ function verdict(row: Candidate, extra: Record<string, unknown> = {}) {
     city: row.city,
     zip: row.zip,
     tier: row.tier,
+    use: row.use,
     just_value: Number(row.just_value),
     defensible_value: Number(row.defensible_value),
     annual_savings: Number(row.annual_savings),
