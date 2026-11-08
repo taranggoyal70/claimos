@@ -1,4 +1,4 @@
-// Self-check for api/portal.ts and api/portal-action.ts against a fake PostgREST and file API: bun scripts/portal-test.ts
+// Self-check for api/portal.ts, api/track.ts and api/portal-action.ts against a fake PostgREST and file API: bun scripts/portal-test.ts
 import assert from 'node:assert/strict';
 Object.assign(process.env, { DATABASE_REST_URL: 'https://db.test/rest/', DATABASE_SERVICE_KEY: 'k', TRACK_SECRET: 's', NAIVE_API_KEY: 'n' });
 
@@ -18,7 +18,8 @@ globalThis.fetch = (async (input: any, init: any = {}) => {
   if (url.includes('/signups?')) return json([{ email: ME, address: '520 Richard Jackson Blvd', city: 'Panama City Beach', zip: '32407', created_at: '2026-11-04', case_id: 'FL-13-2026-34801143000' }]);
   if (url.includes('/cases?') && method === 'GET') return json([
     CASE,
-    { ...CASE, case_id: 'FL-13-2026-34801143000', owner_email: null, documents: null, history: null, messages: null },   // reached through the sign-up
+    { ...CASE, case_id: 'NULLS', documents: null, history: null, messages: null },                                        // null jsonb
+    { ...CASE, case_id: 'FL-13-2026-34801143000', owner_email: null },                                                    // only the sign-up points here: not the owner's
     { ...CASE, case_id: 'LEAK', owner_email: 'francescoXrosciano@me.com' },                                              // what ilike's "_" lets through
   ]);
   if (url.includes('/cases?') && method === 'PATCH') return json([{ ...CASE, ...body }]);
@@ -32,6 +33,7 @@ globalThis.fetch = (async (input: any, init: any = {}) => {
 
 const { sign } = await import('../lib/token.ts');
 const { GET } = await import('../api/portal.ts');
+const { GET: trackGET } = await import('../api/track.ts');
 const { POST } = await import('../api/portal-action.ts');
 const t = sign(ME);
 const post = (body: unknown) => POST(new Request('https://x/api/portal-action', { method: 'POST', body: JSON.stringify(body) }));
@@ -43,7 +45,7 @@ assert.equal(r.status, 200);
 assert.equal(r.headers.get('cache-control'), 'no-store');
 const d = await r.json();
 assert.equal(d.email, ME);
-assert.deepEqual(d.cases.map((c: any) => c.case_id), [CASE.case_id, 'FL-13-2026-34801143000']);
+assert.deepEqual(d.cases.map((c: any) => c.case_id), [CASE.case_id, 'NULLS']);
 assert.ok(d.cases.every((c: any) => !('owner_email' in c)));
 assert.deepEqual(d.cases[1].documents, []);                                    // null jsonb normalised
 assert.equal(d.cases[0].documents[0].url, 'https://signed.test/draft.pdf');
@@ -52,7 +54,10 @@ assert.equal(d.cases[0].documents[1].url, undefined);
 assert.deepEqual(d.meetings.map((m: any) => m.id), ['m1']);
 assert.ok(!('email' in d.meetings[0]));
 assert.equal(d.signups[0].address, '520 Richard Jackson Blvd');
-assert.ok(calls.some((c) => c.url.includes('case_id.in.(%22FL-13-2026-34801143000%22)')), 'case ids quoted in in.()');
+assert.ok(!calls.some((c) => c.url.includes('case_id.in.')), 'cases are matched on owner_email only');
+const tr = await (await trackGET(new Request('https://x/api/track?t=' + encodeURIComponent(t)))).json();
+assert.deepEqual(tr.cases.map((c: any) => c.case_id), [CASE.case_id, 'NULLS']);
+assert.ok(tr.cases.every((c: any) => !('owner_email' in c)) && tr.signups[0].address === '520 Richard Jackson Blvd');
 
 // Without a key, no file call and no url
 delete process.env.NAIVE_API_KEY;
@@ -65,6 +70,7 @@ assert.ok(!calls.slice(n0).some((c) => c.url.includes('api.vetta.sh')));
 assert.equal((await post({ t: 'nope', action: 'book' })).status, 401);
 assert.deepEqual(await (await post({ t, action: 'nope' })).json(), { error: 'Unknown action.', field: 'action' });
 assert.equal((await (await post({ t, action: 'message', case_id: 'LEAK', text: 'hi' })).json()).field, 'case_id');
+assert.equal((await (await post({ t, action: 'message', case_id: 'FL-13-2026-34801143000', text: 'hi' })).json()).field, 'case_id');
 
 // book
 const soon = new Date(Date.now() + 3 * 86400e3).toISOString();
