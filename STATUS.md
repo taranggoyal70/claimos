@@ -54,6 +54,14 @@ Teammates' agents on the same board: `find` (Nick, 6-hourly), `qualify` (Smaran)
 
 Details: `taxappeal-chase/HANDOFF-ESCALATE.md`, each folder's README.
 
+## Before the demo (a person at the laptop; the permission classifier denies agents the seed)
+
+```bash
+cd taxappeal-site && naive db query --app app_nkhc92xe21cyzfd5qakpkcj4g4 "$(cat db/seed_francesco.sql)"
+```
+Its last statement prints the five demo stages; they must be evidence, signup, stopped, waiting, won (one each).
+The board mirror skips rows whose `owner_email` is set since 2026-11-08, when a pass had reset three of them.
+
 ## Open items
 
 1. Dashboard: label won cases "Invoice sent" / "Paid" from `cases.status`; collect the two authorization choices on the site and write the `authorization:` line (queued behind the portal build).

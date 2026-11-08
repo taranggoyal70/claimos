@@ -44,7 +44,8 @@ yourself is the two statements quoted below; every other statement comes from `s
    stages yourself. Several cards can share one case_id (Find's card, the Evidence hand-off
    `File · …`, a `Waiting on …` card): write them all; sync.py keeps the furthest step per case.
    Then `python3 sync.py cases cards.tsv > cases.sql`, run `cases.sql` with `db_query` and check
-   `upserted` equals the lines you wrote.
+   `upserted` plus `skipped_owner_rows` equals the cases you wrote (a case with `owner_email` set
+   belongs to the owner's portal; the upsert leaves it alone, and so do you).
 
 3. **Report** in five lines: the run id and whether it was imported, skipped or left partial (rows
    upserted); cases seeded (the insert's row count) and moved cards upserted; the result of

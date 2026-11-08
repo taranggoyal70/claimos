@@ -60,3 +60,8 @@ Stage comes from the card (`sync.py: stage()`): `Waiting on …` → waiting, `S
 `File ·` → file (done → waiting), a done Find card → Qualify's verdict in the note (QUALIFIED →
 qualify, REJECTED → stopped, EVIDENCE ready → file); the furthest step wins when cards share a case.
 Run it after a Find run or a few times a day (a launchd job on the Mac mini is the natural home).
+
+A case with `cases.owner_email` set (the portal demo seed `taxappeal-site/db/seed_francesco.sql` today,
+real sign-ups later) is the owner's: the upsert skips it (`where cases.owner_email is null`) and reports
+the count as `skipped_owner_rows`. On 2026-11-08 a mirror pass had reset three of the five demo rows
+(won → find, stopped → find, evidence → file) and the dashboard read "$0 won"; this is why.

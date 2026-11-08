@@ -141,14 +141,17 @@ def cases(tsv_path):
                 rows[parts[0]] = (parts, st)
     assert rows, "no card lines"
     vals = ",\n".join("(" + ", ".join(q(p.strip()) for p in r) + ", " + q(st) + ")" for r, st in rows.values())
+    # A case with owner_email set is the portal's (the demo seed today, real sign-ups later): the board never overwrites it.
+    # shortcut: such a case never takes the board's stage, so a real owner's case would stall in the portal; upgrade when the first real owner signs
     print(f"with raw ({', '.join(CARD_COLS)}, stage) as (values\n{vals}),\n"
           f"ins as (insert into cases (case_id, address, county, county_value, requested_value, annual_savings, stage, status, updated_at)\n"
           f"  select case_id, nullif(address, ''), nullif(county, ''), nullif(just_value, '')::numeric, nullif(defensible_value, '')::numeric,\n"
           f"    nullif(annual_savings, '')::numeric, stage, status, updated_at::timestamptz from raw\n"
           f"  on conflict (case_id) do update set address = excluded.address, county = excluded.county, county_value = excluded.county_value,\n"
           f"    requested_value = excluded.requested_value, annual_savings = excluded.annual_savings, stage = excluded.stage,\n"
-          f"    status = excluded.status, updated_at = excluded.updated_at returning 1)\n"
-          f"select count(*) as upserted from ins")
+          f"    status = excluded.status, updated_at = excluded.updated_at\n"
+          f"  where cases.owner_email is null returning 1)\n"
+          f"select count(*) as upserted, (select count(*) from raw join cases using (case_id) where cases.owner_email is not null) as skipped_owner_rows from ins")
 
 
 if __name__ == "__main__":
