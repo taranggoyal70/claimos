@@ -1,0 +1,47 @@
+# Sign up + Chase desk on Naive. Apply with: naive agent apply -f signup.agent.yaml  (setup.sh does it)
+name: signup
+description: >
+  Sign up and Chase desk. Answers homeowners who write to the Claim OS inbox, collects what Evidence
+  needs, sends the authorization form, follows up once, and puts each new owner on the company board.
+  Phone only for county offices and owners who asked to be called. Never cold-contacts anyone.
+model: anthropic/claude-haiku-5.5
+harness: pi
+window: immediate   # owners are waiting for a reply
+
+budget:
+  cap_usd: 5          # per day
+  max_task_usd: 0.30  # one 15-minute pass
+  period: day
+
+system_file: signup.system.md
+
+# Monid (phone). The bearer lives in the vault, matched to this URL and injected server-side.
+mcp_servers:
+  - { type: url, name: monid, url: "https://mcp.monid.ai/v1" }
+
+tools:
+  default_config:
+    permission: ask   # anything not named below stops for a person, including every Monid tool
+  configs:
+    board_read: { enabled: true, permission: allow }
+    board_write: { enabled: true, permission: allow }
+    ask_operator: { enabled: true, permission: ask }
+    session_spend: { enabled: true, permission: allow }
+    # AgentMail, through the org's agent_mail connection; the key lives on the connection, not here.
+    # shortcut: tool names assumed to be <connector>.<Composio slug>; confirm on the first session's tool list.
+    agent_mail.AGENT_MAIL_LIST_INBOXES: { enabled: true, permission: allow }
+    agent_mail.AGENT_MAIL_LIST_THREADS: { enabled: true, permission: allow }
+    agent_mail.AGENT_MAIL_GET_THREAD: { enabled: true, permission: allow }
+    agent_mail.AGENT_MAIL_GET_MESSAGE: { enabled: true, permission: allow }
+    agent_mail.AGENT_MAIL_UPDATE_THREAD_LABELS: { enabled: true, permission: allow }
+    agent_mail.AGENT_MAIL_REPLY_TO_MESSAGE: { enabled: true, permission: ask }   # every send is approved
+    agent_mail.AGENT_MAIL_SEND_MESSAGE: { enabled: true, permission: ask }
+    # Monid: reads are free to run, the call itself is approved. Names from Monid's MCP; confirm at setup.
+    monid.discover: { enabled: true, permission: allow }
+    monid.inspect: { enabled: true, permission: allow }
+    monid.run: { enabled: true, permission: ask }
+
+metadata:
+  desk: property_tax
+  step: signup
+  company: Claim OS
