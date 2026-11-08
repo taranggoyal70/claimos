@@ -27,8 +27,11 @@ tools:
   default_config:
     permission: deny
   configs:
-    claimos.letters_due: { enabled: true, permission: allow }
+    claimos.letters_due: { enabled: false, permission: deny }   # one MCP call per pass: send_letter {all_due: true} only; a second call parks
     claimos.send_letter: { enabled: true, permission: allow }
+    claimos.health: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
+    claimos.letter_preview: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
+    claimos.mirror_run: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
     board_read: { enabled: true, permission: allow }
     session_spend: { enabled: true, permission: allow }
     email.read: { enabled: false, permission: deny }

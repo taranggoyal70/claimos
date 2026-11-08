@@ -36,6 +36,10 @@ tools:
     board_read: { enabled: true, permission: allow }
     session_spend: { enabled: true, permission: allow }
     claimos.mirror_run: { enabled: true, permission: allow }
+    claimos.health: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
+    claimos.letters_due: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
+    claimos.send_letter: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
+    claimos.letter_preview: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
     email.read: { enabled: false, permission: deny }
     ask_operator: { enabled: false, permission: deny }
     apps:
