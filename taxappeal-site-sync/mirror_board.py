@@ -7,7 +7,8 @@ hundreds of cards with full bodies and the agent's board_read cannot page, so a 
 Also the other direction: every consented site sign-up (`signups`) gets a `Sign up ·` card on the board (status
 blocked; a row whose (email, date) already stands in a website card's body is skipped, and `--key signup:<row id>`
 makes the add itself idempotent), and when a new sign-up matched a case the Find card gets a comment, the
-`authorization:` hand-off line, and `cases.owner_email` is set. `python3 mirror_dryrun.py` runs the same pass with every write stubbed.
+`authorization:` hand-off line, and `cases.owner_email` is set; the owner gets the owner script by email through a
+`Message · <address> · <case_id>` card assigned to signup. `python3 mirror_dryrun.py` runs the same pass with every write stubbed.
 Needs: naive (logged in, org Claim OS), python3. Uses sync.py next to this file.
 """
 import json, re, subprocess, sys, tempfile, os
@@ -17,6 +18,16 @@ BOARD_OWNER = "agt_84kdvn48drb35vhrpnzd71ex21"      # the CEO's company board
 APP = "app_nkhc92xe21cyzfd5qakpkcj4g4"              # claimos-site
 HERE = Path(__file__).resolve().parent
 SIGNUP_FIELDS = ("email", "address", "phone", "call_ok", "consent", "verdict", "case_id", "claim_code")   # the card body, in order
+# signup.system.md's owner script: every new website sign-up gets it through a `Message ·` card assigned to signup
+# (HANDOFF-ESCALATE.md, "Telling the owner something"), which emails the body as written and marks the Sign up card `sent:`.
+OWNER_SCRIPT = """Thank you for signing up with Claim OS for {addr}.
+
+Could you reply to confirm that you are the owner of record, and whether you received this year's TRIM notice (the proposed-value letter the county mails in August)?
+
+What happens next: we check the county's value against comparable sales for free. If the home looks over-assessed, we send you a short agreement and the county's authorization form (DR-486POA, https://floridarevenue.com/property/Documents/dr486poa.pdf) to sign, and we only get paid if the value goes down, on the terms in the agreement. Photos of damage or repair quotes help but are optional; you can send them later.
+{call}
+Claim OS is a private company and is not affiliated with any government agency.
+the Claim OS team"""
 
 
 def naive(*args):
@@ -66,6 +77,9 @@ def mirror_signups(find_card, known, website):
         if card["id"] in known:
             continue
         new += 1
+        call = f"\nA colleague will call you at {s['phone']}.\n" if s.get("call_ok") and s.get("phone") else ""
+        msg = naive("board", "add", BOARD_OWNER, "--title", f"Message · {addr} · {s.get('case_id') or 'no case'}", "--status", "todo",
+                    "--assignee", "signup", "--key", f"message:signup:{s['id']}", "--body", f"to: {s['email']}\n" + OWNER_SCRIPT.format(addr=addr, call=call))
         if s.get("case_id"):
             # never steal a case another owner (or the demo seed) already holds; the owner signed, so the tracker shows the sign-up step
             naive("db", "query", "--app", APP,
@@ -76,7 +90,7 @@ def mirror_signups(find_card, known, website):
                 # the hand-off line the coordinator, Escalate and Collect parse; the site offers no fee or appeal choices yet
                 naive("board", "comment", BOARD_OWNER, find_card[s["case_id"]], "--body",
                       f"authorization: case_id {s['case_id']} · scope vab_petition · fee none · partial_above none · reopen_risk no")
-        print(f"sign up card {card['id']} · {addr} · case {s.get('case_id') or 'none'}", file=sys.stderr)
+        print(f"sign up card {card['id']} · message card {msg['id']} · {addr} · case {s.get('case_id') or 'none'}", file=sys.stderr)
     print(f"signups: {len(rows)} consented, {new} new card(s)", file=sys.stderr)
 
 

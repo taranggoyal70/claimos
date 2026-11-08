@@ -79,7 +79,11 @@ runs the whole pass with every write stubbed and prints what it would add; a hea
 Escalate (step 4a) and Collect (step 4c) parse: `authorization: case_id <id> · scope vab_petition · fee none · partial_above none ·
 reopen_risk no` (the site collects no fee or appeal choices, so the defaults: accept partial wins, no reopen risk). The case gets
 `owner_email` and stage `signup` (only when no owner held it).
-The `Sign up` card is then the owner's conversation, like the ones `signup` opens from mail.
+The `Sign up` card is then the owner's conversation, like the ones `signup` opens from mail. The owner also hears from us at once:
+the same pass adds one `Message · <address> · <case_id>` card (assignee `signup`, status `todo`, `--key message:signup:<row id>`,
+body `to: <email>` + signup.system.md's owner script: confirm owner of record and TRIM notice, free check, agreement + DR-486POA
+next, private-company line); the signup desk emails it and writes `sent:` on the Message card and the Sign up card
+(`taxappeal-chase/HANDOFF-ESCALATE.md`, "Telling the owner something"). The owner's reply lands in `claimos@` and signup's hourly pass takes it from there.
 
 ## Letters to owners (laptop, not the agent)
 
