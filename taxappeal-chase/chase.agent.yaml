@@ -1,41 +1,37 @@
-# Chase desk on Naive: once a day it follows up, by email, on board cards that are waiting on someone
-# (a county office, an owner) and carry a `follow_up:` line. setup.sh applies it and creates the schedule paused.
+# Chase desk on Naive: a county reply to records@claim-os-d4myby.usenaive.ai wakes it (native inbox, wake on)
+# and it attaches the reply to the waiting card; once a day (09:30 ET) it sends the follow-ups that are due.
+# Fully autonomous: deny by default, explicit allow rows only, nothing at ask, ask_operator off.
+# email.read stays DENIED: it flags the session read_people and every later send/board_write parks. The
+# daily pass works from the board only; replies reach the board through the wake sessions.
 name: chase
 description: >
-  Chase desk. Daily follow-ups on cases waiting on someone outside: reads blocked and doing cards that
-  carry a follow_up: line, sends one short follow-up email when one is due, records chased: on the card,
-  attaches any reply from that sender, and after three follow-ups escalates to a person. Email only.
+  Chase desk. Daily follow-ups by email from records@ on cases waiting on a county office or an owner
+  (cards with a follow_up: line), and on every reply that lands in records@ it records the reply on the
+  waiting card. After three follow-ups it hands the card to the Escalate desk. Runs without asking anyone.
 model: anthropic/claude-haiku-5.5
 harness: pi
 window: immediate
 
 budget:
   cap_usd: 5          # per day
-  max_task_usd: 1.00  # each approval resumes the session and re-sends ~100k tokens; 0.50 died mid-pass  # one pass
+  max_task_usd: 1.00  # one pass or one reply
   period: day
 
 system_file: chase.system.md
 
-mcp_servers:
-  - { type: url, name: agentmail, url: "https://mcp.agentmail.to/mcp" }
+mcp_servers: []   # AgentMail/Monid MCP removed: any MCP result flags the session and parks later writes
 
 tools:
   default_config:
-    permission: ask
+    permission: deny
   configs:
     board_read: { enabled: true, permission: allow }
     board_write: { enabled: true, permission: allow }
-    ask_operator: { enabled: true, permission: ask }
     session_spend: { enabled: true, permission: allow }
-    agentmail.list_messages: { enabled: true, permission: allow }
-    agentmail.get_message: { enabled: true, permission: allow }
-    agentmail.send_message: { enabled: true, permission: allow }      # first follow-up, no thread yet
-    agentmail.reply_to_message: { enabled: true, permission: allow }  # later ones, in the sender's thread
-    # The persona also carries the agent_mail *connection*, whose list_messages is broken server-side
-    # ("unexpected keyword argument 'request'"); never offer its tools, so the model uses the MCP ones above.
-    agent_mail.list_messages: { enabled: false, permission: deny }
-    agent_mail.get_message: { enabled: false, permission: deny }
-    agent_mail.send_email: { enabled: false, permission: deny }
+    email.inboxes: { enabled: true, permission: allow }
+    email.send: { enabled: true, permission: allow }
+    email.read: { enabled: false, permission: deny }
+    ask_operator: { enabled: false, permission: deny }
 
 metadata:
   desk: property_tax

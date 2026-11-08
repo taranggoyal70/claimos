@@ -1,5 +1,6 @@
 # Evidence desk on Naive: builds the hearing packet for a company-board card assigned to "evidence" and hands
 # it to File. No schedule: assigning the card is what starts it. setup.sh applies it (create/update by name).
+# Fully autonomous: deny by default, explicit allow rows only, nothing at ask, ask_operator off. No mail tools.
 name: evidence
 description: >
   Evidence desk. Takes one qualified property-tax case from the company board, rebuilds Find's comparable
@@ -33,6 +34,8 @@ tools:
     board_read: { enabled: true, permission: allow }
     board_write: { enabled: true, permission: allow }
     session_spend: { enabled: true, permission: allow }
+    email.read: { enabled: false, permission: deny }
+    ask_operator: { enabled: false, permission: deny }
 
 metadata:
   desk: property_tax

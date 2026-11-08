@@ -1,19 +1,27 @@
 # Site sync desk on Naive. Apply with ./setup.sh (naive agent create/update -f site-sync.agent.yaml)
+# Every 15 minutes: Find's newest run into the site database, then one claimos.mirror_run call (board <-> cases
+# mirror, server-side on the Vercel app). Fully autonomous: deny by default, explicit allow rows only, nothing
+# at ask, ask_operator off. mirror_run is the LAST call of a pass: any MCP result flags the session read_people,
+# after which bash/write/fetch_file are refused and further MCP calls park. The MCP bearer is in the Claim OS
+# Desk vault, so the agent holds that persona and the schedule runs as it.
 name: site-sync
 description: >
-  Site sync. Every 6 hours copies Find's newest published run into the website database (candidates)
-  and mirrors each company-board card's status into the cases table. Reads the company's own records
-  only; never contacts anyone, never writes to the board.
+  Site sync. Every 15 minutes copies Find's newest published run into the website database (candidates)
+  and runs the board mirror on the Claim OS site (claimos.mirror_run). Reads the company's own records
+  only; never contacts anyone. Runs without asking anyone.
 model: anthropic/claude-haiku-5.5   # gpt-oss-120b lost the procedure after step 1 in testing (2026-11-07)
 harness: pi
 window: immediate
 
 budget:
-  cap_usd: 5          # per day
+  cap_usd: 10         # per day: 96 passes, most skip the import
   max_task_usd: 0.50  # one pass
   period: day
 
 system_file: site-sync.system.md
+
+mcp_servers:
+  - { type: url, name: claimos, url: "https://claimos-site-mds8vwd4myby.vercel.app/api/mcp" }
 
 tools:
   default_config:
@@ -27,6 +35,9 @@ tools:
     fetch_file: { enabled: true, permission: allow }
     board_read: { enabled: true, permission: allow }
     session_spend: { enabled: true, permission: allow }
+    claimos.mirror_run: { enabled: true, permission: allow }
+    email.read: { enabled: false, permission: deny }
+    ask_operator: { enabled: false, permission: deny }
     apps:
       enabled: true
       permission: allow

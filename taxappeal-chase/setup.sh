@@ -19,6 +19,10 @@ if [ -n "$AGENT" ]; then naive agent update "$AGENT" -f chase.agent.yaml >/dev/n
   AGENT=$(naive agent create -f chase.agent.yaml | jq -r .id); fi
 naive identity attach --agent "$AGENT" --identity "$IDN" >/dev/null
 echo "  $AGENT"
+ADDR=records@claim-os-d4myby.usenaive.ai   # county replies wake chase
+naive identity email list --identity "$IDN" | jq -e --arg a "$ADDR" '.data[] | select(.address==$a)' >/dev/null \
+  || naive identity email provision --identity "$IDN" --address "$ADDR" --agent "$AGENT" >/dev/null
+echo "  inbox $ADDR"
 
 echo "3/3 schedule: daily 09:30 America/New_York, created paused"
 CRON="30 9 * * *"

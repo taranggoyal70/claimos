@@ -1,41 +1,38 @@
-# Outreach desk on Naive: contacts county offices, or an owner who asked for a call, when a board card
-# assigned to "outreach" asks for it. No schedule: assigning the card is what starts it. setup.sh applies it.
+# Outreach desk on Naive: county questions by email from outreach@claim-os-d4myby.usenaive.ai. Assigning it a
+# card starts it; the office's reply to outreach@ wakes it again (native inbox, wake on). No schedule.
+# Fully autonomous: deny by default, explicit allow rows only, nothing at ask, ask_operator off.
+# email.read stays DENIED (it flags the session read_people and parks every later write). Monid and the
+# AgentMail MCP are off: any MCP result flags the session the same way, so a call needs discover -> inspect
+# -> run and parked on the second call (ses_jxjjgx3s9t3e0wexb47bmf6z0x, 2026-11-08).
 name: outreach
 description: >
-  Outreach desk. Takes a board card from another desk and gets what it asks for from the outside world:
-  a county office's deadline, hearing date or filing rule (by email, then phone), or a call back to an
-  owner who asked for one. Never contacts an owner first. Answers go on the card.
+  Outreach desk. Takes a board card from another desk and gets what it asks for from a county office
+  by email from outreach@, records the answer on the card when the office replies. Never contacts an
+  owner first, never calls. Runs without asking anyone.
 model: anthropic/claude-haiku-5.5
 harness: pi
 window: immediate
 
 budget:
   cap_usd: 5          # per day
-  max_task_usd: 0.50  # one card
+  max_task_usd: 0.50  # one card or one reply
   period: day
 
 system_file: outreach.system.md
 
-mcp_servers:
-  - { type: url, name: agentmail, url: "https://mcp.agentmail.to/mcp" }
-  - { type: url, name: monid, url: "https://mcp.monid.ai/v1" }
+mcp_servers: []   # AgentMail/Monid MCP removed: any MCP result flags the session and parks later writes
 
 tools:
   default_config:
-    permission: ask
+    permission: deny
   configs:
     board_read: { enabled: true, permission: allow }
     board_write: { enabled: true, permission: allow }
-    ask_operator: { enabled: true, permission: ask }
     session_spend: { enabled: true, permission: allow }
-    agentmail.list_messages: { enabled: true, permission: allow }
-    agentmail.get_message: { enabled: true, permission: allow }
-    agentmail.send_message: { enabled: true, permission: allow }      # new email to a county office
-    agentmail.reply_to_message: { enabled: true, permission: allow }  # continue an office or owner thread
-    monid.monid_discover: { enabled: true, permission: allow }
-    monid.monid_inspect: { enabled: true, permission: allow }
-    monid.monid_run: { enabled: true, permission: ask }               # a phone call always asks
-    monid.monid_get_run: { enabled: true, permission: allow }
+    email.inboxes: { enabled: true, permission: allow }
+    email.send: { enabled: true, permission: allow }
+    email.read: { enabled: false, permission: deny }
+    ask_operator: { enabled: false, permission: deny }
 
 metadata:
   desk: property_tax

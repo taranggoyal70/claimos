@@ -1,0 +1,40 @@
+# Letters desk on Naive: daily 10:00 ET it mails the first letter to every qualified owner who has not had one,
+# through the Claim OS site's MCP server (claimos.send_letter renders the letter and posts it to Lob).
+# Fully autonomous: deny by default, explicit allow rows only, nothing at ask, ask_operator off.
+# ONE claimos call per pass: any MCP result flags the session read_people and the next MCP call parks for
+# approval (seen live on Monid, 2026-11-08). The bearer is in the Claim OS Desk vault, so the agent holds that
+# persona and the schedule runs as it. setup.sh applies it.
+name: letters
+description: >
+  Letters desk. Once a day sends the first postal letter, through the Claim OS site and Lob, to each
+  qualified owner who has not had one, and reports what went out. Never writes mail, never contacts
+  anyone any other way. Runs without asking anyone.
+model: anthropic/claude-haiku-5.5
+harness: pi
+window: immediate
+
+budget:
+  cap_usd: 2          # per day
+  max_task_usd: 1.00  # one pass
+  period: day
+
+system_file: letters.system.md
+
+mcp_servers:
+  - { type: url, name: claimos, url: "https://claimos-site-mds8vwd4myby.vercel.app/api/mcp" }
+
+tools:
+  default_config:
+    permission: deny
+  configs:
+    claimos.letters_due: { enabled: true, permission: allow }
+    claimos.send_letter: { enabled: true, permission: allow }
+    board_read: { enabled: true, permission: allow }
+    session_spend: { enabled: true, permission: allow }
+    email.read: { enabled: false, permission: deny }
+    ask_operator: { enabled: false, permission: deny }
+
+metadata:
+  desk: property_tax
+  step: letters
+  company: Claim OS

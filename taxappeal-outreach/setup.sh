@@ -30,7 +30,7 @@ bearer https://mcp.agentmail.to/mcp AGENTMAIL_API_KEY
 bearer https://mcp.monid.ai/v1 MONID_API_KEY
 echo "  $VLT"
 
-echo "3/4 agents: signup (inbox, scheduled) and outreach (card-driven, no schedule)"
+echo "3/4 agents: signup (hello@ wakes it, daily sweep) and outreach (card-driven, outreach@ wakes it)"
 apply() {  # apply <name> -> prints the agent id; creates or updates from <name>.agent.yaml, attaches the persona
   local id; id=$(naive agent list --limit 100 | jq -r --arg n "$1" '.data[] | select(.name==$n) | .id' | head -1)
   if [ -n "$id" ]; then naive agent update "$id" -f "$1.agent.yaml" >/dev/null; else
@@ -40,11 +40,19 @@ apply() {  # apply <name> -> prints the agent id; creates or updates from <name>
 AGENT=$(apply signup); echo "  signup   $AGENT"
 OUTREACH=$(apply outreach); echo "  outreach $OUTREACH (started by assigning it a card)"
 
-echo "4/4 signup schedule: every 15 minutes, created paused"
-DEP=$(naive deploy list | jq -r --arg a "$AGENT" '.data[] | select(.agent_id==$a and .cron=="*/15 * * * *") | .id' | head -1)
-[ -n "$DEP" ] || DEP=$(naive deploy create --agent "$AGENT" --cron "*/15 * * * *" --budget-usd 1.00 \
-  --window immediate --identity "$IDN" --prompt "Run your Sign up pass now on the inbox claimos@agentmail.to." | jq -r .id) \
-  && naive deploy pause "$DEP" >/dev/null   # a new schedule starts enabled; keep it paused until one good pass
-echo "  $DEP ($(naive deploy show "$DEP" | jq -r .schedule_status))"
-
-echo "done. After one good pass (naive session create --agent $AGENT --identity $IDN --message 'Run your Sign up pass now on the inbox claimos@agentmail.to.' --budget-usd 1.00 --window immediate): naive deploy resume $DEP"
+echo "4/4 native inboxes (wake on: a mail starts the owning agent) and the signup daily sweep"
+inbox() {  # inbox <localpart> <agent id>: provisions <localpart>@ on the org's system domain once
+  local addr="$1@claim-os-d4myby.usenaive.ai"
+  naive identity email list --identity "$IDN" | jq -e --arg a "$addr" '.data[] | select(.address==$a)' >/dev/null \
+    || naive identity email provision --identity "$IDN" --address "$addr" --agent "$2" >/dev/null
+  echo "  $addr -> $2"
+}
+inbox hello "$AGENT"; inbox outreach "$OUTREACH"
+SWEEP="Run your Sign up sweep now."
+DEP=$(naive deploy list | jq -r --arg a "$AGENT" '.data[] | select(.agent_id==$a) | .id' | head -1)
+if [ -n "$DEP" ]; then naive deploy update "$DEP" --cron "0 9 * * *" --timezone America/New_York --budget-usd 1.00 \
+    --identity "$IDN" --prompt "$SWEEP" >/dev/null || [ $? -eq 2 ]; else
+  DEP=$(naive deploy create --agent "$AGENT" --cron "0 9 * * *" --timezone America/New_York --budget-usd 1.00 \
+    --window immediate --identity "$IDN" --prompt "$SWEEP" | jq -r .id); fi
+echo "  $DEP ($(naive deploy show "$DEP" | jq -c '{schedule_status, cron}'))"
+echo "done. Owner mail to hello@claim-os-d4myby.usenaive.ai starts signup on its own; county replies to outreach@ start outreach."
