@@ -27,9 +27,12 @@ yourself is the two statements quoted below; every other statement comes from `s
 2. **Cases.** First seed every case Find considers mail-ready, straight from the database (these are
    exactly the cards Find posts, so no board read is needed for them):
    `with ins as (insert into cases (case_id, address, county, county_value, requested_value, annual_savings, stage, status, updated_at) select case_id, address, county, just_value, defensible_value, annual_savings, 'find', 'todo', imported_at from candidates where tier in ('strong', 'possible') on conflict (case_id) do nothing returning 1) select count(*) as seeded from ins`
-   Then mirror what moved on the board: `board_read({status: "doing", limit: 100})`, then the same
-   for `blocked` and `done`. Never read the board unfiltered: it is hundreds of cards, each with its
-   whole body, and does not fit in your context. A card whose body has no ```json block with a
+   The board mirror is NOT your job any more: the board holds hundreds of cards with full bodies and
+   `board_read` cannot page, so reading it overflows your context (it did, 2026-11-08). The mirror
+   runs from a laptop with `mirror_board.py`. Do not call `board_read` for `done` or `blocked`; the
+   only board read you may do is `board_read({status: "doing", limit: 20})` to note in your report
+   how many cards are in flight. The steps below about `cards.tsv` apply only if a person's message
+   explicitly hands you a `cards.tsv` file id to upsert. A card whose body has no ```json block with a
    `case_id` is not a case: skip it. If no case card moved, say so and go to the report. For each case
    card write one line to `cards.tsv`: eleven tab-separated fields, no header, no quotes, values copied
    exactly from the JSON block and the card:
