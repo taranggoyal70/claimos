@@ -1,0 +1,44 @@
+# taxappeal-site-sync: keeps the website database current
+
+One Naïve agent, `site-sync`, that every 6 hours (a) copies Find's newest published run into the
+`candidates` table of the `claimos-site` app and (b) mirrors every company-board card that carries a
+case into the `cases` table. The website (another folder) only reads those two tables.
+
+```
+Find run (candidates.csv + summary.json, org files) ──► site-sync ──► candidates (upsert by case_id, addr_key)
+company board cards (```json block with case_id)    ──►           ──► cases (stage from status/assignee)
+```
+
+| Piece | Lives in | Notes |
+|---|---|---|
+| `site-sync.agent.yaml` | Naïve agent | Haiku 5.5, $0.50 a pass, $5 a day; deny-by-default, `apps` limited to `claimos-site` |
+| `site-sync.system.md` | its instructions | the pass in plain steps, five-line report |
+| `sync.py` | org file, fetched each pass | CSV / board lines → SQL; needs no secret, the agent runs the SQL through the `apps` tool |
+| `setup.sh` | one-time setup | agent, upload sync.py, schedule `40 */6 * * *` America/New_York, created paused |
+
+## Setup
+
+```bash
+naive login …            # the Claim OS org
+./setup.sh               # prints the agent id, file id, schedule id and a one-pass test command
+naive deploy resume dep_…
+```
+
+## How it stays cheap and idempotent
+
+- The sandbox has no API key, so the model relays SQL: `sync.py sql` writes one upsert per 200 rows
+  (`insert … on conflict (case_id) do update`) and the agent passes each file's text to `db_query`.
+- A run is skipped when its `run_id` is already in `candidates`, or when the county's case-id set
+  already matches (Find re-publishes the same county several times a day). A pass that runs out of
+  budget resumes from the rows already in (`--skip`).
+- `cases` is mirrored incrementally: only cards updated after `max(cases.updated_at)` are read, in
+  order, and `updated_at` is the card's own. Stage: blocked → stopped, done → file, assigned to
+  evidence → evidence, assigned to file → file, else find.
+- `addr_key` = `upper(regexp_replace(trim(address), '\s+', ' ', 'g')) || '|' || coalesce(zip,'')`,
+  computed in SQL, so it can never drift from the website's lookup.
+
+## Not done
+
+- A county re-run whose case ids are unchanged but whose values changed is not re-imported
+  (shortcut: upgrade when Find starts changing values between runs).
+- `find_files` is name-search; if Find renames its outputs the prompt's two queries must follow.

@@ -1,0 +1,39 @@
+# Site sync desk on Naive. Apply with ./setup.sh (naive agent create/update -f site-sync.agent.yaml)
+name: site-sync
+description: >
+  Site sync. Every 6 hours copies Find's newest published run into the website database (candidates)
+  and mirrors each company-board card's status into the cases table. Reads the company's own records
+  only; never contacts anyone, never writes to the board.
+model: anthropic/claude-haiku-5.5   # gpt-oss-120b lost the procedure after step 1 in testing (2026-11-07)
+harness: pi
+window: immediate
+
+budget:
+  cap_usd: 5          # per day
+  max_task_usd: 0.50  # one pass
+  period: day
+
+system_file: site-sync.system.md
+
+tools:
+  default_config:
+    permission: deny   # nothing but the tools named below is offered to the model
+  configs:
+    bash: { enabled: true, permission: allow }
+    read: { enabled: true, permission: allow }
+    write: { enabled: true, permission: allow }
+    ls: { enabled: true, permission: allow }
+    find_files: { enabled: true, permission: allow }   # how it finds the newest Find run in the org file library
+    fetch_file: { enabled: true, permission: allow }
+    board_read: { enabled: true, permission: allow }
+    session_spend: { enabled: true, permission: allow }
+    apps:
+      enabled: true
+      permission: allow
+      config:
+        allowed_apps: [app_nkhc92xe21cyzfd5qakpkcj4g4]   # claimos-site only; the prompt limits it to db_query
+
+metadata:
+  desk: property_tax
+  step: site_sync
+  company: Claim OS
