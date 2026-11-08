@@ -62,6 +62,16 @@ cd taxappeal-site && naive db query --app app_nkhc92xe21cyzfd5qakpkcj4g4 "$(cat 
 Its last statement prints the five demo stages; they must be evidence, signup, stopped, waiting, won (one each).
 The board mirror skips rows whose `owner_email` is set since 2026-11-08, when a pass had reset three of them.
 
+Also human-run (the classifier denies agents `naive app deploy` and `naive db migrate` as production deploys): the
+claim-code build of the site (commit dc32aeb and later; the live site still runs the 09:15Z build) and its ledger row.
+
+```bash
+naive app deploy app_nkhc92xe21cyzfd5qakpkcj4g4 taxappeal-site   # poll `naive app deployments app_nkhc92xe21cyzfd5qakpkcj4g4` until the newest is ready
+cd taxappeal-site && naive db migrate db/migrations/003_claim_codes.sql --app app_nkhc92xe21cyzfd5qakpkcj4g4   # claim_codes already exists; this only records 003 in vetta_migrations
+```
+Check: `/check` shows the "Have a letter from us?" code field and `/api/verdict?code=BADCODE1` returns `{"found":false,"bad_code":true}`
+(the old handler returns `{"found":false}` only).
+
 ## Open items
 
 1. Dashboard: label won cases "Invoice sent" / "Paid" from `cases.status`; collect the two authorization choices on the site and write the `authorization:` line (queued behind the portal build).
