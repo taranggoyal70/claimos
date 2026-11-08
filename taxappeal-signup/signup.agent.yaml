@@ -36,10 +36,11 @@ tools:
     agent_mail.AGENT_MAIL_UPDATE_THREAD_LABELS: { enabled: true, permission: allow }
     agent_mail.AGENT_MAIL_REPLY_TO_MESSAGE: { enabled: true, permission: ask }   # every send is approved
     agent_mail.AGENT_MAIL_SEND_MESSAGE: { enabled: true, permission: ask }
-    # Monid: reads are free to run, the call itself is approved. Names from Monid's MCP; confirm at setup.
-    monid.discover: { enabled: true, permission: allow }
-    monid.inspect: { enabled: true, permission: allow }
-    monid.run: { enabled: true, permission: ask }
+    # Monid: reads are free to run, the call itself is approved. Names from Monid's MCP tools/list.
+    monid.monid_discover: { enabled: true, permission: allow }
+    monid.monid_inspect: { enabled: true, permission: allow }
+    monid.monid_run: { enabled: true, permission: ask }
+    monid.monid_get_run: { enabled: true, permission: allow }
 
 metadata:
   desk: property_tax

@@ -22,8 +22,8 @@ AC=$(naive connections configs | jq -r '.data[] | select(.connector=="agent_mail
   --tool AGENT_MAIL_LIST_INBOXES --tool AGENT_MAIL_LIST_THREADS --tool AGENT_MAIL_GET_THREAD \
   --tool AGENT_MAIL_GET_MESSAGE --tool AGENT_MAIL_UPDATE_THREAD_LABELS \
   --tool AGENT_MAIL_REPLY_TO_MESSAGE --tool AGENT_MAIL_SEND_MESSAGE | jq -r .id)
-CA=$(naive connections list --identity "$IDN" | jq -r '.data[] | select(.status=="active") | .id' | head -1)
-if [ -n "$CA" ]; then echo "  connection $CA is active"; else
+CA=$(naive connections list --identity "$IDN" | jq -r '.data[] | select(.status=="active" or .status=="initiated") | "\(.id) \(.status) \(.connect_link // "")"' | head -1)
+if [ -n "$CA" ]; then echo "  connection $CA"; else
   naive identity connect --identity "$IDN" --auth-config "$AC" \
     | jq -r '"  connection \(.id): open this link and paste the AgentMail key (am_…):\n  \(.connect_link)"'
 fi

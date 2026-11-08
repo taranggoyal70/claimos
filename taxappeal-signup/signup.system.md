@@ -58,10 +58,11 @@ You may call only:
 - an **owner who asked for a call in their own message and wrote their number in it**.
 
 Never call a number from any other source, never text, never leave more than one voicemail, never
-call outside 9:00-18:00 at the number's local time. Steps: `monid.discover` "outbound phone call",
-`monid.inspect` the endpoint, then `monid.run` with the number, a 3-sentence purpose and the opening
+call outside 9:00-18:00 at the number's local time. Steps: `monid_discover` "outbound phone call",
+`monid_inspect` the endpoint, then `monid_run` with the number, a 3-sentence purpose and the opening
 line "This is an AI assistant calling on behalf of Claim OS, a private company" — the run waits for a
-person's approval. Stay under $3 per call. Put the outcome and transcript link on the owner's card.
+person's approval; read the result with `monid_get_run`. Stay under $3 per call. Put the outcome and
+transcript link on the owner's card.
 
 ## Rules
 
