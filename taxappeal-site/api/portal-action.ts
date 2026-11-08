@@ -47,7 +47,12 @@ async function boardSignals(m: Meeting, email: string, roll: string | null) {
     body: [`case_id: ${m.case_id}`, `signup_card: ${card?.id ?? 'none'}`, 'source: website', `to: ${email}`, 'reply_to_message: none', `booking_url: ${url}`,
       `presenter_email: ${process.env.PRESENTER_EMAIL?.trim() || 'none'}`, `requested_slot: ${when}`, 'deck_version: build', 'update_only: no'].join('\n'),
   }));
-  for (const r of await Promise.allSettled(jobs)) if (r.status === 'rejected') console.error('booking board signal', r.reason);
+  // Both writes finish before the reply (Vercel may freeze work left running after it), capped so a slow board never holds the booking.
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const cap = new Promise<'timeout'>((ok) => { timer = setTimeout(ok, 6000, 'timeout'); });
+  const done = await Promise.race([Promise.allSettled(jobs), cap]).finally(() => clearTimeout(timer));
+  if (done === 'timeout') return console.error('booking board signals: writes still pending after 6 s, booking saved anyway');
+  for (const r of done) if (r.status === 'rejected') console.error('booking board signal', r.reason);
 }
 
 // What an owner can do from the portal. JSON body {t, action, ...}:
@@ -75,10 +80,7 @@ export async function POST(req: Request) {
       const address = str(b.address, 200) || (c && [c.address, c.unit && `Unit ${c.unit}`, c.city].filter(Boolean).join(', ')) || null;
       const [row] = await db('meetings', { method: 'POST', body: JSON.stringify({ email, name, slot: isNaN(ms) ? null : slot.toISOString(), case_id: c?.case_id ?? null, address,
         status: ref ? 'confirmed' : 'requested', notes: ref ? `booked via ${provider} · ${ref}` : null }) });
-      const signals = boardSignals(row, email.toLowerCase(), c?.address ?? null).catch((e) => console.error('booking board signals', e));
-      // On Vercel the reply goes out now and the function stays up for the signals (the hook @vercel/functions' waitUntil reads); elsewhere they are awaited.
-      const later = (globalThis as any)[Symbol.for('@vercel/request-context')]?.get?.()?.waitUntil;
-      if (later) later(signals); else await signals;
+      await boardSignals(row, email.toLowerCase(), c?.address ?? null).catch((e) => console.error('booking board signals', e));
       return Response.json({ id: row.id, slot: row.slot }, { status: 201 });
     }
 
