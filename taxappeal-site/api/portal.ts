@@ -7,10 +7,7 @@ type Meeting = { id: string; email: string; slot: string; status: string; addres
 
 // A seven-day link for a document kept as an org file. No NAIVE_API_KEY, or a failed call, leaves the row with no url
 // (the page shows it as "on file"); file_id never reaches the browser.
-// NAIVE_API_KEY is a files:read-only key set on the app by hand; a secret applies on the next deploy. One-time setup:
-//   naive keys create --name "app claimos-site (files:read)" --scopes files:read      (the key value is shown once)
-//   curl -X POST https://api.vetta.sh/v1/apps/app_nkhc92xe21cyzfd5qakpkcj4g4/secrets -H "authorization: Bearer <admin key>" \
-//     -H 'content-type: application/json' -d '{"name":"NAIVE_API_KEY","value":"<that key>"}'   then deploy
+// NAIVE_API_KEY is a files:read-only key a person puts on the app with scripts/set-secrets.sh; it applies on the next deploy.
 // Links serve the stored content type; these files were uploaded as application/octet-stream, so browsers download them.
 async function linked({ file_id, ...doc }: Doc): Promise<Doc> {
   if (!file_id || doc.url || !process.env.NAIVE_API_KEY) return doc;

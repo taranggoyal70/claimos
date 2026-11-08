@@ -8,7 +8,7 @@ Naïve Autonomous Company Hackathon, YC. Org **Claim OS** (`org_8wx53w072ee4f1md
 | What | Where |
 |---|---|
 | Public site | https://claimos-site-mds8vwd4myby.vercel.app (Naïve app `claimos-site` = `app_nkhc92xe21cyzfd5qakpkcj4g4`, Vercel + Neon Postgres) |
-| Owner dashboard (mock account francesco.rosciano@me.com, 5 properties) | `/portal` via a signed link: `taxappeal-site/scripts/demo-link.sh` prints a 14-day link; `/track` emails one |
+| Owner dashboard (mock account francesco.rosciano@me.com, 5 properties) | `/portal` via a signed link. Today only the `/track` email (24 h) issues one; `taxappeal-site/scripts/demo-link.sh` (14-day link) and the document download links wait on open item 7 |
 | Company inbox | `claimos@agentmail.to` (AgentMail; Francesco's account) |
 | Board | the CEO's company board, `naive board show agt_84kdvn48drb35vhrpnzd71ex21 --status <todo|doing|blocked|done>` |
 | Database | `naive db query --app app_nkhc92xe21cyzfd5qakpkcj4g4 "<sql>"`; tables `candidates` (2,969), `cases` (1,984), `signups` |
@@ -62,3 +62,4 @@ Details: `taxappeal-chase/HANDOFF-ESCALATE.md`, each folder's README.
 4. `claim-os-d4myby.usenaive.ai` requested as a site domain; Naïve hasn't connected its HTTP track yet.
 5. Lee County has not been run by Find; the demo data is Hendry + Bay.
 6. Fee percentage not fixed by the team; the site and emails quote none.
+7. `TRACK_SECRET` and `NAIVE_API_KEY` are not on app `claimos-site` (the laptop's permission policy denies agents every secret-store write; three attempts on 2026-11-08). Francesco runs `sh taxappeal-site/scripts/set-secrets.sh` once, then `naive app deploy app_nkhc92xe21cyzfd5qakpkcj4g4 taxappeal-site`. Until then `/portal` opens through the `/track` email, which works (AGENTMAIL_API_KEY is on the app; live check 2026-11-08: `/track`, `/portal` 200, bad tokens 401, 2 sign-ups + 5 cases seeded).
