@@ -110,7 +110,8 @@ def main():
         code = codes[cid] = code_for(cid, key)
         p, v, e = j.get("property", {}), j.get("values", {}), j.get("estimate", {})
         city_state_zip = f"{m.get('city') or ''}, {m.get('state') or ''} {m.get('zip') or ''}".strip(", ")
-        prop = f"{title(p.get('address'))}, {title(p.get('city') or rec['property'].get('city'))}, FL {rec['property'].get('zip') or ''}".rstrip()
+        unit = f" #{p['unit']}" if p.get("unit") else ""   # condo unit, written as /check shows it ("8515 Surf Dr #2")
+        prop = f"{title(p.get('address'))}{unit}, {title(p.get('city') or rec['property'].get('city'))}, FL {rec['property'].get('zip') or ''}".rstrip()
         vals = dict(date=today.strftime("%B %-d, %Y"), property=prop, county=j.get("jurisdiction", {}).get("county", ""),
                     year=str(rec.get("jurisdiction", {}).get("tax_year") or cid.split("-")[2]), county_value=money(v["just_value"]),
                     our_value=money(e["defensible_value"]), savings=money(e["annual_savings"]), code=code, site=SITE, case_id=cid)
