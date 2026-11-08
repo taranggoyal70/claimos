@@ -191,7 +191,7 @@
       show({ street: title(v.address), address: title(v.address) + (v.unit ? ' #' + v.unit : '') + ', ' + (v.zip || zip), unit: v.unit || unit, city: v.city ? title(v.city) : '', zip: v.zip || zip,
         value: v.just_value, over: v.just_value - v.defensible_value, savings: v.annual_savings, badge, tone, code: v.claim_code || '',
         note: v.use === 'possessory_interest'
-          ? 'Best case. Publicly owned land under a long lease: the taxable interest is the leasehold, assessed on the unsecured roll, which the city does not publish. Taxable value estimated at the rehabilitation cost the Assessor typically enrols; defensible value at the 2026 San Francisco office sale average. The Assessor decides.'
+          ? 'Publicly owned land under a long lease: the taxable interest is the leasehold, on the unsecured roll the city does not publish. Port of San Francisco filings put it near $12.4M; 2026 sales nearby (600 20th St at about $1,200 per sq ft, 1 De Haro St at about $800) put the market value well above that, so we see no case to appeal.'
           : 'Estimate from public county records and recent sales; the county decides.',
         estimated: v.use === 'possessory_interest', run: fmtRun(v.run_date) });
     } else {
