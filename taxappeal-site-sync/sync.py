@@ -21,6 +21,7 @@ CAST = {"tax_year": "int", "homestead": "boolean", "just_value": "numeric", "ass
 CHUNK = 200          # ~40 KB of SQL: the model passes each chunk as one tool argument
 TAG = "$tsv$"        # dollar-quote tag; asserted absent from the data
 ADDR_KEY = "upper(regexp_replace(trim(address), '\\s+', ' ', 'g')) || '|' || coalesce(zip, '')"  # the brief's rule
+DEMO_OWNER = "francesco.rosciano@me.com"   # the portal's seeded mock account: the only owner rows the board never overwrites
 CARD_COLS = ["case_id", "title", "address", "county", "just_value", "defensible_value", "annual_savings", "status", "assignee", "updated_at", "note"]
 RANK = {"find": 0, "qualify": 1, "signup": 2, "evidence": 3, "file": 4, "waiting": 5, "appeal": 6, "won": 7, "stopped": -1}
 
@@ -141,8 +142,8 @@ def cases(tsv_path):
                 rows[parts[0]] = (parts, st)
     assert rows, "no card lines"
     vals = ",\n".join("(" + ", ".join(q(p.strip()) for p in r) + ", " + q(st) + ")" for r, st in rows.values())
-    # A case with owner_email set is the portal's (the demo seed today, real sign-ups later): the board never overwrites it.
-    # shortcut: such a case never takes the board's stage, so a real owner's case would stall in the portal; upgrade when the first real owner signs
+    # The demo seed's rows are hand-written fiction: the board never overwrites them. A real owner's row keeps its owner_email
+    # (the upsert never sets it) but takes the board's stage, else the tracker would stall at "signup" forever.
     print(f"with raw ({', '.join(CARD_COLS)}, stage) as (values\n{vals}),\n"
           f"ins as (insert into cases (case_id, address, county, county_value, requested_value, annual_savings, stage, status, updated_at)\n"
           f"  select case_id, nullif(address, ''), nullif(county, ''), nullif(just_value, '')::numeric, nullif(defensible_value, '')::numeric,\n"
@@ -150,8 +151,8 @@ def cases(tsv_path):
           f"  on conflict (case_id) do update set address = excluded.address, county = excluded.county, county_value = excluded.county_value,\n"
           f"    requested_value = excluded.requested_value, annual_savings = excluded.annual_savings, stage = excluded.stage,\n"
           f"    status = excluded.status, updated_at = excluded.updated_at\n"
-          f"  where cases.owner_email is null returning 1)\n"
-          f"select count(*) as upserted, (select count(*) from raw join cases using (case_id) where cases.owner_email is not null) as skipped_owner_rows from ins")
+          f"  where cases.owner_email is distinct from {q(DEMO_OWNER)} returning 1)\n"
+          f"select count(*) as upserted, (select count(*) from raw join cases using (case_id) where cases.owner_email = {q(DEMO_OWNER)}) as skipped_demo_rows from ins")
 
 
 if __name__ == "__main__":

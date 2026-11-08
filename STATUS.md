@@ -63,7 +63,7 @@ Details: `taxappeal-chase/HANDOFF-ESCALATE.md`, each folder's README.
 cd taxappeal-site && naive db query --app app_nkhc92xe21cyzfd5qakpkcj4g4 "$(cat db/seed_francesco.sql)"
 ```
 Its last statement prints the five demo stages; they must be evidence, signup, stopped, waiting, won (one each).
-The board mirror skips rows whose `owner_email` is set since 2026-11-08, when a pass had reset three of them.
+The board mirror skips only the demo seed's rows (`owner_email` francesco.rosciano@me.com, `DEMO_OWNER` in sync.py) since 2026-11-08, when a pass had reset three of them; a real owner's row takes the board's stage.
 
 Also human-run (the classifier denies agents `naive app deploy` and `naive db migrate` as production deploys): the
 claim-code build of the site (commit dc32aeb and later; the live site still runs the 09:15Z build) and its ledger row.
@@ -93,7 +93,7 @@ values, deadlines, what we need from you, history, documents, messages), `/porta
 + `db/seed_francesco.sql` the mock account francesco.rosciano@me.com with five properties (4220 NW 13th St
 waiting on the county · 7969 1st Pl at evidence with the real packet and DR-486 draft · 520 Richard Jackson
 Blvd unit 1203 at sign-up · 2002 Anchor Ln won · 9014 E Mac Ct stopped). The board mirror never overwrites a
-case that has an `owner_email` (sync.py guard), so the demo rows survive site-sync.
+demo seed's case (sync.py `DEMO_OWNER` guard), so the demo rows survive site-sync.
 
 Demo path today: open `/track`, enter francesco.rosciano@me.com, click the emailed 24-hour link (proven live
 08:02 UTC). For a 14-day link and live document downloads, a person runs once:

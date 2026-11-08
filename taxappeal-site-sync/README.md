@@ -61,10 +61,11 @@ Stage comes from the card (`sync.py: stage()`): `Waiting on …` → waiting, `S
 qualify, REJECTED → stopped, EVIDENCE ready → file); the furthest step wins when cards share a case.
 Run it after a Find run or a few times a day (a launchd job on the Mac mini is the natural home).
 
-A case with `cases.owner_email` set (the portal demo seed `taxappeal-site/db/seed_francesco.sql` today,
-real sign-ups later) is the owner's: the upsert skips it (`where cases.owner_email is null`) and reports
-the count as `skipped_owner_rows`. On 2026-11-08 a mirror pass had reset three of the five demo rows
-(won → find, stopped → find, evidence → file) and the dashboard read "$0 won"; this is why.
+The portal demo seed's rows (`taxappeal-site/db/seed_francesco.sql`, `owner_email` francesco.rosciano@me.com,
+`DEMO_OWNER` in sync.py) are hand-written: the upsert skips them and reports the count as `skipped_demo_rows`. On
+2026-11-08 a mirror pass had reset three of the five demo rows (won → find, stopped → find, evidence → file) and the
+dashboard read "$0 won"; this is why. A real owner's row keeps its `owner_email` (the upsert never sets it) and takes
+the board's stage, so the tracker moves on after the sign-up.
 
 The same pass also carries website sign-ups to the board (`mirror_signups`): every consented `signups`
 row gets a `Sign up · <address>` card in `blocked` (body: email, address, phone, call_ok, consent,
