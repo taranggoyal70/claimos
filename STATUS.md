@@ -47,7 +47,7 @@ Teammates' agents on the same board: `find` (Nick, 6-hourly), `qualify` (Smaran)
 
 ## Hand-offs between desks
 
-- Owner conversation: `Sign up · <address>` card (blocked). A person assigns it to `evidence` once the owner confirmed.
+- Owner conversation: `Sign up · <address>` card (blocked). Once the owner confirmed, a person assigns the case's **Find card** to `evidence`, never the Sign up card: Evidence reads Find's case from the ```json block that ends the Find card's body, and no Sign up card (mail or website) carries one. The Find card is the one with the `owner signed up via the website` / `claim-link` comment, or whose title carries the Sign up card's address (website cards also name the `case_id`); proven with Find card `crd_wskrrg2yp3hxqsn23fjx8psd3c`.
 - Evidence → File: `File · <address> · <case_id>` card assigned to `File`, body = packet ids + the case JSON.
 - Filed: File writes `Waiting on county · <address> · <case_id>` with `follow_up: <office> <email>, every <N> days, last chased never`.
 - Chase → Escalate: `decision-letter · case … · level … · received … · <messageId>` (full letter) + `decision:` + `escalate`; Escalate answers with card notes (`WON · `, `APPEAL · `, `STOPPED · `) or `escalate-result · PENDING|INCOMPLETE …`.
