@@ -59,7 +59,14 @@ python3 taxappeal-site-sync/mirror_board.py     # reads every column with `naive
 Stage comes from the card (`sync.py: stage()`): `Waiting on …` → waiting, `Sign up ·` → signup,
 `File ·` → file (done → waiting), a done Find card → Qualify's verdict in the note (QUALIFIED →
 qualify, REJECTED → stopped, EVIDENCE ready → file); the furthest step wins when cards share a case.
-Run it after a Find run or a few times a day (a launchd job on the Mac mini is the natural home).
+Scheduled by `com.claimos.mirror.plist`: launchd runs it every 15 minutes (`StartInterval` 900, once more at load; a pass
+takes ~40 s and launchd never overlaps two) on the machine with the repo and the logged-in CLI, today this laptop (the
+paths are absolute; the Mac mini has neither the repo nor `naive`). Install once, log in `~/Library/Logs/claimos.mirror.log`:
+
+```bash
+cp taxappeal-site-sync/com.claimos.mirror.plist ~/Library/LaunchAgents/ && launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.claimos.mirror.plist
+launchctl bootout gui/$(id -u)/com.claimos.mirror      # stop it
+```
 
 The portal demo seed's rows (`taxappeal-site/db/seed_francesco.sql`, `owner_email` francesco.rosciano@me.com,
 `DEMO_OWNER` in sync.py) are hand-written: the upsert skips them and reports the count as `skipped_demo_rows`. On
