@@ -46,10 +46,10 @@ window.Portal = (() => {
   const emptyCard = (d) => {
     const card = el('div', 'card step'), s = (d.signups || [])[0], pills = el('div', 'pills');
     if (s) {
-      card.append(el('h3', null, 'Nothing yet.'), el('p', null, `We have your sign-up for ${title(s.address)}${s.city ? ', ' + title(s.city) : ''}${s.zip ? ' ' + s.zip : ''}` +
+      card.append(el('h2', null, 'Nothing yet.'), el('p', null, `We have your sign-up for ${title(s.address)}${s.city ? ', ' + title(s.city) : ''}${s.zip ? ' ' + s.zip : ''}` +
         (d.signups.length > 1 ? ` and ${d.signups.length - 1} more` : '') + ' and are checking the parcel against the county roll by hand; this page fills in as we go.'));
     } else {
-      card.append(el('h3', null, 'Nothing under this email yet.'), el('p', null, `We have no sign-up or case for ${d.email}. If you used a different email, request a new link with it.`));
+      card.append(el('h2', null, 'Nothing under this email yet.'), el('p', null, `We have no sign-up or case for ${d.email}. If you used a different email, request a new link with it.`));
       const a = el('a', 'pill', 'Request a new link'); a.href = '/track'; pills.append(a);
     }
     const chk = el('a', 'pill', 'Check another address'); chk.href = '/check'; pills.append(chk);
@@ -58,7 +58,7 @@ window.Portal = (() => {
   };
 
   const notice = (h, p, btnText, href) => {
-    const card = el('div', 'card step'), head = el('h3', null, h), pills = el('div', 'pills'), a = el('a', 'btn', btnText);
+    const card = el('div', 'card step'), head = el('h2', null, h), pills = el('div', 'pills'), a = el('a', 'btn', btnText);
     head.tabIndex = -1; a.href = href; pills.append(a);
     card.append(head, el('p', null, p), pills);
     return card;
@@ -66,7 +66,7 @@ window.Portal = (() => {
 
   async function load(render) {
     const main = document.querySelector('[data-portal]');
-    const show = (card) => { document.body.classList.add('is-out'); main.replaceChildren(card); main.removeAttribute('aria-busy'); card.querySelector('h3').focus({ preventScroll: true }); };
+    const show = (card) => { document.body.classList.add('is-out'); main.replaceChildren(card); main.removeAttribute('aria-busy'); card.querySelector('h2').focus({ preventScroll: true }); };
     const u = new URL(location.href), t = u.searchParams.get('t');
     if (t) { store.set(t); u.searchParams.delete('t'); history.replaceState(null, '', u.pathname + u.search + u.hash); }
     const tok = store.get();

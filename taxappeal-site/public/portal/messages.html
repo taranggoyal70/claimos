@@ -108,7 +108,7 @@
     const threads = P.sortCases(d.cases || []).map((c, i) => [c, i]).filter(([c]) => (c.messages || []).length);
     if (!threads.length) {
       const card = el('div', 'card step');
-      card.append(el('h3', null, 'No messages yet.'), el('p', null, 'We write from claimos@agentmail.to; add it to your contacts so nothing is filtered.'));
+      card.append(el('h2', null, 'No messages yet.'), el('p', null, 'We write from claimos@agentmail.to; add it to your contacts so nothing is filtered.'));
       return main.replaceChildren(card);
     }
     main.replaceChildren(...threads.map(([c, i]) => {
