@@ -29,7 +29,13 @@ def stage(title, status, assignee, note=""):
     """The loop step a card stands for: the title prefix says which desk wrote it, the status how far it got,
     and on a closed Find card the note's first word is the desk's verdict (QUALIFIED / REJECTED / EVIDENCE ready)."""
     t, a, n = title.strip().lower(), (assignee or "").strip().lower(), (note or "").strip().upper()
-    if t.startswith("waiting on"):
+    if t.startswith("waiting on"):                         # Escalate writes the outcome into the card's note
+        if n.startswith("WON"):
+            return "won"
+        if n.startswith("APPEAL"):
+            return "appeal"
+        if n.startswith("STOPPED"):
+            return "stopped"
         return "waiting"
     if t.startswith("sign up"):
         return "signup"

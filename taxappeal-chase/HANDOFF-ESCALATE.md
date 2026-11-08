@@ -51,19 +51,37 @@ escalate
   the decision arrived on paper, a person adds the same two comments by hand and uploads the scan
   with `publish_file`, quoting the `fil_` id instead of a messageId.
 
-## How Escalate reads it
+## What Escalate writes back, and what the tracker shows
 
-1. `board_read` with `status` `blocked` (never the unfiltered list: the board holds hundreds of Find
-   cards). Keep the cards whose title starts with `Waiting on`.
-2. For each, `board_read` by `card_id`; in `comments`, take the **latest** `decision:` line. A card
-   with no `decision:` comment has no decision yet; leave it.
-3. Parse the four fields split on ` · `. Read the notice with `agentmail__get_message` when the
-   text matters (grounds for denial, hearing remarks).
-4. Decide the next step (re-hearing request, appeal to circuit court, accept, or stop) and record
-   it: comment `escalate: <next step> · <deadline>`, and either create the next step's card
-   (`File · …` assigned to `File` for a re-filing) or move this card to `done` with a note. The
-   `cases` table in the site database mirrors the card's status through site-sync; a comment
-   `stage: appeal` or `stage: won` on the card is picked up on the next sync.
+Escalate acts only on cards that carry a `decision-letter` comment. It records its outcome on the
+**same Waiting-on card**, and the site's board mirror (`taxappeal-site-sync/mirror_board.py`,
+`sync.py: stage()`) turns the card into the owner's tracker step from the card's own fields:
+
+| Escalate's outcome | What it does to the card | Tracker step |
+|---|---|---|
+| won | status `done`, note starts with `WON · ` | `won` |
+| closed | status `done`, note starts with `STOPPED · ` | `stopped` |
+| appealing again | status `blocked`, note starts with `APPEAL · ` | `appeal` |
+| waiting (hearing scheduled, letter unclear or unreadable) | card left as is, plus an `escalate-result` comment (below) | `waiting` |
+
+When Escalate decides to wait, it posts a comment whose first line is one of
+
+```
+escalate-result · PENDING · <code> · <messageId>
+escalate-result · INCOMPLETE · <code> · <messageId>
+```
+
+(the PENDING comment's second line ends in `check again <YYYY-MM-DD>`). Chase then treats the card
+as open again: new replies are attached, a new decision gets `decision-letter` + `decision:` +
+`escalate` again, follow-ups resume on the card's cadence (none before the `check again` date on a
+PENDING card), and the three-follow-up cap restarts, counting only `chased:` comments after the
+latest `escalate-result` comment.
+
+When a case must be refiled, Escalate creates one card for Evidence: title
+`Evidence · <address> · <case_id>`, assignee `evidence`, status `todo`; body `From Escalate: <code> ·
+<level name> (<form>) by <deadline>`, one `fix: <item> (<why>)` line per missing item,
+`petition_deadline: <YYYY-MM-DD>`, then the case's original ```json block copied from the Waiting-on
+card. Assigning it is what starts Evidence.
 
 ## Where everything else is
 
