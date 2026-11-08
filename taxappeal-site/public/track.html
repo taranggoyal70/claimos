@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Track my claim — Claim OS</title>
+<meta name="description" content="Enter the email you signed up with and we email you a link to your case page: where your property tax appeal stands, the county's value against ours, the filing deadline, and what we need from you.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<style>.hero .thanks { margin-top: 8px; }</style>
+<script>/* Wakes /api/portal and the database once per browser session, so the emailed portal link opens fast. */
+try { if (!sessionStorage.claimos_warm) { sessionStorage.claimos_warm = 1; fetch('/api/portal?warm=1', { keepalive: true }).catch(() => {}); } } catch {}</script>
+</head>
+<body>
+
+<div class="top">
+  <header class="nav wrap">
+    <a class="wordmark" href="/">Claim OS</a>
+    <nav class="nav-links" aria-label="Site">
+      <a href="/how-it-works">How it works</a>
+      <a href="/pricing">How we get paid</a>
+      <a href="/faq">FAQ</a>
+      <a href="/about">About</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="pill" href="/track" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>Track my claim</a>
+      <a class="pill" href="/signup">Sign up</a>
+      <a class="btn" href="/check">Check my property</a>
+    </div>
+    <details class="menu">
+      <summary>Menu</summary>
+      <nav aria-label="Site">
+        <a href="/check">Check my property</a>
+        <a href="/track" aria-current="page">Track my claim</a>
+        <a href="/signup">Sign up</a>
+        <a href="/how-it-works">How it works</a>
+        <a href="/pricing">How we get paid</a>
+        <a href="/faq">FAQ</a>
+        <a href="/about">About</a>
+      </nav>
+    </details>
+  </header>
+
+  <section class="hero compact wrap" id="ask">
+    <div>
+      <h1>Where is my claim?</h1>
+      <p class="sub">Enter the email you signed up with. We send a link that opens your cases.</p>
+      <form class="bar" id="link-form" novalidate>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <input class="address" name="email" type="email" placeholder="you@example.com" aria-label="Email" autocomplete="email" autofocus required>
+        <button class="btn" type="submit">Email me a link</button>
+      </form>
+      <p class="bar-err" role="alert"></p>
+      <div class="thanks" id="sent" hidden>
+        <h2 tabindex="-1">Check your inbox.</h2>
+        <ul>
+          <li>If we have cases for that email, a link is on its way from claimos@agentmail.to. It works for 24 hours.</li>
+          <li>Add claimos@agentmail.to to your contacts so the link isn't filtered.</li>
+        </ul>
+        <div class="pills"><button class="pill" type="button" id="again">Send another link</button><a class="pill" href="/check">Check my property</a></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <span class="label">Product</span>
+        <ul>
+          <li><a href="/check">Check my property</a></li>
+          <li><a href="/track">Track my claim</a></li>
+          <li><a href="/how-it-works">How it works</a></li>
+          <li><a href="/pricing">How we get paid</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Company</span>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="mailto:hello@claim-os-d4myby.usenaive.ai">hello@claim-os-d4myby.usenaive.ai</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Legal</span>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-note">Claim OS is a private company and is not affiliated with any government agency, county property appraiser or value adjustment board. Claim OS is not a law firm and does not give legal advice. Estimates come from public county records and may be out of date; only the county decides your value, and nothing here is a promise of a lower bill.</p>
+    <p class="foot-copy">© 2026 Claim OS</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const q = new URLSearchParams(location.search), t = q.get('t');
+  // The emailed link lands here; the portal owns the session from there on.
+  // The fetch starts the portal's data request now (keepalive outlives this page), so /portal finds it in the HTTP cache.
+  if (t) { fetch('/api/portal?t=' + encodeURIComponent(t), { keepalive: true }).catch(() => {}); location.replace('/portal?t=' + encodeURIComponent(t)); return; }
+
+  const ask = $('#ask'), form = $('#link-form'), err = $('.bar-err', ask), sent = $('#sent');
+  const showForm = (on) => { form.hidden = !on; $('h1', ask).hidden = !on; $('.sub', ask).hidden = !on; sent.hidden = on; };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.textContent = '';
+    const email = form.email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Enter the email you signed up with.'; form.email.focus(); return; }
+    const btn = $('button', form);
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/track-request', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) err.textContent = r.status === 400 && d.error ? d.error : 'We could not send the link right now. Try again in a minute, or email hello@claim-os-d4myby.usenaive.ai and we will send it by hand.';
+      else { showForm(false); $('h2', sent).focus(); }
+    } catch { err.textContent = 'We could not send the link right now. Try again in a minute, or email hello@claim-os-d4myby.usenaive.ai and we will send it by hand.'; }
+    btn.disabled = false;
+  });
+  $('#again').addEventListener('click', () => { showForm(true); form.email.value = ''; form.email.focus(); });
+
+  // The portal sends expired sessions back here with ?expired=1
+  if (q.has('expired')) { history.replaceState(null, '', '/track'); err.textContent = 'This link has expired. Request a new one.'; form.email.focus(); }
+})();
+</script>
+</body>
+</html>

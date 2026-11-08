@@ -1,0 +1,32 @@
+{
+  "_note": "FAKE sample data for demos and tests. Not a real property.",
+  "case_id": "FL-Lee-2026-SAMPLE-0001",
+  "county": "Lee",
+  "roll_year": 2026,
+  "county_level": 0.85,
+  "annual_savings": 870,
+  "petition_deadline": "2026-09-15",
+  "subject": {
+    "parcel_id": "00-00-00-00-00000.0001",
+    "address": "100 SAMPLE AVE, CAPE CORAL (sample)",
+    "sqft": 1850,
+    "year_built": 2004,
+    "just_value": 410000,
+    "last_sale": null
+  },
+  "sales": [
+    {"parcel_id": "S-1", "address": "101 SAMPLE AVE (sample)", "sale_date": "2025-09-12", "sale_price": 412000, "adjusted_price": 418000, "sqft": 1800, "year_built": 2003, "arms_length": true},
+    {"parcel_id": "S-2", "address": "117 SAMPLE AVE (sample)", "sale_date": "2025-06-03", "sale_price": 420000, "adjusted_price": 432000, "sqft": 1900, "year_built": 2006, "arms_length": true},
+    {"parcel_id": "S-3", "address": "12 EXAMPLE CT (sample)", "sale_date": "2025-11-20", "sale_price": 407000, "adjusted_price": 409000, "sqft": 1780, "year_built": 2002, "arms_length": true},
+    {"parcel_id": "S-4", "address": "33 EXAMPLE CT (sample)", "sale_date": "2025-03-28", "sale_price": 436000, "adjusted_price": 452000, "sqft": 1950, "year_built": 2005, "arms_length": true},
+    {"parcel_id": "S-5", "address": "8 DEMO LN (sample)", "sale_date": "2025-08-15", "sale_price": 446000, "adjusted_price": 455000, "sqft": 2000, "year_built": 2007, "arms_length": true},
+    {"parcel_id": "S-6", "address": "20 DEMO LN (sample, after Jan 1)", "sale_date": "2026-03-10", "sale_price": 300000, "sqft": 1840, "year_built": 2004, "arms_length": true},
+    {"parcel_id": "S-7", "address": "41 DEMO LN (sample, not arm's-length)", "sale_date": "2025-07-01", "sale_price": 150000, "sqft": 1860, "year_built": 2004, "arms_length": false}
+  ],
+  "peers": [
+    {"parcel_id": "P-1", "sqft": 1800, "just_value": 351000},
+    {"parcel_id": "P-2", "sqft": 1900, "just_value": 368000},
+    {"parcel_id": "P-3", "sqft": 1820, "just_value": 360000},
+    {"parcel_id": "P-4", "sqft": 1870, "just_value": 362000}
+  ]
+}

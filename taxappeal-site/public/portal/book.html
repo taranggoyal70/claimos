@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book a meeting — Claim OS</title>
+<meta name="description" content="Book a 20-minute call with a licensed tax professional about your property tax appeal. No cost.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/portal/portal.css">
+<style>#cal-box { min-height: 640px; margin: 16px 0; } #cal-link, #ext a { text-decoration: underline; }</style>
+</head>
+<body>
+
+<div class="top">
+  <header class="nav wrap">
+    <a class="wordmark" href="/">Claim OS</a>
+    <nav class="nav-links" aria-label="Site">
+      <a href="/how-it-works">How it works</a>
+      <a href="/pricing">How we get paid</a>
+      <a href="/faq">FAQ</a>
+      <a href="/about">About</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="nav-who" hidden>Signed in as <b data-email></b></span>
+      <a class="pill" href="/track" data-signout hidden>Sign out</a>
+      <a class="btn" href="/check">Check my property</a>
+    </div>
+    <details class="menu">
+      <summary>Menu</summary>
+      <nav aria-label="Site">
+        <a href="/portal" aria-current="page">Your properties</a>
+        <a href="/check">Check my property</a>
+        <a href="/how-it-works">How it works</a>
+        <a href="/pricing">How we get paid</a>
+        <a href="/faq">FAQ</a>
+        <a href="/about">About</a>
+        <a href="/track" data-signout hidden>Sign out</a>
+      </nav>
+    </details>
+  </header>
+
+  <section class="hero compact wrap">
+    <div>
+      <h1>Talk to a licensed tax professional</h1>
+      <p class="sub">A 20-minute call, no cost. We go through your numbers and what the county will ask.</p>
+      <nav class="tabs" aria-label="Portal">
+        <a class="pill" href="/portal">Overview</a>
+        <a class="pill" href="/portal/messages">Messages</a>
+        <a class="pill" href="/portal/book" aria-current="page">Book a meeting</a>
+        <a class="pill" href="/portal/account">Account</a>
+      </nav>
+    </div>
+  </section>
+</div>
+
+<main class="wrap portal" data-portal aria-live="polite" aria-busy="true">
+  <div class="card step" id="booked" hidden>
+    <h2></h2>
+    <p></p>
+    <div class="pills"><button class="pill" type="button" id="another">Book another</button><a class="pill" href="/portal">Your properties</a></div>
+  </div>
+
+  <form class="card form-card" id="book" hidden novalidate>
+    <h2>Book a call</h2>
+    <p class="sub">Pick a property and a time. We confirm by email from claimos@agentmail.to.</p>
+    <p class="sub" id="ext" hidden>Or <a target="_blank" rel="noopener">open our calendar in a new tab</a>.</p>
+    <div class="form-grid">
+      <div class="field">
+        <label for="name">Your name</label>
+        <input id="name" name="name" autocomplete="name" maxlength="120" required>
+        <span class="err" id="err-name" role="alert"></span>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" readonly>
+      </div>
+      <div class="field full">
+        <label for="case">Property</label>
+        <select id="case" name="case_id"></select>
+      </div>
+      <fieldset class="slots-field full">
+        <legend>Pick a time (Eastern)</legend>
+        <div class="slots" id="slots"></div>
+        <span class="err" id="err-slot" role="alert"></span>
+      </fieldset>
+      <button class="btn" type="submit">Book the call</button>
+      <span class="err full" id="err-form" role="alert"></span>
+      <p class="caption full">Claim OS is a private company, not a government agency, and not a law firm. The call is about your appeal, not legal advice.</p>
+    </div>
+  </form>
+
+  <div class="card form-card" id="cal" hidden>
+    <h2>Pick a time</h2>
+    <p class="sub">About <span id="cal-about"></span>. <a id="cal-link" target="_blank" rel="noopener">Open the calendar in a new tab</a></p>
+    <div id="cal-box"></div>
+    <span class="err" id="err-cal" role="alert"></span>
+    <div class="pills"><button class="pill" type="button" id="cal-back">Change details</button></div>
+  </div>
+
+  <div class="card form-card thanks" id="done" hidden>
+    <h2 tabindex="-1">Booked.</h2>
+    <ul>
+      <li id="done-when"></li>
+      <li>We confirm by email from claimos@agentmail.to, with the call link.</li>
+      <li>Have your TRIM notice and any photos of the home to hand.</li>
+    </ul>
+    <div class="pills"><a class="pill" href="/portal">Back to your properties</a><a class="pill" href="/portal/messages">Messages</a></div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <span class="label">Product</span>
+        <ul>
+          <li><a href="/check">Check my property</a></li>
+          <li><a href="/track">Track my claim</a></li>
+          <li><a href="/how-it-works">How it works</a></li>
+          <li><a href="/pricing">How we get paid</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Company</span>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="mailto:hello@claim-os-d4myby.usenaive.ai">hello@claim-os-d4myby.usenaive.ai</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Legal</span>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-note">Claim OS is a private company and is not affiliated with any government agency, county property appraiser or value adjustment board. Claim OS is not a law firm and does not give legal advice. Estimates come from public county records and may be out of date; only the county decides your value, and nothing here is a promise of a lower bill.</p>
+    <p class="foot-copy">© 2026 Claim OS</p>
+  </div>
+</footer>
+
+<script src="/portal/portal.js"></script>
+<script>
+(() => {
+  const P = Portal, { el, when, title, addr } = P, $ = (s, r = document) => r.querySelector(s);
+  const booked = $('#booked'), form = $('#book'), done = $('#done'), cal = $('#cal');
+  const NET = 'We could not book the call. Try again, or email hello@claim-os-d4myby.usenaive.ai.';
+  const setErr = (field, msg) => { ($('#err-' + field) || $('#err-form')).textContent = msg; };
+  const about = (c) => (c ? `${addr(c)}, ${title(c.city)}` : '');
+  let cases = [];
+  // GET /api/booking: with a cal.com or calendly.com BOOKING_URL the time is picked in that calendar's embed, else in the picker below.
+  let cfg = {};
+  const ready = fetch('/api/booking').then((r) => r.json()).then((b) => { cfg = b; }).catch(() => {});
+  const embed = () => cfg.provider === 'cal' || cfg.provider === 'calendly';
+
+  // The next five weekdays at 10:00 and 3:00 Eastern, whatever the visitor's clock says; values carry New York's offset.
+  const NY = 'America/New_York';
+  const fmt = (d, o) => new Intl.DateTimeFormat('en-US', { timeZone: NY, ...o }).format(d);
+  const ymd = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: NY, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+  const offset = (d) => new Intl.DateTimeFormat('en-US', { timeZone: NY, timeZoneName: 'longOffset' }).formatToParts(d).find((p) => p.type === 'timeZoneName')?.value.replace('GMT', '') || '+00:00';
+  function slots() {
+    const out = [], d = new Date();
+    while (out.length < 10) {
+      d.setDate(d.getDate() + 1);
+      if (/^S/.test(fmt(d, { weekday: 'short' }))) continue; // Sat, Sun
+      for (const [h, label] of [['10:00', '10:00 AM'], ['15:00', '3:00 PM']]) out.push({ value: `${ymd(d)}T${h}:00${offset(d)}`, label: `${fmt(d, { weekday: 'short', month: 'short', day: 'numeric' })} · ${label}` });
+    }
+    return out;
+  }
+
+  function render(d) {
+    cases = P.sortCases(d.cases || []);
+    const meetings = d.meetings || [];
+    const next = meetings.filter((m) => m.status !== 'cancelled' && new Date(m.slot) >= Date.now()).sort((a, b) => String(a.slot).localeCompare(String(b.slot)))[0];
+    if (next) {
+      const c = cases.find((x) => x.case_id === next.case_id);
+      $('h2', booked).textContent = `You have a call on ${when(next.slot)}`;
+      $('p', booked).textContent = `About ${about(c) || next.address || 'your appeal'}. ${next.status === 'confirmed' ? 'Confirmed.' : 'Requested; we confirm by email.'} To move it, reply to our email.`;
+      booked.hidden = false;
+    } else form.hidden = false;
+    form.name.value = meetings.map((m) => m.name).filter(Boolean).pop() || '';
+    form.email.value = d.email;
+    form.case_id.replaceChildren(...cases.map((c) => new Option(addr(c), c.case_id)), new Option('A general question', ''));
+    $('#slots').replaceChildren(...slots().map((s) => {
+      const l = el('label', 'slot'), i = el('input'); Object.assign(i, { type: 'radio', name: 'slot', value: s.value });
+      l.append(i, el('span', null, s.label)); return l;
+    }));
+    $('.slots-field', form).hidden = embed();
+    $('button[type="submit"]', form).textContent = embed() ? 'Pick a time' : 'Book the call';
+    $('#ext').hidden = cfg.provider !== 'link'; $('#ext a').href = cfg.url || '';
+  }
+
+  // Step two with a calendar: its inline embed, prefilled. A booking there calls onBooked() with the calendar's own reference.
+  let picked = null, sent = false;
+  function openCal(name, c) {
+    picked = { name, c }; sent = false;
+    const box = $('#cal-box'), email = form.email.value, notes = c ? `${about(c)} · case ${c.case_id}` : 'A general question';
+    $('#cal-about').textContent = c ? addr(c) : 'a general question';
+    $('#cal-link').href = cfg.url; $('#err-cal').textContent = '';
+    form.hidden = true; cal.hidden = false; box.replaceChildren();
+    if (cfg.provider === 'cal') {
+      if (!window.Cal) {
+        // cal.com's own embed loader snippet: queues Cal(...) calls until embed.js arrives
+        (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement('script')).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if (typeof namespace === 'string') { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ['initNamespace', namespace]); } else p(cal, ar); return; } p(cal, ar); }; })(window, 'https://app.cal.com/embed/embed.js', 'init');
+        Cal('init', { origin: 'https://app.cal.com' });
+        // V1 carries the booking under .booking, V2 flat; whichever fires first wins
+        for (const action of ['bookingSuccessful', 'bookingSuccessfulV2']) Cal('on', { action, callback: (e) => { const x = e.detail?.data || {}; onBooked('cal', x.uid || x.booking?.uid, x.startTime || x.booking?.startTime); } });
+      }
+      Cal('inline', { elementOrSelector: box, calLink: new URL(cfg.url).pathname.slice(1), config: { name, email, notes, layout: 'month_view' } });
+    } else {
+      box.style.height = '700px'; // Calendly's inline widget needs a fixed height
+      const go = () => Calendly.initInlineWidget({ url: cfg.url, parentElement: box, prefill: { name, email, customAnswers: { a1: notes } } });
+      if (window.Calendly) go(); else document.head.append(Object.assign(document.createElement('script'), { src: 'https://assets.calendly.com/assets/external/widget.js', onload: go }));
+    }
+  }
+  // Calendly tells the page by postMessage; it gives no time, the invite holds it
+  window.addEventListener('message', (e) => { if (e.origin === 'https://calendly.com' && e.data?.event === 'calendly.event_scheduled') onBooked('calendly', e.data.payload?.invitee?.uri || e.data.payload?.event?.uri, null); });
+
+  async function onBooked(provider, ref, slot) {
+    if (sent || !picked) return;
+    sent = true;
+    const { name, c } = picked, about2 = c ? addr(c) : 'a general question';
+    let t = null; try { t = sessionStorage.getItem('claimos_t'); } catch {}
+    try {
+      const r = await fetch('/api/portal-action', { method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ t, action: 'book', provider, booking_ref: ref || '', slot: slot || '', name, case_id: c ? c.case_id : '', address: about(c) }) });
+      if (!r.ok) throw new Error(r.status);
+      cal.hidden = true;
+      $('#done-when').textContent = slot ? `${when(slot)}, about ${about2}.` : `About ${about2}. The time is in your calendar invite.`;
+      done.hidden = false;
+      $('h2', done).focus();
+    } catch { $('#err-cal').textContent = 'Your call is booked on the calendar, but we could not save it here. Email hello@claim-os-d4myby.usenaive.ai and we add it.'; }
+  }
+  window.bookedInCalendar = onBooked; // callable by hand to test the hand-off without a real booking
+
+  $('#cal-back').addEventListener('click', () => { cal.hidden = true; form.hidden = false; form.name.focus(); });
+  $('#another').addEventListener('click', () => { booked.hidden = true; form.hidden = false; form.name.focus(); });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    form.querySelectorAll('.err').forEach((x) => (x.textContent = ''));
+    const name = form.name.value.trim(), slot = form.querySelector('input[name="slot"]:checked')?.value;
+    if (!name) { setErr('name', 'Enter your name.'); return form.name.focus(); }
+    if (embed()) return openCal(name, cases.find((x) => x.case_id === form.case_id.value));
+    if (!slot) { setErr('slot', 'Pick a time.'); return form.querySelector('input[name="slot"]').focus(); }
+    const c = cases.find((x) => x.case_id === form.case_id.value), btn = $('button[type="submit"]', form);
+    let t = null; try { t = sessionStorage.getItem('claimos_t'); } catch {}
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/portal-action', { method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ t, action: 'book', name, address: about(c), case_id: c ? c.case_id : '', slot }) });
+      const d = await r.json().catch(() => ({}));
+      if (r.status === 401) return P.load(render); // the link expired meanwhile: portal.js shows the sign-in card
+      if (!r.ok) return setErr(d.field, d.error || NET);
+      form.hidden = true;
+      $('#done-when').textContent = `${when(slot)}, about ${c ? addr(c) : 'a general question'}.`;
+      done.hidden = false;
+      $('h2', done).focus();
+    } catch { setErr('form', NET); } finally { btn.disabled = false; }
+  });
+
+  ready.then(() => P.load(render));
+})();
+</script>
+</body>
+</html>

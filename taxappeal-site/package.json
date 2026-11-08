@@ -1,0 +1,8 @@
+{
+  "name": "claimos-site",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": { "build": "echo 'static site, nothing to build'" },
+  "engines": { "node": "24.x" },
+  "dependencies": { "@neondatabase/serverless": "^1.2.0" }
+}

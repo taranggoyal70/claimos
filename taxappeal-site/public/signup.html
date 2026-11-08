@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign up — Claim OS</title>
+<meta name="description" content="Sign up with your Florida property address and we start a free review of its assessed value. We email you a link to your case page right away.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<script>/* Wakes /api/portal and the database once per browser session, so the emailed portal link opens fast. */
+try { if (!sessionStorage.claimos_warm) { sessionStorage.claimos_warm = 1; fetch('/api/portal?warm=1', { keepalive: true }).catch(() => {}); } } catch {}</script>
+</head>
+<body>
+
+<div class="top">
+  <header class="nav wrap">
+    <a class="wordmark" href="/">Claim OS</a>
+    <nav class="nav-links" aria-label="Site">
+      <a href="/how-it-works">How it works</a>
+      <a href="/pricing">How we get paid</a>
+      <a href="/faq">FAQ</a>
+      <a href="/about">About</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="pill" href="/track"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>Track my claim</a>
+      <a class="pill" href="/signup" aria-current="page">Sign up</a>
+      <a class="btn" href="/check">Check my property</a>
+    </div>
+    <details class="menu">
+      <summary>Menu</summary>
+      <nav aria-label="Site">
+        <a href="/check">Check my property</a>
+        <a href="/signup" aria-current="page">Sign up</a>
+        <a href="/track">Track my claim</a>
+        <a href="/how-it-works">How it works</a>
+        <a href="/pricing">How we get paid</a>
+        <a href="/faq">FAQ</a>
+        <a href="/about">About</a>
+      </nav>
+    </details>
+  </header>
+
+  <section class="hero compact wrap">
+    <div>
+      <h1>Sign up for a free review</h1>
+      <p class="sub">Tell us which Florida home to look at. We check the county's value against comparable sales, email you a link to your case page right away, and only get paid if the value goes down.</p>
+    </div>
+  </section>
+</div>
+
+<main class="wrap">
+  <div class="card form-card" id="signup">
+    <h2>Your property</h2>
+    <p class="sub">No cost to start. We reply from hello@claim-os-d4myby.usenaive.ai. Already checked your address? <a href="/check">See the estimate first</a>.</p>
+    <form class="form-grid" novalidate>
+      <div class="field full"><label for="f-address">Street address</label><input id="f-address" name="address" type="text" autocomplete="street-address" required><small class="err" id="err-address" role="alert"></small></div>
+      <div class="field"><label for="f-unit">Unit (optional)</label><input id="f-unit" name="unit" type="text" autocomplete="address-line2"></div>
+      <div class="field"><label for="f-city">City</label><input id="f-city" name="city" type="text" autocomplete="address-level2"></div>
+      <div class="field"><label for="f-zip">ZIP</label><input id="f-zip" name="zip" type="text" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" required><small class="err" id="err-zip" role="alert"></small></div>
+      <div class="field"><label for="f-code">Claim code from our letter (optional)</label><input id="f-code" name="claim_code" type="text" autocomplete="off" maxlength="8" spellcheck="false"></div>
+      <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required><small class="err" id="err-email" role="alert"></small></div>
+      <div class="field"><label for="f-phone">Phone (optional)</label><input id="f-phone" name="phone" type="tel" autocomplete="tel"></div>
+      <label class="check full"><input id="f-call-ok" name="call_ok" type="checkbox" disabled><span>You may call me about this property</span></label>
+      <label class="check full"><input name="pro_call" type="checkbox"><span>Request a call with a licensed tax professional</span></label>
+      <div class="field full"><label class="check"><input name="consent" type="checkbox" required><span>I own this property or act for the owner, and agree that Claim OS may review its public records and email me about an appeal.</span></label><small class="err" id="err-consent" role="alert"></small></div>
+      <div class="field full"><button class="btn" type="submit">Sign up</button><small class="err" id="err-form" role="alert"></small></div>
+    </form>
+    <div class="thanks" id="thanks" hidden>
+      <h2 tabindex="-1">Check your email.</h2>
+      <ul>
+        <li>A link to your case page is on its way from claimos@agentmail.to. It works for 24 hours; you can ask for a new one any time from <a href="/track">Track my claim</a>.</li>
+        <li>We confirm your parcel against the county roll by hand and write within a day or two. Add claimos@agentmail.to to your contacts so it isn't filtered.</li>
+        <li>If the case holds, we send the agreement to sign. Nothing is filed before you sign.</li>
+      </ul>
+      <div class="pills"><a class="pill" href="/track">Track my claim</a><a class="pill" href="/check">Check another address</a></div>
+    </div>
+  </div>
+</main>
+
+<!-- Canonical footer. Copy verbatim as the last element in <body> on every page. -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <span class="label">Product</span>
+        <ul>
+          <li><a href="/check">Check my property</a></li>
+          <li><a href="/track">Track my claim</a></li>
+          <li><a href="/how-it-works">How it works</a></li>
+          <li><a href="/pricing">How we get paid</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Company</span>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="mailto:hello@claim-os-d4myby.usenaive.ai">hello@claim-os-d4myby.usenaive.ai</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Legal</span>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-note">Claim OS is a private company and is not affiliated with any government agency, county property appraiser or value adjustment board. Claim OS is not a law firm and does not give legal advice. Estimates come from public county records and may be out of date; only the county decides your value, and nothing here is a promise of a lower bill.</p>
+    <p class="foot-copy">© 2026 Claim OS</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const el = $('#signup'), f = $('form', el), btn = $('button', f);
+  const q = new URLSearchParams(location.search);
+  for (const k of ['address', 'zip', 'city', 'unit']) if (q.get(k)) f[k].value = q.get(k);
+  if (q.get('code')) f.claim_code.value = q.get('code').toUpperCase();
+  f.phone.addEventListener('input', () => { f.call_ok.disabled = !f.phone.value.trim(); if (f.call_ok.disabled) f.call_ok.checked = false; });
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    f.querySelectorAll('.err').forEach((x) => { x.textContent = ''; });
+    const body = { address: f.address.value, unit: f.unit.value, city: f.city.value, zip: f.zip.value, email: f.email.value, phone: f.phone.value,
+      call_ok: f.call_ok.checked, pro_call: f.pro_call.checked, consent: f.consent.checked, claim_code: f.claim_code.value };
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/signup', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+      if (r.status === 201) {
+        // The case-page link goes out as soon as the row exists; a mail hiccup must not undo the sign-up, so its result is not awaited.
+        fetch('/api/track-request', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: f.email.value }) }).catch(() => {});
+        f.hidden = true; $('.sub', el).hidden = true; $('h2', el).hidden = true;
+        const t = $('#thanks', el); t.hidden = false; $('h2', t).focus();
+        return;
+      }
+      const errors = (await r.json().catch(() => ({}))).errors || { form: 'Something went wrong. Please try again.' };
+      for (const k in errors) ($('#err-' + k, el) || $('#err-form', el)).textContent = errors[k];
+    } catch { $('#err-form', el).textContent = 'We could not reach our server. Please try again.'; }
+    btn.disabled = false;
+  });
+})();
+</script>
+</body>
+</html>

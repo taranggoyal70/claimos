@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Account — Claim OS</title>
+<meta name="description" content="The email and properties Claim OS holds for you, what we store, and how to leave.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/portal/portal.css">
+</head>
+<body>
+
+<div class="top">
+  <header class="nav wrap">
+    <a class="wordmark" href="/">Claim OS</a>
+    <nav class="nav-links" aria-label="Site">
+      <a href="/how-it-works">How it works</a>
+      <a href="/pricing">How we get paid</a>
+      <a href="/faq">FAQ</a>
+      <a href="/about">About</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="nav-who" hidden>Signed in as <b data-email></b></span>
+      <a class="pill" href="/track" data-signout hidden>Sign out</a>
+      <a class="btn" href="/check">Check my property</a>
+    </div>
+    <details class="menu">
+      <summary>Menu</summary>
+      <nav aria-label="Site">
+        <a href="/portal" aria-current="page">Your properties</a>
+        <a href="/check">Check my property</a>
+        <a href="/how-it-works">How it works</a>
+        <a href="/pricing">How we get paid</a>
+        <a href="/faq">FAQ</a>
+        <a href="/about">About</a>
+        <a href="/track" data-signout hidden>Sign out</a>
+      </nav>
+    </details>
+  </header>
+
+  <section class="hero compact wrap">
+    <div>
+      <h1>Account</h1>
+      <p class="sub">What we hold about you, and how to leave.</p>
+      <nav class="tabs" aria-label="Portal">
+        <a class="pill" href="/portal">Overview</a>
+        <a class="pill" href="/portal/messages">Messages</a>
+        <a class="pill" href="/portal/book">Book a meeting</a>
+        <a class="pill" href="/portal/account" aria-current="page">Account</a>
+      </nav>
+    </div>
+  </section>
+</div>
+
+<main class="wrap portal" data-portal aria-live="polite" aria-busy="true"></main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <span class="label">Product</span>
+        <ul>
+          <li><a href="/check">Check my property</a></li>
+          <li><a href="/track">Track my claim</a></li>
+          <li><a href="/how-it-works">How it works</a></li>
+          <li><a href="/pricing">How we get paid</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Company</span>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="mailto:hello@claim-os-d4myby.usenaive.ai">hello@claim-os-d4myby.usenaive.ai</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Legal</span>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-note">Claim OS is a private company and is not affiliated with any government agency, county property appraiser or value adjustment board. Claim OS is not a law firm and does not give legal advice. Estimates come from public county records and may be out of date; only the county decides your value, and nothing here is a promise of a lower bill.</p>
+    <p class="foot-copy">© 2026 Claim OS</p>
+  </div>
+</footer>
+
+<script src="/portal/portal.js"></script>
+<script>
+(() => {
+  const P = Portal, { el, addr, place } = P, main = document.querySelector('[data-portal]');
+  const link = (cls, text, href) => { const a = el('a', cls, text); a.href = href; return a; };
+  const pills = (...as) => { const d = el('div', 'pills'); d.append(...as); return d; };
+  const section = (label, ...kids) => { const s = el('div'); s.append(el('span', 'label', label), ...kids); return s; };
+
+  function render(d) {
+    const cases = P.sortCases(d.cases || []), card = el('article', 'card case');
+    const props = el('ul', 'props');
+    for (const c of cases) {
+      const li = el('li'), a = link(null, null, P.PROP(c)), text = el('span');
+      text.append(el('strong', null, addr(c)), el('span', 'caption', place(c)));
+      a.append(text, P.chip(c)); li.append(a); props.append(li);
+    }
+    card.append(
+      section('Signed-in email', el('p', 'val', d.email), el('p', 'note', 'Links to this portal go to this address and work for 24 hours.')),
+      section('Properties', cases.length ? props : el('p', 'note', 'Nothing yet. Your properties appear here once we have checked a parcel for you.'), pills(link('pill', 'Check another address', '/check'))),
+      section('Your data', el('p', 'text', 'We store what you typed on the site, the public roll data for each parcel, and the emails we exchanged. Nothing is sold or shared.'),
+        pills(link('pill', 'Delete my data', P.mailto('Delete my data · ' + d.email)), link('pill', 'Privacy', '/privacy'))),
+      (() => { const s = el('div'), a = link('btn btn-light', 'Sign out', '/track'); a.dataset.signout = ''; s.append(a); return s; })(),
+    );
+    main.replaceChildren(card);
+  }
+
+  P.load(render);
+})();
+</script>
+</body>
+</html>

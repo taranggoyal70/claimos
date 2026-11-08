@@ -1,0 +1,39 @@
+# Chase desk on Naive: a county reply to records@claim-os-d4myby.usenaive.ai wakes it (native inbox, wake on)
+# and it attaches the reply to the waiting card; once a day (09:30 ET) it sends the follow-ups that are due.
+# Fully autonomous: deny by default, explicit allow rows only, nothing at ask, ask_operator off.
+# email.read stays DENIED: it flags the session read_people and every later send/board_write parks. The
+# daily pass works from the board only; replies reach the board through the wake sessions.
+name: chase
+description: >
+  Chase desk. Daily follow-ups by email from records@ on cases waiting on a county office or an owner
+  (cards with a follow_up: line), and on every reply that lands in records@ it records the reply on the
+  waiting card. After three follow-ups it hands the card to the Escalate desk. Runs without asking anyone.
+model: anthropic/claude-haiku-5.5
+harness: pi
+window: immediate
+
+budget:
+  cap_usd: 5          # per day
+  max_task_usd: 1.00  # one pass or one reply
+  period: day
+
+system_file: chase.system.md
+
+mcp_servers: []   # AgentMail/Monid MCP removed: any MCP result flags the session and parks later writes
+
+tools:
+  default_config:
+    permission: deny
+  configs:
+    board_read: { enabled: true, permission: allow }
+    board_write: { enabled: true, permission: allow }
+    session_spend: { enabled: true, permission: allow }
+    email.inboxes: { enabled: true, permission: allow }
+    email.send: { enabled: true, permission: allow }
+    email.read: { enabled: false, permission: deny }
+    ask_operator: { enabled: false, permission: deny }
+
+metadata:
+  desk: property_tax
+  step: chase
+  company: Claim OS

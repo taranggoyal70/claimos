@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Board mirror every 15 min (README "Board mirror"). Absolute paths are this laptop's: it holds the repo and the
+     logged-in CLI (`naive` is a bun wrapper in ~/.local/bin, so PATH names it); the Mac mini has neither yet. -->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.claimos.mirror</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/francescorosciano/Desktop/codes/claimos/taxappeal-site-sync/mirror_board.py</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>900</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/francescorosciano/Library/Logs/claimos.mirror.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/francescorosciano/Library/Logs/claimos.mirror.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/bin:/bin:/usr/sbin:/sbin:/Users/francescorosciano/.local/bin</string>
+    </dict>
+</dict>
+</plist>

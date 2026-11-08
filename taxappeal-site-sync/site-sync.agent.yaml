@@ -1,0 +1,54 @@
+# Site sync desk on Naive. Apply with ./setup.sh (naive agent create/update -f site-sync.agent.yaml)
+# Every 15 minutes: Find's newest run into the site database, then one claimos.mirror_run call (board <-> cases
+# mirror, server-side on the Vercel app). Fully autonomous: deny by default, explicit allow rows only, nothing
+# at ask, ask_operator off. mirror_run is the LAST call of a pass: any MCP result flags the session read_people,
+# after which bash/write/fetch_file are refused and further MCP calls park. The MCP bearer is in the Claim OS
+# Desk vault, so the agent holds that persona and the schedule runs as it.
+name: site-sync
+description: >
+  Site sync. Every 15 minutes copies Find's newest published run into the website database (candidates)
+  and runs the board mirror on the Claim OS site (claimos.mirror_run). Reads the company's own records
+  only; never contacts anyone. Runs without asking anyone.
+model: anthropic/claude-haiku-5.5   # gpt-oss-120b lost the procedure after step 1 in testing (2026-11-07)
+harness: pi
+window: immediate
+
+budget:
+  cap_usd: 5          # per day: 96 passes at ~$0.005 each
+  max_task_usd: 0.50  # one pass
+  period: day
+
+system_file: site-sync.system.md
+
+mcp_servers:
+  - { type: url, name: claimos, url: "https://claimos-site-mds8vwd4myby.vercel.app/api/mcp" }
+
+tools:
+  default_config:
+    permission: deny   # nothing but the tools named below is offered to the model
+  configs:
+    bash: { enabled: true, permission: allow }
+    read: { enabled: true, permission: allow }
+    write: { enabled: true, permission: allow }
+    ls: { enabled: true, permission: allow }
+    find_files: { enabled: true, permission: allow }   # how it finds the newest Find run in the org file library
+    fetch_file: { enabled: true, permission: allow }
+    board_read: { enabled: true, permission: allow }
+    session_spend: { enabled: true, permission: allow }
+    claimos.mirror_run: { enabled: true, permission: allow }
+    claimos.health: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
+    claimos.letters_due: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
+    claimos.send_letter: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
+    claimos.letter_preview: { enabled: false, permission: deny }   # MCP tools not named here are offered at ask; a stray call parks the schedule
+    email.read: { enabled: false, permission: deny }
+    ask_operator: { enabled: false, permission: deny }
+    apps:
+      enabled: true
+      permission: allow
+      config:
+        allowed_apps: [app_nkhc92xe21cyzfd5qakpkcj4g4]   # claimos-site only; the prompt limits it to db_query
+
+metadata:
+  desk: property_tax
+  step: site_sync
+  company: Claim OS

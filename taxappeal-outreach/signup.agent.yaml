@@ -1,0 +1,40 @@
+# Sign up desk on Naive: owner mail to hello@claim-os-d4myby.usenaive.ai wakes it (native inbox, wake on),
+# Message · cards assigned to it start it, and a daily 09:00 ET sweep sends the 3-day nudges.
+# Fully autonomous: deny by default, explicit allow rows only, nothing at ask, ask_operator off.
+# email.read stays DENIED: calling it flags the session read_people and every later send/board_write parks
+# for approval (probe 2026-11-08). The wake message already carries the mail, fenced.
+# `naive agent update <id> -f signup.agent.yaml` from this folder re-applies.
+name: signup
+description: >
+  Sign up desk. Answers homeowners who write to hello@claim-os-d4myby.usenaive.ai, collects what Evidence
+  needs, puts each owner on the company board, sends Message cards other desks write, and nudges once
+  after 3 days. Replies only; never writes to anyone first, never calls. Runs without asking anyone.
+model: anthropic/claude-haiku-5.5
+harness: pi
+window: immediate   # owners are waiting for a reply
+
+budget:
+  cap_usd: 10         # per day (live value since 2026-11-08; 5 had no room left on the demo day)
+  max_task_usd: 4.00  # live value since 2026-11-08
+  period: day
+
+system_file: signup.system.md
+
+mcp_servers: []   # AgentMail/Monid MCP removed: any MCP result flags the session and parks later writes
+
+tools:
+  default_config:
+    permission: deny   # nothing but the tools named below is offered to the model
+  configs:
+    board_read: { enabled: true, permission: allow }
+    board_write: { enabled: true, permission: allow }
+    session_spend: { enabled: true, permission: allow }
+    email.inboxes: { enabled: true, permission: allow }
+    email.send: { enabled: true, permission: allow }    # ask-by-default tool: this row is what lets it run
+    email.read: { enabled: false, permission: deny }    # see header: reading mail would park every later write
+    ask_operator: { enabled: false, permission: deny }
+
+metadata:
+  desk: property_tax
+  step: signup
+  company: Claim OS

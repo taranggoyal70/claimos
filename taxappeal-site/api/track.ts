@@ -1,0 +1,22 @@
+import { db, fail } from '../lib/lookup';
+import { verify } from '../lib/token';
+
+const headers = { 'cache-control': 'no-store' };
+type Signup = { email: string; address: string; city: string | null; zip: string | null; created_at: string; case_id: string | null };
+type Case = { case_id: string; owner_email: string | null } & Record<string, unknown>;
+
+// The owner's sign-ups, and the cases carrying their email (never the cases a sign-up points at: see lib/portal.ts).
+export async function GET(req: Request) {
+  const email = verify(new URL(req.url).searchParams.get('t') ?? '');
+  if (!email) return Response.json({ error: 'expired' }, { status: 401, headers });
+  try {
+    const enc = encodeURIComponent(email);
+    // ilike makes the match case-insensitive; the filter below removes what its "_" wildcard lets through
+    const signups = ((await db(`signups?select=email,address,city,zip,created_at,case_id&email=ilike.${enc}&order=created_at.desc`)) as Signup[])
+      .filter((s) => s.email.toLowerCase() === email);
+    const cases = ((await db(`cases?select=case_id,address,county,owner_email,stage,status,county_value,requested_value,annual_savings,filing_deadline,needs_from_owner,history,updated_at&owner_email=ilike.${enc}&order=updated_at.desc`)) as Case[])
+      .filter((c) => (c.owner_email ?? '').toLowerCase() === email)
+      .map(({ owner_email, ...c }) => c);
+    return Response.json({ email, signups: signups.map(({ email, ...s }) => s), cases }, { headers });
+  } catch (e) { return fail(e); }
+}

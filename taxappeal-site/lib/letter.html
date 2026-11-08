@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Claim OS · $property</title>
+<style>
+@page { size: letter; margin: 0.7in 0.9in; }
+body { margin: 0; font: 10.5pt/1.42 Inter, -apple-system, "Helvetica Neue", Arial, sans-serif; color: #111110; }
+@media screen { body { max-width: 6.5in; margin: 40px auto; padding: 0 24px; } }
+.head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #dedbd5; padding-bottom: 8px; margin-bottom: 18px; }
+.wordmark { font-weight: 600; font-size: 15pt; letter-spacing: -.3px; }
+.muted { color: #736e68; }
+p { margin: 0 0 9pt; }
+table { border-collapse: collapse; margin: 6pt 0 12pt; }
+td { padding: 2pt 28px 2pt 0; }
+td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; padding-right: 0; }
+.code { display: inline-block; padding: 1px 10px; border: 1px solid #111110; border-radius: 6px; font-weight: 600; letter-spacing: .12em; }
+ol { padding-left: 20px; margin: 0 0 9pt; } li { margin: 3pt 0; }
+.foot { margin-top: 18px; padding-top: 8px; border-top: 1px solid #dedbd5; font-size: 8.5pt; line-height: 1.4; color: #736e68; }
+</style>
+</head>
+<body>
+<div class="head"><span class="wordmark">Claim OS</span><span class="muted">$date</span></div>
+<p>$mail</p>
+<p><strong>Re: $property · $county County $year property tax</strong></p>
+<p>Dear owner of $property,</p>
+<p>We are Claim OS, a private company. We are not the county, the property appraiser or the value adjustment board, and we are not a law firm. We write because the public record suggests your home may be assessed above what it would sell for.</p>
+<p>We compared the $county County property appraiser's $year value for your home with recent sales of similar homes nearby. From the public records:</p>
+<table>
+<tr><td>County's $year value</td><td>$county_value</td></tr>
+<tr><td>Our value from recent sales</td><td>$our_value</td></tr>
+<tr><td>Estimated yearly tax saving</td><td>about $savings</td></tr>
+</table>
+<p>This is something we have identified, not something we have filed. Nothing happens unless you ask us to, and only the county decides your value; we cannot promise a result.</p>
+<p><strong>If you want us to look into it</strong></p>
+<ol>
+<li>Go to <strong>$site/check</strong> and enter your claim code <span class="code">$code</span>. You will see these numbers and can start your review in a minute. Or email <strong>hello@claim-os-d4myby.usenaive.ai</strong> and quote the code.</li>
+<li>If the case holds up, we send you a short agreement and the county's authorization form (DR‑486POA) to sign. We prepare and file the appeal and keep you posted; you sign, nothing more.</li>
+</ol>
+<p><strong>How we are paid.</strong> A share of the first year's savings, only if the value goes down; nothing otherwise. The exact terms are in the agreement you sign.</p>
+<p>If you no longer own this home, please disregard this letter.</p>
+<p>The Claim OS team<br><span class="muted">hello@claim-os-d4myby.usenaive.ai · $site</span></p>
+<p class="foot">Claim OS is a private company and is not affiliated with any government agency, county property appraiser or value adjustment board. Claim OS is not a law firm and does not give legal advice. The figures above come from the $year $county County tax roll and the recorded sales the county publishes, and may be out of date; the estimated saving assumes the county's typical millage. Claim code $code · case $case_id</p>
+</body>
+</html>
