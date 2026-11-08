@@ -63,7 +63,7 @@ Details: `taxappeal-chase/HANDOFF-ESCALATE.md`, each folder's README.
 cd taxappeal-site && naive db query --app app_nkhc92xe21cyzfd5qakpkcj4g4 "$(cat db/seed_francesco.sql)"
 ```
 Its last statement prints the five demo stages; they must be evidence, signup, stopped, waiting, won (one each).
-The board mirror skips only the demo seed's rows (`owner_email` francesco.rosciano@me.com, `DEMO_OWNER` in sync.py) since 2026-11-08, when a pass had reset three of them; a real owner's row takes the board's stage.
+The board mirror skips only the demo seed's rows (`owner_email` francesco.rosciano@me.com, `DEMO_OWNER` in sync.py) since 2026-11-08, when a pass had reset three of them; a real owner's row only moves forward with the board's stage (`RANK`, stopped final), never back from signup to find while the Find card sits in todo.
 
 Also human-run (the classifier denies agents `naive app deploy` and `naive db migrate` as production deploys): the
 claim-code build of the site (commit dc32aeb and later; the live site still runs the 09:15Z build) and its ledger row.

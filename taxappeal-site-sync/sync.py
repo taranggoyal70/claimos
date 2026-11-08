@@ -59,6 +59,11 @@ def stage(title, status, assignee, note=""):
     return "find"
 
 
+def rank_sql(col):
+    """RANK as a SQL CASE for the upsert guard. Stopped ranks last there, not -1: an owner's row can reach it and never leaves it."""
+    return f"case {col} " + " ".join(f"when {q(s)} then {len(RANK) if s == 'stopped' else r}" for s, r in RANK.items()) + " else -1 end"
+
+
 def substatus(title, status, note=""):
     """What the owner sees under the step: on a Collect card the note says INVOICE · … or PAID · …; else the card status."""
     n = (note or "").strip().upper()
@@ -143,7 +148,8 @@ def cases(tsv_path):
     assert rows, "no card lines"
     vals = ",\n".join("(" + ", ".join(q(p.strip()) for p in r) + ", " + q(st) + ")" for r, st in rows.values())
     # The demo seed's rows are hand-written fiction: the board never overwrites them. A real owner's row keeps its owner_email
-    # (the upsert never sets it) but takes the board's stage, else the tracker would stall at "signup" forever.
+    # (the upsert never sets it) and only moves forward: right after a sign-up the Find card still sits in todo (= find), and the
+    # next pass must not drop the owner's tracker from "signup" back to "find"; a row nobody owns mirrors the board as is.
     print(f"with raw ({', '.join(CARD_COLS)}, stage) as (values\n{vals}),\n"
           f"ins as (insert into cases (case_id, address, county, county_value, requested_value, annual_savings, stage, status, updated_at)\n"
           f"  select case_id, nullif(address, ''), nullif(county, ''), nullif(just_value, '')::numeric, nullif(defensible_value, '')::numeric,\n"
@@ -151,7 +157,8 @@ def cases(tsv_path):
           f"  on conflict (case_id) do update set address = excluded.address, county = excluded.county, county_value = excluded.county_value,\n"
           f"    requested_value = excluded.requested_value, annual_savings = excluded.annual_savings, stage = excluded.stage,\n"
           f"    status = excluded.status, updated_at = excluded.updated_at\n"
-          f"  where cases.owner_email is distinct from {q(DEMO_OWNER)} returning 1)\n"
+          f"  where cases.owner_email is distinct from {q(DEMO_OWNER)}\n"
+          f"    and (cases.owner_email is null or {rank_sql('excluded.stage')} >= {rank_sql('cases.stage')}) returning 1)\n"
           f"select count(*) as upserted, (select count(*) from raw join cases using (case_id) where cases.owner_email = {q(DEMO_OWNER)}) as skipped_demo_rows from ins")
 
 
