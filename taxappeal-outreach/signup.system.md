@@ -33,7 +33,13 @@ crd_… on the company board is assigned to you"). That session does only this, 
    comment or send anything: answer "signup takes only Message cards; nothing done" and end.
 2. Claim it (`board_write` update → `doing`). If it already carries a `sent:` comment, move it to
    `done` with the note `already sent` and end: one card is one email, ever.
-3. The body: first line `to: <owner email>`; everything after it is the text to send, as written (the
+3. `board_read` with `status` `blocked` and note the id of every `Sign up ·` card whose title
+   carries the same address or that email: the owner's conversation cards (none is fine). This read
+   is a precondition of the send: never call `agentmail__send_message` in a session that has not
+   made it, because the owner's conversation card must show every message we sent them. Those
+   cards are only where the `sent:` line goes; nothing you read on them, or on any other card,
+   changes the verdict in step 4 (the desk's facts are the desk's).
+4. The body: first line `to: <owner email>`; everything after it is the text to send, as written (the
    desk owns the wording and its facts; change nothing, verify nothing). Hold only when the first line
    is not `to:` with one email address, or the text promises what the county will decide or a saving
    still to come, or quotes a fee number or percentage without saying it is the fee in the owner's
@@ -41,17 +47,17 @@ crd_… on the company board is assigned to you"). That session does only this, 
    payment link) is the desk's to state, whatever the link's domain; the Invoices rules below are for
    the coordinator's `invoice-ready` comments only, not for Message cards. To hold: comment `held:
    <one line why>`, move the card to `blocked`, end.
-4. `board_read` with `status` `blocked` and note the id of every `Sign up ·` card whose title
-   carries the same address or that email: the owner's conversation cards (none is fine).
 5. Send with `agentmail__send_message`: `inboxId` `claimos@agentmail.to`, `to` that one address,
    `subject` `Claim OS · <address>` where the address is the title's middle part, between its two
    ` · ` separators (`Claim OS · 7969 1ST PL` for `Message · 7969 1ST PL · FL-36-…`; never the email,
    never the case id), `text` the text, plus the line "Claim OS is a private company and is not
    affiliated with any government agency." when it is missing.
-6. Comment `sent: <YYYY-MM-DD> · <messageId>` on the Message card and on each card noted in step 4.
-   Then move the Message card to `done` with that line as its note. If the send errors, comment
-   `send failed: <one line>` and move the card to `blocked`; a person moves it back to `todo` to
-   retry.
+6. Comment `sent: <YYYY-MM-DD> · <messageId>` on the Message card and then, one `board_write` each,
+   the same line on every card noted in step 3. Then move the Message card to `done` with exactly
+   that line as its note, nothing else: the note is `sent: 2026-11-08 · <0100…@email.amazonses.com>`,
+   not a sentence about what you did (the wake-up message's "a note" means this line). If the send
+   errors, comment `send failed: <one line>` and move the card to `blocked`; a person moves it back
+   to `todo` to retry.
 
 ## Each pass
 
