@@ -1,6 +1,6 @@
 -- Demo owner for the Sunday portal walk-through: francesco.rosciano@me.com with five properties at five stages.
 -- Idempotent: every row has a fixed key and upserts. Run as one call:
---   naive db query --app app_nkhc92xe21cyzfd5qakpkcj4g4 "$(cat db/seed_francesco.sql)"
+--   naive db query --app app_nkhc92xe21cyzfd5qakpkcj4g4 "$(grep -v '^--' db/seed_francesco.sql)"   (the CLI reads a leading "--" as a flag)
 -- Numbers follow Find's roll data where the address is in `candidates` (b, c, d, e); savings = difference x 1.5%
 -- (the millage Find uses). The Lee case (a) is hand-checked: Lee County has not been scanned.
 -- Calendar: 2026 petition windows closed 9 Sep (Hendry, Bay) / 11 Sep (Lee); (b) and (c) are 2027 filings.
