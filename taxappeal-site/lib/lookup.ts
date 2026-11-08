@@ -47,21 +47,31 @@ export async function findByCode(code: string): Promise<Candidate | null> {
   return rows[0] ?? null;
 }
 
+// People type "YC Office, 560 20th St., San Francisco, CA": the first "<number> <word>" in the text is the house and street.
+const houseStreet = (address: string) => address.toUpperCase().replace(/[.,#]/g, ' ').match(/(?:^|\s)(\d+)\s+(\S+)/)?.slice(1, 3) ?? [];
+
 // zip + house number narrow the rows; exact addr_key wins, else the first street token must appear.
+// A wrong ZIP falls back to the house number alone when exactly one address (or the city typed) matches.
 // Condo buildings share one addr_key with a row per unit: without a unit that pick returns the whole list.
 export async function findCandidate(address: string, zip: string, unit = ''): Promise<Candidate | Candidate[] | null> {
   const key = addrKey(address, zip);
-  const [house, street] = key.split('|')[0].split(' ');
-  if (!/^\d{5}$/.test(zip.trim()) || !/^\d+$/.test(house) || !street) return null;
-  const q = [
-    SELECT,
-    `zip=eq.${zip.trim()}`,
-    `addr_key=like.${encodeURIComponent(house + ' *')}`,
-    'order=imported_at.desc',
-  ].join('&');
-  const rows = (await db(`candidates?${q}`)) as Candidate[];
-  const exact = rows.filter((r) => r.addr_key === key);
-  const hits = exact.length ? exact : rows.filter((r) => r.addr_key.split('|')[0].split(' ').includes(street));
+  const [house, street] = houseStreet(address);
+  if (!house || !street) return null;
+  const like = `addr_key=like.${encodeURIComponent(house + ' *')}`;
+  const onStreet = (rows: Candidate[]) => rows.filter((r) => r.addr_key.split('|')[0].split(' ').includes(street));
+  let hits: Candidate[] = [];
+  if (/^\d{5}$/.test(zip.trim())) {
+    const rows = (await db(`candidates?${SELECT}&zip=eq.${zip.trim()}&${like}&order=imported_at.desc`)) as Candidate[];
+    const exact = rows.filter((r) => r.addr_key === key);
+    hits = exact.length ? exact : onStreet(rows);
+  }
+  if (!hits.length) {
+    const any = onStreet((await db(`candidates?${SELECT}&${like}&order=imported_at.desc&limit=200`)) as Candidate[]);
+    const typed = address.toUpperCase();
+    const groups = [...new Set(any.map((r) => r.addr_key))];
+    const pick = groups.length === 1 ? groups[0] : groups.find((k) => any.some((r) => r.addr_key === k && r.city && typed.includes(r.city.toUpperCase())));
+    hits = pick ? any.filter((r) => r.addr_key === pick) : [];
+  }
   if (unitKey(unit)) return hits.find((r) => unitKey(r.unit) === unitKey(unit)) ?? (hits.length === 1 ? hits[0] : null);
   if (hits.length > 1 && new Set(hits.map((r) => r.addr_key)).size === 1) return hits;
   return hits[0] ?? null;
