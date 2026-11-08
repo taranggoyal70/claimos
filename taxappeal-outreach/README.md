@@ -4,7 +4,7 @@ Two Naïve agents that share one persona ("Claim OS Desk") and one inbox, `claim
 
 | Agent | Starts when | Does | Never |
 |---|---|---|---|
-| `signup` | every 15 min (paused until the first good pass) | answers homeowners who wrote in, puts each on a `Sign up ·` board card, one follow-up after 3 days | writes to anyone first, calls |
+| `signup` | hourly, or a `Message ·` card assigned to it | answers homeowners who wrote in, puts each on a `Sign up ·` board card, one follow-up after 3 days; emails an owner the text of a `Message · <address> · <case_id>` card another desk assigned to it (see `taxappeal-chase/HANDOFF-ESCALATE.md`, "Telling the owner something") | writes to anyone first, calls |
 | `outreach` | a board card is assigned to it | asks a county office a question (email, then phone), or calls back an owner who asked, and puts the answer on the card | contacts an owner first |
 
 ```

@@ -84,6 +84,28 @@ When a case must be refiled, Escalate creates one card for Evidence: title
 `petition_deadline: <YYYY-MM-DD>`, then the case's original ```json block copied from the Waiting-on
 card. Assigning it is what starts Evidence.
 
+## Telling the owner something
+
+Any desk that needs to tell the owner something (Collect its invoice and payment link, Escalate its
+update after a decision) creates ONE card and nothing else:
+
+- Title: `Message · <address> · <case_id>`
+- Assignee: `signup`, status `todo` (the assignment is what starts the Sign up desk on it)
+- Body: first line `to: <owner email>` (the `owner_email` on `cases`, or the `from:` line of the
+  owner's `Sign up ·` card), then the text to send exactly as it should read. The desk owns the
+  wording: Collect writes the invoice amount and the payment link, Escalate its update. The content
+  rules still apply: no promised outcome, no fee number or percentage unless the text says it is the
+  fee in the owner's signed agreement. Sign up adds the private-company line when it is missing and
+  changes nothing else.
+
+Sign up sends the text from `claimos@agentmail.to` with the subject `Claim OS · <address>`, comments
+`sent: <YYYY-MM-DD> · <messageId>` on the Message card and on the owner's `Sign up ·` card when one
+exists, and moves the Message card to `done` with that line as its note. One card is one email: a
+card that already carries a `sent:` comment is never sent again, so a new message is a new card. A
+card Sign up could not send sits in `blocked` with a `held: <why>` or `send failed: <why>` comment; a
+person fixes the body and moves it back to `todo`. The owner's reply, if any, lands in
+`claimos@agentmail.to` and Sign up's hourly pass records it on the owner's `Sign up ·` card.
+
 ## Where everything else is
 
 | Thing | Where |
@@ -92,4 +114,5 @@ card. Assigning it is what starts Evidence.
 | Filing receipt, petition number, hearing date | File's note on the `Waiting on` card body (File owns those lines) |
 | Follow-ups sent and when | `chased: <date>` comments (max three, then `escalate`) |
 | Owner conversation | the `Sign up · <address>` card (status `blocked`) and its comments |
+| Messages we sent the owner | `Message · <address> · <case_id>` cards (done) and their `sent:` comments, mirrored on the `Sign up ·` card |
 | Owner-facing status page | `cases` table → https://claimos-site-mds8vwd4myby.vercel.app/track |

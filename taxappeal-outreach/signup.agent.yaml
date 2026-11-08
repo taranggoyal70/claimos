@@ -1,4 +1,5 @@
-# Sign up desk on Naive: owner conversations from the inbox, on a 15-minute schedule. setup.sh applies it.
+# Sign up desk on Naive: owner conversations from the inbox (hourly schedule) and Message · cards other desks
+# assign to it. setup.sh applies it; `naive agent update <id> -f signup.agent.yaml` from this folder re-applies.
 name: signup
 description: >
   Sign up desk. Answers homeowners who write to the Claim OS inbox, collects what Evidence needs, sends
@@ -10,7 +11,7 @@ window: immediate   # owners are waiting for a reply
 
 budget:
   cap_usd: 5          # per day
-  max_task_usd: 1.00  # one pass; each approval resumes the session and re-sends ~100k tokens; 0.50 died between reply and card
+  max_task_usd: 2.00  # one pass; each approval resumes the session and re-sends ~100k tokens; 1.00 was raised live on 2026-11-08
   period: day
 
 system_file: signup.system.md
@@ -25,12 +26,13 @@ tools:
   configs:
     board_read: { enabled: true, permission: allow }
     board_write: { enabled: true, permission: allow }
-    ask_operator: { enabled: true, permission: ask }
+    ask_operator: { enabled: false, permission: ask }  # off since 2026-11-08: questions go on the owner's card instead
     session_spend: { enabled: true, permission: allow }
     # Three mail operations. Naive still holds every send for approval once a session has read mail.
     agentmail.list_messages: { enabled: true, permission: allow }
     agentmail.get_message: { enabled: true, permission: allow }
     agentmail.reply_to_message: { enabled: true, permission: allow }
+    agentmail.send_message: { enabled: true, permission: allow }  # only for a `Message ·` card (see signup.system.md)
 
 metadata:
   desk: property_tax
