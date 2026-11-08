@@ -86,7 +86,7 @@
     el.className = 'card form-card rise'; el.id = 'signup';
     el.innerHTML = `
       <h2>Start your review</h2>
-      <p class="sub">No cost to start. We reply from claimos@agentmail.to.</p>
+      <p class="sub">No cost to start. We reply from hello@claim-os-d4myby.usenaive.ai.</p>
       <form class="form-grid" novalidate>
         <div class="field full"><label for="f-address">Street address</label><input id="f-address" name="address" type="text" autocomplete="street-address" required><small class="err" id="err-address" role="alert"></small></div>
         <div class="field" id="unit-field" hidden><label for="f-unit">Unit</label><input id="f-unit" name="unit" type="text" autocomplete="address-line2"></div>

@@ -129,7 +129,7 @@
         <ul>
           <li><a href="/about">About</a></li>
           <li><a href="/faq">FAQ</a></li>
-          <li><a href="mailto:claimos@agentmail.to">claimos@agentmail.to</a></li>
+          <li><a href="mailto:hello@claim-os-d4myby.usenaive.ai">hello@claim-os-d4myby.usenaive.ai</a></li>
         </ul>
       </div>
       <div>
@@ -150,7 +150,7 @@
 (() => {
   const P = Portal, { el, when, title, addr } = P, $ = (s, r = document) => r.querySelector(s);
   const booked = $('#booked'), form = $('#book'), done = $('#done'), cal = $('#cal');
-  const NET = 'We could not book the call. Try again, or email claimos@agentmail.to.';
+  const NET = 'We could not book the call. Try again, or email hello@claim-os-d4myby.usenaive.ai.';
   const setErr = (field, msg) => { ($('#err-' + field) || $('#err-form')).textContent = msg; };
   const about = (c) => (c ? `${addr(c)}, ${title(c.city)}` : '');
   let cases = [];
@@ -235,7 +235,7 @@
       $('#done-when').textContent = slot ? `${when(slot)}, about ${about2}.` : `About ${about2}. The time is in your calendar invite.`;
       done.hidden = false;
       $('h2', done).focus();
-    } catch { $('#err-cal').textContent = 'Your call is booked on the calendar, but we could not save it here. Email claimos@agentmail.to and we add it.'; }
+    } catch { $('#err-cal').textContent = 'Your call is booked on the calendar, but we could not save it here. Email hello@claim-os-d4myby.usenaive.ai and we add it.'; }
   }
   window.bookedInCalendar = onBooked; // callable by hand to test the hand-off without a real booking
 

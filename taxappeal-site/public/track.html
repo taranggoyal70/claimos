@@ -82,7 +82,7 @@ try { if (!sessionStorage.claimos_warm) { sessionStorage.claimos_warm = 1; fetch
         <ul>
           <li><a href="/about">About</a></li>
           <li><a href="/faq">FAQ</a></li>
-          <li><a href="mailto:claimos@agentmail.to">claimos@agentmail.to</a></li>
+          <li><a href="mailto:hello@claim-os-d4myby.usenaive.ai">hello@claim-os-d4myby.usenaive.ai</a></li>
         </ul>
       </div>
       <div>
@@ -119,9 +119,9 @@ try { if (!sessionStorage.claimos_warm) { sessionStorage.claimos_warm = 1; fetch
     try {
       const r = await fetch('/api/track-request', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email }) });
       const d = await r.json().catch(() => ({}));
-      if (!r.ok) err.textContent = r.status === 400 && d.error ? d.error : 'We could not send the link right now. Try again in a minute, or email claimos@agentmail.to and we will send it by hand.';
+      if (!r.ok) err.textContent = r.status === 400 && d.error ? d.error : 'We could not send the link right now. Try again in a minute, or email hello@claim-os-d4myby.usenaive.ai and we will send it by hand.';
       else { showForm(false); $('h2', sent).focus(); }
-    } catch { err.textContent = 'We could not send the link right now. Try again in a minute, or email claimos@agentmail.to and we will send it by hand.'; }
+    } catch { err.textContent = 'We could not send the link right now. Try again in a minute, or email hello@claim-os-d4myby.usenaive.ai and we will send it by hand.'; }
     btn.disabled = false;
   });
   $('#again').addEventListener('click', () => { showForm(true); form.email.value = ''; form.email.focus(); });

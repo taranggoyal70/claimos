@@ -45,7 +45,7 @@
   <section class="hero compact wrap">
     <div>
       <h1>Messages</h1>
-      <p class="sub">Every email we exchanged, by property. Reply from your own inbox; we read claimos@agentmail.to.</p>
+      <p class="sub">Every email we exchanged, by property. Reply from your own inbox; we read hello@claim-os-d4myby.usenaive.ai.</p>
       <nav class="tabs" aria-label="Portal">
         <a class="pill" href="/portal">Overview</a>
         <a class="pill" href="/portal/messages" aria-current="page">Messages</a>
@@ -75,7 +75,7 @@
         <ul>
           <li><a href="/about">About</a></li>
           <li><a href="/faq">FAQ</a></li>
-          <li><a href="mailto:claimos@agentmail.to">claimos@agentmail.to</a></li>
+          <li><a href="mailto:hello@claim-os-d4myby.usenaive.ai">hello@claim-os-d4myby.usenaive.ai</a></li>
         </ul>
       </div>
       <div>
@@ -108,7 +108,7 @@
     const threads = P.sortCases(d.cases || []).map((c, i) => [c, i]).filter(([c]) => (c.messages || []).length);
     if (!threads.length) {
       const card = el('div', 'card step');
-      card.append(el('h2', null, 'No messages yet.'), el('p', null, 'We write from claimos@agentmail.to; add it to your contacts so nothing is filtered.'));
+      card.append(el('h2', null, 'No messages yet.'), el('p', null, 'We write from hello@claim-os-d4myby.usenaive.ai; add it to your contacts so nothing is filtered.'));
       return main.replaceChildren(card);
     }
     main.replaceChildren(...threads.map(([c, i]) => {

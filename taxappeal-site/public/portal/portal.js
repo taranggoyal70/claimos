@@ -28,7 +28,7 @@ window.Portal = (() => {
   const PROP = (c) => '/portal/property?id=' + encodeURIComponent(c.case_id);
   // A case document's link: its own url, else /api/doc signs the file on click (has_file), else null ("on file")
   const doc = (c, x) => x.url || (x.has_file ? `/api/doc?t=${encodeURIComponent(store.get() || '')}&case=${encodeURIComponent(c.case_id)}&i=${c.documents.indexOf(x)}` : null);
-  const mailto = (subject) => 'mailto:claimos@agentmail.to?subject=' + encodeURIComponent(subject);
+  const mailto = (subject) => 'mailto:hello@claim-os-d4myby.usenaive.ai?subject=' + encodeURIComponent(subject);
 
   const CHIP = { find: ['Checking', 'gray'], qualify: ['Checking', 'gray'], signup: ['Signed up', 'amber'], evidence: ['Evidence', 'amber'], file: ['Filing', 'amber'],
     waiting: ['Waiting on county', ''], appeal: ['Second round', ''], won: ['Won', 'green'], stopped: ['Closed', 'gray'] };
@@ -94,7 +94,7 @@ window.Portal = (() => {
     let d;
     // With a cached copy on screen, skip the HTTP cache: a booking or message sent a moment ago must show up
     try { const r = await fetch('/api/portal?t=' + encodeURIComponent(tok), cached ? { cache: 'no-cache' } : {}); d = r.ok ? await r.json() : null; } catch { d = null; }
-    if (!d) return cached ? undefined : show(notice('We could not reach our records.', 'Please reload to try again, or email claimos@agentmail.to and we answer by hand.', 'Reload', location.href));
+    if (!d) return cached ? undefined : show(notice('We could not reach our records.', 'Please reload to try again, or email hello@claim-os-d4myby.usenaive.ai and we answer by hand.', 'Reload', location.href));
     if (d.error === 'expired') { store.clear(); return show(notice('That link has expired.', 'Links work for 24 hours. Request a new one and we email it within a minute.', 'Email me a new link', '/track')); }
     store.set(JSON.stringify({ t: tok, at: Date.now(), data: d }), CACHE);
     if (cached && JSON.stringify(cached.data) === JSON.stringify(d)) return;
