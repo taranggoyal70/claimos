@@ -101,6 +101,34 @@ pass writes nothing (`messages: N on the board, 0 written`); the demo seed's row
 replies signup sends by `reply_to_message` (the card records only `replied: <date>`, no id). The card-comment reads add ~1 s per
 `Message ·` / `Sign up ·` card to the pass.
 
+## Board mirror in the app (`taxappeal-site/lib/mirror.ts`)
+
+The laptop mirror above is ported to the site: `mirrorRun({dry, only})` in `taxappeal-site/lib/mirror.ts` does the same pass
+through the board REST (`lib/naive-board.ts`: pages the whole board with `?after=`, REST has no column filter) and PostgREST.
+It is reached as the MCP tool `claimos.mirror_run` (`api/mcp.ts`) or `POST /api/mirror` with the `CLAIMOS_MCP_BEARER` bearer,
+body `{"dry": true, "only": ["owner"]}` (dry is the default). Steps, in order: `cases` (sync.py's stage/substatus/rank and the
+DEMO_OWNER guard), `signups`, `messages` (a332f84), then three bridges for hand-offs no teammate agent writes:
+
+- `evidence` (a): a `Sign up ·` card with `owner_confirmed: yes` (comment) or `source: website` + `consent: True` whose case's
+  Find card is QUALIFIED and unassigned gets `assignee: evidence`, status `todo`, and the comment `evidence-started · <signup card>`.
+- `owner` (b, gap #6): every Escalate `owner-update (…): <subject>: <body>` line (in an `escalate-result ·` comment on a
+  `Waiting on` card), Collect `owner-message (…)` line (in a `collect-result ·` comment on a `Collect ·` card) and Collect
+  `payment-link · <ref> · https://…` comment becomes one `Message · <address> · <case_id>` card (assignee signup, todo, body
+  `to: <cases.owner_email or the Sign up card's from:/email:>` + subject, body, private-company line), key `msg:<comment id>`.
+  No owner email: skipped. A text already on a Message card of the case (Collect's repeat reminders): skipped.
+- `waiting` (c): a `File ·` card whose note or a comment carries a confirmation/receipt number and does not say test, replay,
+  held or not filed gets `Waiting on county · <address> · <case_id>` (blocked, key `waiting:<case_id>`, `case_id:`,
+  `level: vab_petition`, `petition:`, a `follow_up:` line only when that text names an email, then Find's json block).
+
+A pass takes 10-13 s (board ~7 s, comments only for Message, Sign up, Waiting on, Collect and File cards, 10 in flight).
+Dry run 2026-11-08 against the live board and DB: 439 cards, 250 case cards; cases 247 to upsert with 0 stage changes
+(the port matches the Python mirror's last write), 3 demo rows skipped; signups 5 consented, 0 new; messages 5 on the
+board, 0 new; (a) 0 to start (the one confirmed, linked case is already `EVIDENCE ready`); (b) 9 owner updates found, all on
+`DEMO ·` cards whose cases have no owner email, so 0 cards; (c) 0 (both File cards say nothing was filed).
+The app's `NAIVE_API_KEY` needs agents:read and agents:write (today it is files:read only; a person runs `naive keys create --name claimos-site --scopes agents:read,agents:write,files:read` and replaces it).
+Shortcut: the cases rank guard is read-then-write, not one SQL statement; a sign-up landing mid-pass can be overwritten once
+and the next pass corrects it.
+
 ## Letters to owners (laptop, not the agent)
 
 First contact is a paper letter, never a cold email or call. `letters.py` writes one letter per QUALIFIED case
