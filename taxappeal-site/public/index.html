@@ -188,7 +188,7 @@
     card.setAttribute('aria-busy', 'true');
     try {
       const v = await (await fetch('/api/verdict?' + new URLSearchParams({ address, zip, unit }))).json();
-      if (v.found && v.city) $('#f-city').value = title(v.city);
+      $('#f-city').value = v.found && v.city ? title(v.city) : '';
       render(v, address);
     } catch { $('#check-err').textContent = 'We could not reach our records. Please try again.'; }
     card.removeAttribute('aria-busy');
