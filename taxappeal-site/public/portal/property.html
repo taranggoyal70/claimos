@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your property — Claim OS</title>
+<meta name="description" content="One property in your Claim OS portal: where the appeal stands, the county's value against ours, the filing deadline and hearing, what we need from you, documents, history and messages.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<style>
+/* Portal rules used by this page. Everything else is site.css as it stands. shortcut: these are the shared
+   portal.css rules kept inline so the page stands on its own; move them to /portal/portal.css once it exists. */
+.nav-who { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.nav-who b { font-weight: 500; color: var(--ink); }
+.tabs { display: flex; flex-wrap: nowrap; overflow-x: auto; margin-top: 24px; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs .pill { width: auto; flex: none; }
+.tabs .pill[aria-current] { background: var(--ink); color: #fff; }
+.hero .back { margin-bottom: 22px; }
+.hero-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.hero .sub { max-width: 72ch; font-variant-numeric: tabular-nums; }
+#main { padding-bottom: 96px; }
+#main > * { max-width: 760px; }
+/* The case is one card with ruled sections, never a card inside a card. */
+.case { padding: 0; }
+.case > * { padding: 22px 24px; }
+.case > * + * { border-top: 1px solid var(--line); }
+.case .tracker { padding-top: 16px; }
+.now { margin-top: 18px; font-size: 14px; color: var(--muted); }
+.now b { font-weight: 500; color: var(--ink); }
+.case .stat.dual { padding: 0; }
+/* Both cells carry the same padding so their labels sit on one line; the list pulls back by that amount. */
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; margin: -14px -16px; }
+.facts > div { padding: 14px 16px; border-radius: var(--radius-s); }
+.facts dd { margin: 6px 0 0; font-size: 15px; font-variant-numeric: tabular-nums; }
+.facts .need { grid-column: 1 / -1; background: var(--surface); }
+.need dd { font-size: 14px; line-height: 1.5; max-width: 64ch; }
+.need .pills { margin-top: 14px; }
+.need .caption { margin-top: 8px; }
+.list { margin-top: 12px; display: grid; }
+.empty { margin-top: 10px; font-size: 14px; color: var(--muted); }
+.doc { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; }
+.doc + .doc { border-top: 1px solid var(--line); }
+.doc:first-child { padding-top: 0; }
+.doc:last-child { padding-bottom: 0; }
+.doc-name { font-size: 14px; font-weight: 500; }
+.doc-name a:hover { text-decoration: underline; }
+.doc .caption { display: block; margin-top: 2px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.doc .onfile { flex: none; font-size: 12px; color: var(--muted); text-align: right; max-width: 11ch; }
+.history .list { gap: 8px; }
+.history li { display: flex; gap: 14px; font-size: 14px; }
+.history time { flex: none; min-width: 96px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.msgs .list { gap: 6px; }
+.msg { padding: 12px 14px; border-radius: var(--radius-s); }
+.msg.me { background: var(--surface); }
+.msg-head { display: flex; align-items: baseline; gap: 10px; }
+.msg-head .label { display: inline; }
+.msg time { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.msg p { margin-top: 4px; font-size: 14px; line-height: 1.5; max-width: 64ch; }
+.msgs .pills { margin-top: 18px; }
+@media (max-width: 1100px) { .nav-who { display: none; } }
+@media (max-width: 720px) {
+  #main { padding-bottom: 64px; }
+  .tabs { flex-direction: row; }
+  .hero .back { width: auto; }
+  .case > * { padding: 18px 20px; }
+  .facts { grid-template-columns: 1fr; gap: 4px 0; }
+  .doc { flex-wrap: wrap; }
+  .doc .onfile { text-align: left; max-width: none; }
+  .history li { flex-direction: column; gap: 2px; }
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <header class="nav wrap">
+    <a class="wordmark" href="/">Claim OS</a>
+    <nav class="nav-links" aria-label="Site">
+      <a href="/how-it-works">How it works</a>
+      <a href="/pricing">How we get paid</a>
+      <a href="/faq">FAQ</a>
+      <a href="/about">About</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="nav-who" id="nav-who" hidden>Signed in as <b></b></span>
+      <button class="pill" type="button" id="nav-out" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>Sign out</button>
+      <a class="btn" href="/check">Check my property</a>
+    </div>
+    <details class="menu">
+      <summary>Menu</summary>
+      <nav aria-label="Site">
+        <a href="/check">Check my property</a>
+        <a href="/portal" aria-current="page">Track my claim</a>
+        <a href="/how-it-works">How it works</a>
+        <a href="/pricing">How we get paid</a>
+        <a href="/faq">FAQ</a>
+        <a href="/about">About</a>
+      </nav>
+    </details>
+  </header>
+
+  <section class="hero compact wrap">
+    <div>
+      <a class="pill back" href="/portal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Your properties</a>
+      <div class="hero-row"><h1 id="h1" tabindex="-1">Your property</h1><span class="badge" id="chip" hidden></span></div>
+      <p class="sub" id="sub">Opening your records…</p>
+      <div class="pills" id="act" hidden><a class="pill" href="/portal"></a></div>
+      <nav class="tabs pills" aria-label="Your portal">
+        <a class="pill" href="/portal">Overview</a>
+        <a class="pill" href="/portal/messages">Messages</a>
+        <a class="pill" href="/portal/book">Book a meeting</a>
+        <a class="pill" href="/portal/account">Account</a>
+      </nav>
+    </div>
+  </section>
+</div>
+
+<section id="main" class="wrap" aria-live="polite">
+  <article class="card case rise" id="case" hidden>
+    <div>
+      <ol class="tracker" id="tracker"></ol>
+      <p class="now" id="now"></p>
+    </div>
+    <div class="stat dual">
+      <div><span class="label">County's value</span><strong class="figure" id="v-county"></strong><span class="stat-sub" id="v-county-sub"></span></div>
+      <div><span class="label" id="v-ours-label">Our value</span><strong class="figure" id="v-ours"></strong><span class="stat-sub" id="v-ours-sub"></span></div>
+    </div>
+    <div>
+      <dl class="facts">
+        <div><dt class="label">Filing deadline</dt><dd id="f-deadline"></dd></div>
+        <div><dt class="label">Hearing</dt><dd id="f-hearing"></dd></div>
+        <div><dt class="label">Petition number</dt><dd id="f-petition"></dd></div>
+        <div><dt class="label">Tax year</dt><dd id="f-year"></dd></div>
+        <div class="need"><dt class="label" id="need-label">What we need from you</dt><dd id="need-text"></dd><p class="caption" id="need-note" hidden>No fee, nothing filed. We check again when the next roll posts.</p><div class="pills" id="need-pills" hidden></div></div>
+      </dl>
+    </div>
+    <div class="docs"><span class="label">Documents</span><ul class="list" id="docs"></ul></div>
+    <div class="history"><span class="label">History</span><ul class="list" id="history"></ul></div>
+    <div class="msgs">
+      <span class="label">Messages</span>
+      <ul class="list" id="msgs"></ul>
+      <div class="pills"><a class="pill" id="msgs-all" href="/portal/messages">All messages</a><a class="pill" id="msgs-reply" href="mailto:claimos@agentmail.to">Reply by email</a></div>
+    </div>
+  </article>
+
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <span class="label">Product</span>
+        <ul>
+          <li><a href="/check">Check my property</a></li>
+          <li><a href="/track">Track my claim</a></li>
+          <li><a href="/how-it-works">How it works</a></li>
+          <li><a href="/pricing">How we get paid</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Company</span>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="mailto:claimos@agentmail.to">claimos@agentmail.to</a></li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Legal</span>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-note">Claim OS is a private company and is not affiliated with any government agency, county property appraiser or value adjustment board. Claim OS is not a law firm and does not give legal advice. Estimates come from public county records and may be out of date; only the county decides your value, and nothing here is a promise of a lower bill.</p>
+    <p class="foot-copy">© 2026 Claim OS</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+  const money = (n) => (n == null || isNaN(Number(n)) ? '—' : '$' + Math.round(Number(n)).toLocaleString('en-US'));
+  const title = (s) => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase().replace(/(^|\s)\S/g, (c) => c.toUpperCase()).replace(/\b(Nw|Ne|Sw|Se)\b/g, (d) => d.toUpperCase());
+  const date = (s) => (s ? new Date(s.length <= 10 ? s + 'T00:00:00' : s).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '');
+  const mailto = (subject) => 'mailto:claimos@agentmail.to?subject=' + encodeURIComponent(subject);
+  const pill = (text, href, blank) => { const a = el('a', 'pill', text); a.href = href; if (blank) { a.target = '_blank'; a.rel = 'noopener'; } return a; };
+
+  const STAGES = ['find', 'qualify', 'signup', 'evidence', 'file', 'waiting', 'appeal', 'won'];
+  const NAMES = ['Find', 'Qualify', 'Sign up', 'Evidence', 'File', 'Waiting on county', 'Appeal again', 'Won and paid'];
+  const CHIP = { find: ['Checking', 'gray'], qualify: ['Checking', 'gray'], signup: ['Signed up', 'amber'], evidence: ['Evidence', 'amber'], file: ['Filing', 'amber'],
+    waiting: ['Waiting on county', ''], appeal: ['Second round', ''], won: ['Won', 'green'], stopped: ['Closed', 'gray'] };
+  const NEXT = { find: 'We are checking the parcel.', qualify: 'We are checking the parcel.', signup: 'We confirm the parcel and send the agreement.',
+    evidence: 'We assemble the evidence packet.', file: "We file the petition before the county's deadline.", waiting: 'Nothing to do. The county sets the hearing; we attend.',
+    appeal: 'We decide the second round with you.', won: "Our invoice follows the county's corrected bill.", stopped: 'Nothing. You owe nothing.' };
+  const KIND = { agreement: 'Agreement', dr486poa: 'DR-486POA', evidence: 'Evidence packet', petition: 'Petition', notice: 'County notice', decision: 'Decision' };
+
+  const h1 = $('#h1'), sub = $('#sub'), chip = $('#chip'), card = $('#case'), act = $('#act');
+
+  // The emailed link lands on /portal?t=…; every portal page keeps the token in sessionStorage and strips it from the URL.
+  const q = new URLSearchParams(location.search);
+  let t = q.get('t');
+  try { if (t) sessionStorage.setItem('claimos_t', t); else t = sessionStorage.getItem('claimos_t'); } catch { /* storage blocked: the ?t= link still works */ }
+  if (q.has('t')) { q.delete('t'); history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '')); }
+  const id = q.get('id');
+
+  // A state the hero can say on its own: heading, one sentence, one way out; focus moves to the heading.
+  const say = (heading, text, pillText, href) => {
+    h1.textContent = heading; sub.textContent = text;
+    const a = $('.pill', act); a.textContent = pillText; a.href = href;
+    act.hidden = false; h1.focus();
+  };
+  const signIn = (expired) => {
+    try { sessionStorage.removeItem('claimos_t'); } catch {}
+    say(expired ? 'Your link has expired.' : 'Sign in to see this property.',
+      expired ? 'Links work for 24 hours. Request a new one with the email you signed up with; it arrives from claimos@agentmail.to.'
+        : 'This page opens from the link we email you. Enter the email you signed up with and we send a new one; it works for 24 hours.',
+      'Email me a link', expired ? '/track?expired=1' : '/track');
+  };
+
+  const render = (d, c) => {
+    const addr = title(c.address) + (c.unit ? ', Unit ' + String(c.unit).trim() : '');
+    const stopped = c.stage === 'stopped', won = c.stage === 'won', i = STAGES.indexOf(c.stage);
+    const needs = !stopped && c.needs_from_owner;
+    document.title = addr + ' — Claim OS';
+    h1.textContent = addr;
+    sub.textContent = [c.city && title(c.city), c.county && c.county + ' County', 'Case ' + c.case_id].filter(Boolean).join(' · ');
+    const [chipText, tone] = needs ? ['Needs you', 'amber'] : CHIP[c.stage] || ['Checking', 'gray'];
+    chip.textContent = chipText; if (tone) chip.dataset.tone = tone; else chip.removeAttribute('data-tone'); chip.hidden = false;
+
+    const tracker = $('#tracker');
+    tracker.classList.toggle('is-closed', stopped);
+    tracker.replaceChildren(...NAMES.map((n, k) => {
+      const li = el('li', stopped ? '' : k < i ? 'is-done' : k === i ? 'is-current' : '', n);
+      if (!stopped && k === i) li.setAttribute('aria-current', 'step');
+      return li;
+    }));
+    $('#now').replaceChildren(el('b', null, stopped ? 'Closed. ' : 'Now: '), document.createTextNode(needs ? c.needs_from_owner : NEXT[c.stage] || NEXT.find));
+
+    const cv = Number(c.county_value), rv = Number(c.requested_value), dv = Number(c.decided_value), sv = money(c.annual_savings) + ' / yr';
+    $('#v-county').textContent = money(c.county_value);
+    $('#v-county-sub').textContent = 'From the ' + (c.county ? c.county + ' County' : 'county') + ' roll';
+    $('#v-ours-label').textContent = won ? 'Decided value' : 'Our value';
+    $('#v-ours').textContent = stopped ? '—' : money(won ? c.decided_value : c.requested_value);
+    $('#v-ours-sub').textContent = stopped ? 'No value requested'
+      : won ? 'Lowered by ' + money(cv - dv) + ' · ' + sv
+      : money(cv - rv) + ' below the county · est. saving ' + sv;
+
+    const year = (c.case_id || '').split('-')[2];
+    $('#f-deadline').textContent = c.filing_deadline ? date(c.filing_deadline) : !stopped && i > -1 && i < STAGES.indexOf('file') ? 'Set when the county mails the TRIM notice (August)' : 'Not set';
+    $('#f-hearing').textContent = stopped ? 'None' : won && c.hearing_date ? 'Held ' + date(c.hearing_date) : c.hearing_date ? date(c.hearing_date) + ' · special magistrate' : 'Not set yet';
+    $('#f-petition').textContent = c.petition_number || (stopped ? 'Not filed' : 'Not filed yet');
+    $('#f-year').textContent = /^\d{4}$/.test(year) ? year : '—';
+
+    const docs = [...(c.documents || [])].sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
+    $('#need-label').textContent = stopped ? 'Why we stopped' : 'What we need from you';
+    $('#need-text').textContent = stopped ? c.stop_reason || 'We stopped this case.' : c.needs_from_owner || 'Nothing right now.';
+    $('#need-note').hidden = !stopped;
+    const pills = $('#need-pills');
+    pills.replaceChildren();
+    if (needs) {
+      const poa = docs.find((x) => x.kind === 'dr486poa' && !/signed/i.test(x.name || '')), signed = docs.some((x) => x.kind === 'dr486poa' && /signed/i.test(x.name || ''));
+      if (poa && !signed) {
+        if (poa.url) pills.append(pill('Open the DR-486POA', poa.url, true));
+        pills.append(pill('Send the signed copy', mailto('Signed DR-486POA · ' + addr + ' · ' + c.case_id)));
+      } else pills.append(pill('Send it by email', mailto(addr + ' · ' + c.case_id)));
+    }
+    pills.hidden = !needs;
+
+    const list = (sel, rows, build) => {
+      const ul = $(sel);
+      ul.replaceChildren(...rows.map(build));
+      ul.hidden = !rows.length;
+      const empty = ul.nextElementSibling?.classList.contains('empty') ? ul.nextElementSibling : ul.insertAdjacentElement('afterend', el('p', 'empty', 'Nothing yet.'));
+      empty.hidden = rows.length > 0;
+    };
+    list('#docs', docs, (x) => {
+      const li = el('li', 'doc'), left = el('div'), name = el('span', 'doc-name');
+      if (x.url) { const a = el('a', null, x.name || 'Document'); a.href = x.url; a.target = '_blank'; a.rel = 'noopener'; name.append(a); } else name.textContent = x.name || 'Document';
+      left.append(name, el('span', 'caption', [KIND[x.kind] || x.kind, date(x.at)].filter(Boolean).join(' · ')));
+      li.append(left);
+      if (x.url) { const p = pill('Open', x.url, true); p.tabIndex = -1; li.append(p); } else li.append(el('span', 'onfile', 'On file. Ask us for a copy.'));
+      return li;
+    });
+    const hist = (c.history || []).map((h) => (typeof h === 'string' ? { line: h } : { date: h.date || h.at || '', line: h.line || h.text || '' }))
+      .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    list('#history', hist, (h) => { const li = el('li'); li.append(el('time', null, date(h.date)), el('span', null, h.line)); return li; });
+    const msgs = (c.messages || []).slice(-3);
+    list('#msgs', msgs, (m) => {
+      const me = m.from === 'owner', li = el('li', 'msg' + (me ? ' me' : '')), head = el('div', 'msg-head');
+      head.append(el('span', 'label', me ? 'You' : 'Claim OS'), el('time', null, date(m.at)));
+      li.append(head, el('p', null, m.text));
+      return li;
+    });
+    // Same order as the overview: needs you first, then active by recency, won, stopped last.
+    const rank = (x) => (x.needs_from_owner && x.stage !== 'stopped' ? 0 : x.stage === 'won' ? 2 : x.stage === 'stopped' ? 3 : 1);
+    const ordered = [...d.cases].sort((a, b) => rank(a) - rank(b) || String(b.updated_at || '').localeCompare(String(a.updated_at || '')));
+    $('#msgs-all').href = '/portal/messages#' + ordered.indexOf(c);
+    $('#msgs-reply').href = mailto('Re: ' + addr + ' · ' + c.case_id);
+    card.hidden = false;
+  };
+
+  async function open() {
+    if (!t) return signIn(false);
+    let r;
+    try { r = await fetch('/api/portal?t=' + encodeURIComponent(t)); } catch { sub.textContent = 'We could not reach our records. Please reload to try again.'; return; }
+    if (r.status === 401) return signIn(true);
+    if (!r.ok) { sub.textContent = 'We could not reach our records. Please reload to try again.'; return; }
+    const d = await r.json();
+    $('#nav-who b').textContent = d.email; $('#nav-who').hidden = false; $('#nav-out').hidden = false;
+    const c = (d.cases || []).find((x) => x.case_id === id);
+    if (!c) return say("We can't find that property.", 'It may sit under another email, or the link is old. Your properties are one step back.', 'Back to your properties', '/portal');
+    render(d, c);
+  }
+  $('#nav-out').addEventListener('click', () => { try { sessionStorage.removeItem('claimos_t'); } catch {} location.href = '/track'; });
+  open();
+})();
+</script>
+</body>
+</html>
