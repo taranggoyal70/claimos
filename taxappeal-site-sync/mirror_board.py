@@ -5,8 +5,9 @@ Runs on a laptop or the Mac mini with the Naive CLI logged in (not inside an age
 hundreds of cards with full bodies and the agent's board_read cannot page, so a model overflows).
     python3 mirror_board.py            # mirror and print the stage counts
 Also the other direction: every consented site sign-up (`signups`) gets a `Sign up ·` card on the board (status
-blocked; `--key signup:<row id>` keeps it one card per row across passes), and when a new sign-up matched a case the
-Find card gets a comment and `cases.owner_email` is set.
+blocked; a row whose (email, date) already stands in a website card's body is skipped, and `--key signup:<row id>`
+makes the add itself idempotent), and when a new sign-up matched a case the Find card gets a comment and
+`cases.owner_email` is set. `python3 mirror_dryrun.py` runs the same pass with every write stubbed.
 Needs: naive (logged in, org Claim OS), python3. Uses sync.py next to this file.
 """
 import json, re, subprocess, sys, tempfile, os
@@ -39,12 +40,26 @@ def q(s):
     return "'" + str(s).replace("'", "''") + "'"
 
 
-def mirror_signups(find_card, known):
-    """Site sign-ups -> board. `board add --key` is idempotent (the API returns the card that key already made), so the
-    board is the cursor: a returned card that main() had already read is old and gets no comment. No column needed."""
+def cards(status):
+    """Every card in a column: `board show` pages (has_more / next_cursor), so follow the cursor."""
+    out, after = [], None
+    while True:
+        page = naive("board", "show", BOARD_OWNER, "--status", status, "--limit", "100", *(["--after", after] if after else []))
+        out += page["data"]
+        if not page.get("has_more"):
+            return out
+        after = page["next_cursor"]
+
+
+def mirror_signups(find_card, known, website):
+    """Site sign-ups -> board. The board is the cursor, no column needed: a row whose (email, date) main() already read
+    in a website card's body is done; `--key` makes the add idempotent on the platform too (it returns the card that key
+    already made), and such a returned card, being in `known`, gets no comment."""
     rows = naive("db", "query", "--app", APP, "select * from signups where consent order by created_at")["rows"]
     new = 0
     for s in rows:
+        if (s["email"], s["created_at"]) in website:
+            continue
         addr = ", ".join(x for x in (s["address"], s.get("city")) if x) + (f" {s['zip']}" if s.get("zip") else "")
         body = "\n".join(f"{k}: {'' if s.get(k) is None else s[k]}" for k in SIGNUP_FIELDS) + f"\nsource: website\ndate: {s['created_at']}"
         card = naive("board", "add", BOARD_OWNER, "--title", f"Sign up · {addr}", "--body", body, "--status", "blocked", "--key", f"signup:{s['id']}")
@@ -63,12 +78,14 @@ def mirror_signups(find_card, known):
 
 
 def main():
-    lines, known, find_card = [], set(), {}
+    lines, known, find_card, website = [], set(), {}, set()
     for status in ("todo", "doing", "blocked", "done"):
-        cards = naive("board", "show", BOARD_OWNER, "--status", status)["data"]
-        for c in cards:
+        for c in cards(status):
             known.add(c["id"])
-            j = case_block(c.get("body"))
+            body = c.get("body") or ""
+            if "source: website" in body:     # a website Sign up card; its email/date lines name the signups row
+                website.add(tuple(re.findall(r"^(?:email|date): (.*)$", body, re.M)))
+            j = case_block(body)
             if not j or not j.get("case_id"):
                 continue
             if c.get("title", "").startswith("FL ") or j["case_id"] not in find_card:   # Find's own card, else any card of the case
@@ -87,7 +104,7 @@ def main():
         sys.exit(f"sync.py cases failed: {sql.stderr.strip()[:300]}")
     res = naive("db", "query", "--app", APP, sql.stdout)
     print("upserted:", res.get("rows"), file=sys.stderr)
-    mirror_signups(find_card, known)
+    mirror_signups(find_card, known, website)
     counts = naive("db", "query", "--app", APP, "select stage, count(*) from cases group by 1 order by 2 desc")
     print(json.dumps(counts.get("rows")))
 

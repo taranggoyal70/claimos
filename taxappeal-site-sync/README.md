@@ -68,10 +68,12 @@ the count as `skipped_owner_rows`. On 2026-11-08 a mirror pass had reset three o
 
 The same pass also carries website sign-ups to the board (`mirror_signups`): every consented `signups`
 row gets a `Sign up · <address>` card in `blocked` (body: email, address, phone, call_ok, consent,
-verdict, case_id, claim_code, source: website, date). The card is added with `--key signup:<row id>`,
-which the platform makes idempotent (a second add returns the card that key already made), so a second
-pass adds nothing and the row needs no extra column; a card the pass had already read from the board
-gets no comment again. When a new sign-up matched a case, the case's Find card gets the comment
+verdict, case_id, claim_code, source: website, date). The board is the cursor and the row needs no extra
+column: a row whose email and date already stand in a website card's body is skipped, and the add itself
+carries `--key signup:<row id>`, which the platform makes idempotent (a second add returns the card that
+key already made; a card the pass had already read gets no comment). `python3 taxappeal-site-sync/mirror_dryrun.py`
+runs the whole pass with every write stubbed and prints what it would add; a healthy repeat ends with
+`signups: N consented, 0 new card(s)`. When a new sign-up matched a case, the case's Find card gets the comment
 `owner signed up via the website: <email> · <date>` and `cases.owner_email` is set (only when empty).
 The `Sign up` card is then the owner's conversation, like the ones `signup` opens from mail.
 
