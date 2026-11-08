@@ -5,6 +5,7 @@
 # Re-running is safe: every resource is looked up by name first.
 set -euo pipefail
 cd "$(dirname "$0")"
+[ -f .env ] && { set -a; . ./.env; set +a; }   # keys live in .env (git-ignored), not in argv
 command -v naive >/dev/null || { echo "install the CLI: npm i -g @usenaive-sdk/cli"; exit 1; }
 command -v jq >/dev/null || { echo "needs jq"; exit 1; }
 echo "org: $(naive whoami | jq -r '.organization.name')"

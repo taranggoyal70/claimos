@@ -24,7 +24,8 @@ owner writes ──► AgentMail inbox ──► signup (every 15 min) ──►
 
 ```bash
 naive login …                      # the Claim OS org
-MONID_API_KEY=… ./setup.sh         # prints the AgentMail Connect Link; paste the am_… key there
+echo 'MONID_API_KEY=…' > .env      # git-ignored; setup.sh loads it
+./setup.sh                         # prints the AgentMail Connect Link; paste the am_… key there
 naive connections show --connection ca_…   # wait for status: active
 naive deploy resume dep_…          # start the 15-minute passes
 ```
