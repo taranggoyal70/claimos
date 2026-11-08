@@ -18,12 +18,23 @@ comment** on the same card. The comments are the record; the body is the brief.
 
 ## The decision is a comment on that card
 
-When a reply contains the county's decision, Chase writes two comments, in this order:
+When a reply contains the county's decision, Chase writes three comments, in this order:
 
 ```
+decision-letter · case <case_id> · level <filing level> · received <YYYY-MM-DD> · <messageId>
+<the full text of the county's message, unedited>
+```
+```
 decision: <granted|denied|partial|dismissed> · value <new just value, or none> · <decision date> · <messageId>
+```
+```
 escalate
 ```
+
+The `decision-letter` comment is the full letter (one per messageId; a PDF's text when it can be
+extracted, otherwise `attachment: <filename> (text not extracted)` after the body). Escalate acts only
+on cards that carry one; `case` and `level` are copied from the card as written, `case unknown` /
+`level unknown` when the card does not say.
 
 Example:
 

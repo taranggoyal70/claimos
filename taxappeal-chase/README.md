@@ -31,6 +31,24 @@ Any card in `blocked` or `doing` whose title starts with `Waiting on` and whose 
 state: `chased: <date>` (latest wins, count = follow-ups sent), `reply from <email> on <date> …`,
 `escalate` (a person owns it). Max one email per card per pass, three per card ever.
 
+When a reply carries the county's decision, three more comments follow, in this order (the Escalate
+desk acts only on cards that have the first one):
+
+```
+decision-letter · case <case_id> · level <filing level> · received <YYYY-MM-DD> · <messageId>
+<the full text of the county's message, unedited; PDF text if extractable, else
+attachment: <filename> (text not extracted)>
+```
+```
+decision: <granted|denied|partial|dismissed> · value <new value or none> · <decision date> · <messageId>
+```
+```
+escalate
+```
+
+`case` and `level` come from the card as written (`case unknown` / `level unknown` when absent);
+one `decision-letter` per messageId, never reposted.
+
 `shortcut: only titles starting with "Waiting on" are opened (the board list omits bodies); if File
 starts writing follow_up: lines on other titles, drop the prefix test in chase.system.md.`
 
