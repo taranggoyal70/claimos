@@ -1,27 +1,17 @@
 import { db, fail } from '../lib/lookup';
 import { verify } from '../lib/token';
-import { ownerData, type Doc } from '../lib/portal';
+import { ownerData } from '../lib/portal';
 
 const headers = { 'cache-control': 'no-store' };
 type Meeting = { id: string; email: string; slot: string; status: string; address: string | null; case_id: string | null; name: string | null; notes: string | null };
 
-// A seven-day link for a document kept as an org file. No NAIVE_API_KEY, or a failed call, leaves the row with no url
-// (the page shows it as "on file"); file_id never reaches the browser.
-// NAIVE_API_KEY is a files:read-only key a person puts on the app with scripts/set-secrets.sh; it applies on the next deploy.
-// Links serve the stored content type; these files were uploaded as application/octet-stream, so browsers download them.
-async function linked({ file_id, ...doc }: Doc): Promise<Doc> {
-  if (!file_id || doc.url || !process.env.NAIVE_API_KEY) return doc;
-  try {
-    const r = await fetch(`https://api.vetta.sh/v1/files/${encodeURIComponent(file_id)}/url`, { method: 'POST', headers: { authorization: `Bearer ${process.env.NAIVE_API_KEY}` } });
-    if (r.ok) doc.url = (await r.json()).url;
-    else console.error(`file url ${r.status} for ${file_id}`);
-  } catch (e) { console.error(e); }
-  return doc;
-}
-
 // Everything the portal shows for the owner the token names: sign-ups, cases (documents, messages, history), meetings.
+// Documents carry has_file instead of a link: /api/doc signs one file when the owner opens it, so file_id never reaches the browser.
 export async function GET(req: Request) {
-  const email = verify(new URL(req.url).searchParams.get('t') ?? '');
+  const q = new URL(req.url).searchParams;
+  // ?warm=1 wakes this function and the database before the owner reaches the portal; always 204 so the console stays clean
+  if (q.has('warm')) { await db('cases?select=case_id&limit=1').catch(() => {}); return new Response(null, { status: 204, headers }); }
+  const email = verify(q.get('t') ?? '');
   // 200, not 401: browsers log every 4xx fetch to the console, and the body already says what happened
   if (!email) return Response.json({ error: 'expired' }, { headers });
   try {
@@ -30,10 +20,10 @@ export async function GET(req: Request) {
       ownerData(email),
       db(`meetings?select=id,email,slot,status,address,case_id,name,notes&email=ilike.${enc}&order=slot.asc`) as Promise<Meeting[]>,
     ]);
-    const out = await Promise.all(cases.map(async (c) => ({ ...c, documents: await Promise.all(c.documents.map(linked)) })));
     return Response.json({
-      email, signups, cases: out,
+      email, signups,
+      cases: cases.map((c) => ({ ...c, documents: c.documents.map(({ file_id, ...d }) => (file_id ? { ...d, has_file: true } : d)) })),
       meetings: meetings.filter((m) => m.email.toLowerCase() === email).map(({ email, ...m }) => m),
-    }, { headers });
+    }, { headers: { 'cache-control': 'private, max-age=60, stale-while-revalidate=600' } });
   } catch (e) { return fail(e); }
 }

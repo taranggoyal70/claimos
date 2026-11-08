@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/site.css">
+<script>/* Wakes /api/portal and the database once per browser session, so the emailed portal link opens fast. */
+try { if (!sessionStorage.claimos_warm) { sessionStorage.claimos_warm = 1; fetch('/api/portal?warm=1', { keepalive: true }).catch(() => {}); } } catch {}</script>
 </head>
 <body>
 

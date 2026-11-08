@@ -1,4 +1,4 @@
-// Self-check for api/portal.ts, api/track.ts and api/portal-action.ts against a fake PostgREST and file API: bun scripts/portal-test.ts
+// Self-check for api/portal.ts, api/doc.ts, api/track.ts and api/portal-action.ts against a fake PostgREST and file API: bun scripts/portal-test.ts
 import assert from 'node:assert/strict';
 Object.assign(process.env, { DATABASE_REST_URL: 'https://db.test/rest/', DATABASE_SERVICE_KEY: 'k', TRACK_SECRET: 's', NAIVE_API_KEY: 'n' });
 
@@ -9,6 +9,12 @@ const CASE = {
   history: [{ date: '2026-11-07', line: 'Drafted.' }], messages: [],
   documents: [{ name: 'DR-486POA draft', kind: 'dr486poa', file_id: 'fil_1', at: '2026-11-07' }, { name: 'Agreement (signed)', kind: 'agreement', at: '2026-11-04' }],
 };
+const ROWS = [
+  CASE,
+  { ...CASE, case_id: 'NULLS', documents: null, history: null, messages: null },                                        // null jsonb
+  { ...CASE, case_id: 'FL-13-2026-34801143000', owner_email: null },                                                    // only the sign-up points here: not the owner's
+  { ...CASE, case_id: 'LEAK', owner_email: 'francescoXrosciano@me.com' },                                              // what ilike's "_" lets through
+];
 const calls: { url: string; method: string; body?: any }[] = [];
 const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { 'content-type': 'application/json' } });
 globalThis.fetch = (async (input: any, init: any = {}) => {
@@ -16,12 +22,9 @@ globalThis.fetch = (async (input: any, init: any = {}) => {
   calls.push({ url, method, body });
   if (url.startsWith('https://api.vetta.sh/v1/files/fil_1/url')) return json({ url: 'https://signed.test/draft.pdf' }, 201);
   if (url.includes('/signups?')) return json([{ email: ME, address: '520 Richard Jackson Blvd', city: 'Panama City Beach', zip: '32407', created_at: '2026-11-04', case_id: 'FL-13-2026-34801143000' }]);
-  if (url.includes('/cases?') && method === 'GET') return json([
-    CASE,
-    { ...CASE, case_id: 'NULLS', documents: null, history: null, messages: null },                                        // null jsonb
-    { ...CASE, case_id: 'FL-13-2026-34801143000', owner_email: null },                                                    // only the sign-up points here: not the owner's
-    { ...CASE, case_id: 'LEAK', owner_email: 'francescoXrosciano@me.com' },                                              // what ilike's "_" lets through
-  ]);
+  if (url.includes('/candidates?')) return json([{ case_id: CASE.case_id, use: null }]);
+  if (url.includes('/cases?select=owner_email,documents')) return json(ROWS.filter((r) => url.endsWith('case_id=eq.' + encodeURIComponent(r.case_id))));
+  if (url.includes('/cases?') && method === 'GET') return json(ROWS);
   if (url.includes('/cases?') && method === 'PATCH') return json([{ ...CASE, ...body }]);
   if (url.includes('/meetings?')) return json([
     { id: 'm1', email: ME, slot: '2026-11-12T20:00:00Z', status: 'confirmed', address: '7969 1st Pl', case_id: CASE.case_id, name: 'F', notes: null },
@@ -33,6 +36,7 @@ globalThis.fetch = (async (input: any, init: any = {}) => {
 
 const { sign } = await import('../lib/token.ts');
 const { GET } = await import('../api/portal.ts');
+const { GET: docGET } = await import('../api/doc.ts');
 const { GET: trackGET } = await import('../api/track.ts');
 const { POST } = await import('../api/portal-action.ts');
 const t = sign(ME);
@@ -44,15 +48,17 @@ assert.equal(bad.status, 200);                                                 /
 assert.deepEqual(await bad.json(), { error: 'expired' });
 const r = await GET(new Request('https://x/api/portal?t=' + encodeURIComponent(t)));
 assert.equal(r.status, 200);
-assert.equal(r.headers.get('cache-control'), 'no-store');
+assert.equal(r.headers.get('cache-control'), 'private, max-age=60, stale-while-revalidate=600');
 const d = await r.json();
 assert.equal(d.email, ME);
 assert.deepEqual(d.cases.map((c: any) => c.case_id), [CASE.case_id, 'NULLS']);
 assert.ok(d.cases.every((c: any) => !('owner_email' in c)));
 assert.deepEqual(d.cases[1].documents, []);                                    // null jsonb normalised
-assert.equal(d.cases[0].documents[0].url, 'https://signed.test/draft.pdf');
+assert.equal(d.cases[0].documents[0].has_file, true);                       // signed on demand by /api/doc
 assert.ok(!('file_id' in d.cases[0].documents[0]));
-assert.equal(d.cases[0].documents[1].url, undefined);
+assert.ok(!('url' in d.cases[0].documents[0]) && !('has_file' in d.cases[0].documents[1]));
+assert.ok(!calls.some((c) => c.url.includes('api.vetta.sh')), 'the portal response signs nothing');
+assert.equal((await GET(new Request('https://x/api/portal?warm=1'))).status, 204);
 assert.deepEqual(d.meetings.map((m: any) => m.id), ['m1']);
 assert.ok(!('email' in d.meetings[0]));
 assert.equal(d.signups[0].address, '520 Richard Jackson Blvd');
@@ -61,12 +67,17 @@ const tr = await (await trackGET(new Request('https://x/api/track?t=' + encodeUR
 assert.deepEqual(tr.cases.map((c: any) => c.case_id), [CASE.case_id, 'NULLS']);
 assert.ok(tr.cases.every((c: any) => !('owner_email' in c)) && tr.signups[0].address === '520 Richard Jackson Blvd');
 
-// Without a key, no file call and no url
+// /api/doc: the owner's file 302s to its signed url; anyone else's case, a doc without a file, or no key does not
+const doc = (q: string) => docGET(new Request('https://x/api/doc?' + q));
+const ok = await doc(`t=${encodeURIComponent(t)}&case=${encodeURIComponent(CASE.case_id)}&i=0`);
+assert.equal(ok.status, 302);
+assert.equal(ok.headers.get('location'), 'https://signed.test/draft.pdf');
+assert.equal((await doc(`t=nope&case=x&i=0`)).headers.get('location'), '/track?expired=1');
+assert.equal((await doc(`t=${encodeURIComponent(t)}&case=LEAK&i=0`)).status, 404);
+assert.equal((await doc(`t=${encodeURIComponent(t)}&case=${encodeURIComponent(CASE.case_id)}&i=1`)).status, 404);
+assert.equal((await doc(`t=${encodeURIComponent(t)}&case=${encodeURIComponent(CASE.case_id)}`)).status, 400);
 delete process.env.NAIVE_API_KEY;
-const n0 = calls.length;
-const d2 = await (await GET(new Request('https://x/api/portal?t=' + encodeURIComponent(t)))).json();
-assert.equal(d2.cases[0].documents[0].url, undefined);
-assert.ok(!calls.slice(n0).some((c) => c.url.includes('api.vetta.sh')));
+assert.equal((await doc(`t=${encodeURIComponent(t)}&case=${encodeURIComponent(CASE.case_id)}&i=0`)).status, 503);
 
 // POST guards
 assert.equal((await post({ t: 'nope', action: 'book' })).status, 401);

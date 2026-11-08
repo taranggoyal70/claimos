@@ -1,18 +1,20 @@
 /* Portal runtime for /portal (the overview). The other portal pages inline their own copy of the token flow.
      <script src="/portal/portal.js"></script> then Portal.load(render)
-   Portal.load(render): reads ?t= (moves it into sessionStorage.claimos_t and off the address bar), calls
-     GET /api/portal?t=, then render(data) with {email, cases, signups, meetings}. No token, or a 200 {error: 'expired'}
+   Portal.load(render): reads ?t= (moves it into sessionStorage.claimos_t and off the address bar), renders at once from
+     the last payload for that token (sessionStorage.claimos_portal {t, at, data}) or shows a skeleton card, then calls
+     GET /api/portal?t= and calls render(data) again only when the answer differs, so render must be safe to repeat.
+     data is {email, cases, signups, meetings}. No token, or a 200 {error: 'expired'}
      (a 4xx would log a console line), shows the "sign in by email" card; any other failure shows the "could not reach
      our records" card. Both go into [data-portal].
    Page markup it expects: <span class="nav-who" hidden>Signed in as <b data-email></b></span>,
      <a href="/track" data-signout hidden>Sign out</a>, <main class="wrap portal" data-portal aria-live="polite">.
    Helpers (elements or strings, never HTML): money date when title addr place closed chip nextAction emptyCard
-     sortCases el mailto PROP. */
+     sortCases el mailto PROP doc. */
 window.Portal = (() => {
-  const KEY = 'claimos_t';
+  const KEY = 'claimos_t', CACHE = 'claimos_portal';
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-  const store = { get: () => { try { return sessionStorage.getItem(KEY); } catch { return null; } },
-    set: (v) => { try { sessionStorage.setItem(KEY, v); } catch {} }, clear: () => { try { sessionStorage.removeItem(KEY); } catch {} } };
+  const store = { get: (k = KEY) => { try { return sessionStorage.getItem(k); } catch { return null; } },
+    set: (v, k = KEY) => { try { sessionStorage.setItem(k, v); } catch {} }, clear: () => { try { sessionStorage.removeItem(KEY); sessionStorage.removeItem(CACHE); } catch {} } };
 
   const money = (n) => (n == null || isNaN(Number(n)) ? '—' : '$' + Math.round(Number(n)).toLocaleString('en-US'));
   const date = (s) => (s ? new Date(s.length <= 10 ? s + 'T00:00:00' : s).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '');
@@ -24,6 +26,8 @@ window.Portal = (() => {
   const place = (c) => [c.city && title(c.city), c.county && c.county + ' County'].filter(Boolean).join(' · ');
   const closed = (c) => c.stage === 'stopped' || c.status === 'stopped';
   const PROP = (c) => '/portal/property?id=' + encodeURIComponent(c.case_id);
+  // A case document's link: its own url, else /api/doc signs the file on click (has_file), else null ("on file")
+  const doc = (c, x) => x.url || (x.has_file ? `/api/doc?t=${encodeURIComponent(store.get() || '')}&case=${encodeURIComponent(c.case_id)}&i=${c.documents.indexOf(x)}` : null);
   const mailto = (subject) => 'mailto:claimos@agentmail.to?subject=' + encodeURIComponent(subject);
 
   const CHIP = { find: ['Checking', 'gray'], qualify: ['Checking', 'gray'], signup: ['Signed up', 'amber'], evidence: ['Evidence', 'amber'], file: ['Filing', 'amber'],
@@ -75,17 +79,29 @@ window.Portal = (() => {
     if (t) { store.set(t); u.searchParams.delete('t'); history.replaceState(null, '', u.pathname + u.search + u.hash); }
     const tok = store.get();
     if (!tok) return show(notice('Sign in by email.', 'We email you a link that opens your properties. It works for 24 hours.', 'Email me a link', '/track'));
+    let cached = null;
+    try { const c = JSON.parse(store.get(CACHE)); if (c && c.t === tok) cached = c; } catch {}
+    const skel = el('div', 'card step skel');
+    const paint = (d) => {
+      skel.remove();
+      document.querySelectorAll('[data-email]').forEach((e) => { e.textContent = d.email; });
+      document.querySelectorAll('.nav-who, [data-signout]').forEach((e) => { e.hidden = false; });
+      render(d);
+      main.removeAttribute('aria-busy');
+    };
+    if (cached) paint(cached.data);
+    else { skel.setAttribute('aria-hidden', 'true'); skel.append(el('i'), el('i'), el('i')); main.prepend(skel); }
     let d;
-    try { const r = await fetch('/api/portal?t=' + encodeURIComponent(tok)); d = r.ok ? await r.json() : null; } catch { d = null; }
-    if (!d) return show(notice('We could not reach our records.', 'Please reload to try again, or email claimos@agentmail.to and we answer by hand.', 'Reload', location.href));
+    // With a cached copy on screen, skip the HTTP cache: a booking or message sent a moment ago must show up
+    try { const r = await fetch('/api/portal?t=' + encodeURIComponent(tok), cached ? { cache: 'no-cache' } : {}); d = r.ok ? await r.json() : null; } catch { d = null; }
+    if (!d) return cached ? undefined : show(notice('We could not reach our records.', 'Please reload to try again, or email claimos@agentmail.to and we answer by hand.', 'Reload', location.href));
     if (d.error === 'expired') { store.clear(); return show(notice('That link has expired.', 'Links work for 24 hours. Request a new one and we email it within a minute.', 'Email me a new link', '/track')); }
-    document.querySelectorAll('[data-email]').forEach((e) => { e.textContent = d.email; });
-    document.querySelectorAll('.nav-who, [data-signout]').forEach((e) => { e.hidden = false; });
-    render(d);
-    main.removeAttribute('aria-busy');
-    main.classList.add('rise');
+    store.set(JSON.stringify({ t: tok, at: Date.now(), data: d }), CACHE);
+    if (cached && JSON.stringify(cached.data) === JSON.stringify(d)) return;
+    paint(d);
+    if (!cached) main.classList.add('rise');
   }
   document.addEventListener('click', (e) => { if (e.target.closest('[data-signout]')) store.clear(); });
 
-  return { load, el, money, date, when, title, addr, place, closed, chip, nextAction, emptyCard, sortCases, mailto, PROP };
+  return { load, doc, el, money, date, when, title, addr, place, closed, chip, nextAction, emptyCard, sortCases, mailto, PROP };
 })();

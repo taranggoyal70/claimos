@@ -102,10 +102,10 @@
 
   // Action pills for a case that needs something: open the POA draft when there is one to sign, else plain email
   const actions = (c) => {
-    const poa = (c.documents || []).filter((d) => d.kind === 'dr486poa'), signed = poa.some((d) => /signed/i.test(d.name)), draft = poa.find((d) => d.url && !/signed/i.test(d.name));
+    const poa = (c.documents || []).filter((d) => d.kind === 'dr486poa'), signed = poa.some((d) => /signed/i.test(d.name)), draft = poa.find((d) => P.doc(c, d) && !/signed/i.test(d.name));
     const out = [];
     if (poa.length && !signed) {
-      if (draft) out.push(link('pill', 'Open the DR-486POA', draft.url, true));
+      if (draft) out.push(link('pill', 'Open the DR-486POA', P.doc(c, draft), true));
       out.push(link('pill', 'Send the signed copy', P.mailto(`Signed DR-486POA · ${addr(c)} · ${c.case_id}`)));
     } else out.push(link('pill', 'Send it by email', P.mailto(`${addr(c)} · ${c.case_id}`)));
     out.push(link('pill', 'Open property', P.PROP(c)));

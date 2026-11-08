@@ -16,6 +16,8 @@
 .live { margin-top: 20px; gap: 8px 28px; font-size: 14px; }
 .live strong { color: #fff; font-weight: 500; font-variant-numeric: tabular-nums; }
 </style>
+<script>/* Wakes /api/portal and the database once per browser session, so the emailed portal link opens fast. */
+try { if (!sessionStorage.claimos_warm) { sessionStorage.claimos_warm = 1; fetch('/api/portal?warm=1', { keepalive: true }).catch(() => {}); } } catch {}</script>
 </head>
 <body>
 

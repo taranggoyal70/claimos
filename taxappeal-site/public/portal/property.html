@@ -130,14 +130,20 @@
   const h1 = $('h1'), sub = $('.hero .sub'), card = $('#case');
   const id = new URLSearchParams(location.search).get('id');
   // Rows under a label; an empty list becomes "Nothing yet."
-  const list = (sel, rows, build) => { const ul = $(sel); ul.replaceChildren(...rows.map(build)); if (!rows.length) ul.replaceWith(el('p', 'empty', 'Nothing yet.')); };
+  // Safe to repeat: portal.js renders again when fresh data differs from the cached copy.
+  const list = (sel, rows, build) => {
+    const ul = $(sel), empty = ul.nextElementSibling?.matches('p.empty') ? ul.nextElementSibling : null;
+    ul.replaceChildren(...rows.map(build)); ul.hidden = !rows.length;
+    if (rows.length) empty?.remove(); else if (!empty) ul.after(el('p', 'empty', 'Nothing yet.'));
+  };
 
   function render(d) {
     const c = (d.cases || []).find((x) => x.case_id === id);
-    if (!c) { h1.textContent = "We can't find that property."; sub.textContent = 'It may sit under another email, or the link is old. Your properties are one step back.'; h1.focus(); return; }
+    if (!c) { card.hidden = true; h1.parentElement.querySelector('.badge')?.remove(); h1.textContent = "We can't find that property."; sub.textContent = 'It may sit under another email, or the link is old. Your properties are one step back.'; h1.focus(); return; }
     const where = addr(c), stopped = closed(c), won = c.stage === 'won', i = STAGES.indexOf(c.stage), needs = !stopped && c.needs_from_owner;
     document.title = where + ' — Claim OS';
     h1.textContent = where;
+    h1.parentElement.querySelector('.badge')?.remove();
     h1.after(P.chip(c));
     sub.textContent = [place(c), 'Case ' + c.case_id].filter(Boolean).join(' · ');
 
@@ -168,21 +174,22 @@
     $('#need-text').textContent = stopped ? c.stop_reason || 'We stopped this case.' : c.needs_from_owner || 'Nothing right now.';
     $('#need-note').hidden = !stopped;
     const pills = $('#need-pills');
+    pills.replaceChildren();
     if (needs) {
       const poa = docs.find((x) => x.kind === 'dr486poa' && !/signed/i.test(x.name || '')), signed = docs.some((x) => x.kind === 'dr486poa' && /signed/i.test(x.name || ''));
       if (poa && !signed) {
-        if (poa.url) pills.append(pill('Open the DR-486POA', poa.url, true));
+        if (P.doc(c, poa)) pills.append(pill('Open the DR-486POA', P.doc(c, poa), true));
         pills.append(pill('Send the signed copy', P.mailto('Signed DR-486POA · ' + where + ' · ' + c.case_id)));
       } else pills.append(pill('Send it by email', P.mailto(where + ' · ' + c.case_id)));
     }
     pills.hidden = !needs;
 
     list('#docs', docs, (x) => {
-      const li = el('li', 'doc'), left = el('div'), name = el('span', 'doc-name');
-      if (x.url) { const a = el('a', null, x.name || 'Document'); a.href = x.url; a.target = '_blank'; a.rel = 'noopener'; name.append(a); } else name.textContent = x.name || 'Document';
+      const li = el('li', 'doc'), left = el('div'), name = el('span', 'doc-name'), href = P.doc(c, x);
+      if (href) { const a = el('a', null, x.name || 'Document'); a.href = href; a.target = '_blank'; a.rel = 'noopener'; name.append(a); } else name.textContent = x.name || 'Document';
       left.append(name, el('span', 'caption', [KIND[x.kind] || x.kind, date(x.at)].filter(Boolean).join(' · ')));
       li.append(left);
-      if (x.url) { const p = pill('Open', x.url, true); p.tabIndex = -1; li.append(p); } else li.append(el('span', 'onfile', 'On file. Ask us for a copy.'));
+      if (href) { const p = pill('Open', href, true); p.tabIndex = -1; li.append(p); } else li.append(el('span', 'onfile', 'On file. Ask us for a copy.'));
       return li;
     });
     const hist = (c.history || []).map((h) => (typeof h === 'string' ? { line: h } : { date: h.date || h.at || '', line: h.line || h.text || '' }))

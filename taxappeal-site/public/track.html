@@ -10,6 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/site.css">
 <style>.hero .thanks { margin-top: 8px; }</style>
+<script>/* Wakes /api/portal and the database once per browser session, so the emailed portal link opens fast. */
+try { if (!sessionStorage.claimos_warm) { sessionStorage.claimos_warm = 1; fetch('/api/portal?warm=1', { keepalive: true }).catch(() => {}); } } catch {}</script>
 </head>
 <body>
 
@@ -101,7 +103,8 @@
   const $ = (s, r = document) => r.querySelector(s);
   const q = new URLSearchParams(location.search), t = q.get('t');
   // The emailed link lands here; the portal owns the session from there on.
-  if (t) { location.replace('/portal?t=' + encodeURIComponent(t)); return; }
+  // The fetch starts the portal's data request now (keepalive outlives this page), so /portal finds it in the HTTP cache.
+  if (t) { fetch('/api/portal?t=' + encodeURIComponent(t), { keepalive: true }).catch(() => {}); location.replace('/portal?t=' + encodeURIComponent(t)); return; }
 
   const ask = $('#ask'), form = $('#link-form'), err = $('.bar-err', ask), sent = $('#sent');
   const showForm = (on) => { form.hidden = !on; $('h1', ask).hidden = !on; $('.sub', ask).hidden = !on; sent.hidden = on; };
