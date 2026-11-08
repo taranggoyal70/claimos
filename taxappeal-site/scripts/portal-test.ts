@@ -16,10 +16,18 @@ const ROWS = [
   { ...CASE, case_id: 'LEAK', owner_email: 'francescoXrosciano@me.com' },                                              // what ilike's "_" lets through
 ];
 const calls: { url: string; method: string; body?: any }[] = [];
+let sqlUp = true;                                                              // the fake Neon HTTP endpoint answers, or 500s
+const { owner_email: _, ...SQL_CASE } = { ...CASE, use: 'single_family' };
 const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { 'content-type': 'application/json' } });
 globalThis.fetch = (async (input: any, init: any = {}) => {
   const url = String(input), method = init.method ?? 'GET', body = init.body ? JSON.parse(init.body) : undefined;
   calls.push({ url, method, body });
+  if (url === 'https://api.sql.test/sql') {
+    if (!sqlUp) return json({ message: 'compute is waking' }, 500);
+    if (body.query === 'select 1') return json({ fields: [{ name: '?column?', dataTypeID: 23 }], rows: [['1']] });
+    return json({ fields: ['signups', 'cases', 'meetings'].map((name) => ({ name, dataTypeID: 114 })),
+      rows: [[JSON.stringify([{ address: 'A', city: null, zip: null, created_at: '2026-11-04', case_id: null }]), JSON.stringify([SQL_CASE]), '[]']] });
+  }
   if (url.startsWith('https://api.vetta.sh/v1/files/fil_1/url')) return json({ url: 'https://signed.test/draft.pdf' }, 201);
   if (url.includes('/signups?')) return json([{ email: ME, address: '520 Richard Jackson Blvd', city: 'Panama City Beach', zip: '32407', created_at: '2026-11-04', case_id: 'FL-13-2026-34801143000' }]);
   if (url.includes('/candidates?')) return json([{ case_id: CASE.case_id, use: null }]);
@@ -66,6 +74,25 @@ assert.ok(!calls.some((c) => c.url.includes('case_id.in.')), 'cases are matched 
 const tr = await (await trackGET(new Request('https://x/api/track?t=' + encodeURIComponent(t)))).json();
 assert.deepEqual(tr.cases.map((c: any) => c.case_id), [CASE.case_id, 'NULLS']);
 assert.ok(tr.cases.every((c: any) => !('owner_email' in c)) && tr.signups[0].address === '520 Richard Jackson Blvd');
+
+// DATABASE_URL: one SQL round trip with the owner's email as every parameter, no REST call; a failing query falls back to REST
+process.env.DATABASE_URL = 'postgresql://u:p@ep-1.sql.test/db';
+let n0 = calls.length;
+const sq = await (await GET(new Request('https://x/api/portal?t=' + encodeURIComponent(t)))).json();
+const sqlCalls = calls.slice(n0);
+assert.equal(sqlCalls.length, 1);
+assert.ok(sqlCalls[0].body.params.length === 3 && sqlCalls[0].body.params.every((p: string) => p === ME));
+assert.deepEqual(sq.cases.map((c: any) => [c.case_id, c.use]), [[CASE.case_id, 'single_family']]);
+assert.equal(sq.cases[0].documents[0].has_file, true);
+assert.ok(!('file_id' in sq.cases[0].documents[0]) && !('owner_email' in sq.cases[0]));
+assert.deepEqual([sq.signups[0].address, sq.meetings], ['A', []]);
+n0 = calls.length;
+assert.equal((await GET(new Request('https://x/api/portal?warm=1'))).status, 204);
+assert.deepEqual(calls.slice(n0).map((c) => c.url), ['https://api.sql.test/sql']);
+sqlUp = false;
+const fb = await (await GET(new Request('https://x/api/portal?t=' + encodeURIComponent(t)))).json();
+assert.deepEqual(fb.cases.map((c: any) => c.case_id), [CASE.case_id, 'NULLS']);  // the REST answer
+delete process.env.DATABASE_URL;
 
 // /api/doc: the owner's file 302s to its signed url; anyone else's case, a doc without a file, or no key does not
 const doc = (q: string) => docGET(new Request('https://x/api/doc?' + q));
