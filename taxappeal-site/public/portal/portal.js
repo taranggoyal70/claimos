@@ -18,8 +18,8 @@ window.Portal = (() => {
 
   const money = (n) => (n == null || isNaN(Number(n)) ? '—' : '$' + Math.round(Number(n)).toLocaleString('en-US'));
   const date = (s) => (s ? new Date(s.length <= 10 ? s + 'T00:00:00' : s).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '');
-  // Meeting slots are Eastern whatever the viewer's clock says
-  const when = (s) => new Date(s).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' }) + ' ET';
+  // Meeting slots are Eastern whatever the viewer's clock says; a Calendly booking saves no slot, the invite has the time
+  const when = (s) => !s ? 'Booked · time in your calendar invite' : new Date(s).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' }) + ' ET';
   // The roll's upper-case addresses with doubled spaces → "4220 NW 13th St"
   const title = (s) => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase().replace(/(^|\s)\S/g, (c) => c.toUpperCase()).replace(/\b(N[ew]|S[ew])\b/g, (m) => m.toUpperCase());
   const addr = (c) => title(c.address) + (c.unit ? `, Unit ${c.unit}` : '');

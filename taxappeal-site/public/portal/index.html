@@ -128,12 +128,12 @@
     return card;
   };
 
-  // Dated items in the next 120 days: booked calls and hearings
+  // Dated items in the next 120 days: booked calls and hearings. A call with no slot (Calendly) is listed first.
   const upcoming = (d, cases) => {
     const now = Date.now(), horizon = now + 120 * 864e5, byId = Object.fromEntries(cases.map((c) => [c.case_id, c])), items = [];
     for (const m of d.meetings || []) {
-      const at = new Date(m.slot).getTime(), c = byId[m.case_id];
-      if (m.status === 'cancelled' || !(at >= now && at <= horizon)) continue;
+      const at = m.slot ? new Date(m.slot).getTime() : now, c = byId[m.case_id];
+      if (m.status === 'cancelled' || (m.slot && !(at >= now && at <= horizon))) continue;
       items.push({ at, time: P.when(m.slot), text: `Call with a licensed tax professional about ${c ? addr(c) : m.address || 'a general question'}`, pill: link('pill', 'Details', '/portal/book') });
     }
     for (const c of cases) {

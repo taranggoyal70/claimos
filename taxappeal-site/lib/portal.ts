@@ -8,7 +8,7 @@ export type Case = {
   needs_from_owner: string | null; history: unknown[]; documents: Doc[]; messages: Msg[];
 } & Record<string, unknown>;
 type Signup = { email: string; address: string; city: string | null; zip: string | null; created_at: string; case_id: string | null };
-type Meeting = { id: string; email: string; slot: string; status: string; address: string | null; case_id: string | null; name: string | null; notes: string | null };
+type Meeting = { id: string; email: string; slot: string | null; status: string; address: string | null; case_id: string | null; name: string | null; notes: string | null };
 type Owner = { signups: Omit<Signup, 'email'>[]; cases: Case[]; meetings: Omit<Meeting, 'email'>[] };
 
 // A hung connection must reach the REST fallback too; 8 s still covers Neon waking from suspend.
