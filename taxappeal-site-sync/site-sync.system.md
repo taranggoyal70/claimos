@@ -31,13 +31,15 @@ yourself is the two statements quoted below; every other statement comes from `s
    for `blocked` and `done`. Never read the board unfiltered: it is hundreds of cards, each with its
    whole body, and does not fit in your context. A card whose body has no ```json block with a
    `case_id` is not a case: skip it. If no case card moved, say so and go to the report. For each case
-   card write one line to `cards.tsv`: ten tab-separated fields, no header, no quotes, values copied
+   card write one line to `cards.tsv`: eleven tab-separated fields, no header, no quotes, values copied
    exactly from the JSON block and the card:
-   `case_id ⇥ card title ⇥ property.address ⇥ jurisdiction.county ⇥ values.just_value ⇥ estimate.defensible_value ⇥ estimate.annual_savings ⇥ status ⇥ assignee (empty if none) ⇥ updated_at`
-   where `card title`, `status`, `assignee` and `updated_at` are the card's own fields (`status` is
-   one of todo, doing, blocked, done), not anything inside the body. Several cards can share one
-   case_id (Find's card, the Evidence hand-off `File · …`, a `Waiting on …` card): write them all;
-   sync.py keeps the furthest step per case.
+   `case_id ⇥ card title ⇥ property.address ⇥ jurisdiction.county ⇥ values.just_value ⇥ estimate.defensible_value ⇥ estimate.annual_savings ⇥ status ⇥ assignee (empty if none) ⇥ updated_at ⇥ note (the first 20 characters of the card's note, empty if none)`
+   where `card title`, `status`, `assignee`, `updated_at` and `note` are the card's own fields
+   (`status` is one of todo, doing, blocked, done), not anything inside the body. Write every case
+   card, including Find cards that Qualify closed as done: sync.py reads the verdict from the note
+   (QUALIFIED → qualify, REJECTED → stopped, EVIDENCE ready → file); do not hold them back or decide
+   stages yourself. Several cards can share one case_id (Find's card, the Evidence hand-off
+   `File · …`, a `Waiting on …` card): write them all; sync.py keeps the furthest step per case.
    Then `python3 sync.py cases cards.tsv > cases.sql`, run `cases.sql` with `db_query` and check
    `upserted` equals the lines you wrote.
 

@@ -21,13 +21,14 @@ CAST = {"tax_year": "int", "homestead": "boolean", "just_value": "numeric", "ass
 CHUNK = 200          # ~40 KB of SQL: the model passes each chunk as one tool argument
 TAG = "$tsv$"        # dollar-quote tag; asserted absent from the data
 ADDR_KEY = "upper(regexp_replace(trim(address), '\\s+', ' ', 'g')) || '|' || coalesce(zip, '')"  # the brief's rule
-CARD_COLS = ["case_id", "title", "address", "county", "just_value", "defensible_value", "annual_savings", "status", "assignee", "updated_at"]
+CARD_COLS = ["case_id", "title", "address", "county", "just_value", "defensible_value", "annual_savings", "status", "assignee", "updated_at", "note"]
 RANK = {"find": 0, "qualify": 1, "signup": 2, "evidence": 3, "file": 4, "waiting": 5, "appeal": 6, "won": 7, "stopped": -1}
 
 
-def stage(title, status, assignee):
-    """The loop step a card stands for: the title prefix says which desk wrote it, the status how far it got."""
-    t, a = title.strip().lower(), (assignee or "").strip().lower()
+def stage(title, status, assignee, note=""):
+    """The loop step a card stands for: the title prefix says which desk wrote it, the status how far it got,
+    and on a closed Find card the note's first word is the desk's verdict (QUALIFIED / REJECTED / EVIDENCE ready)."""
+    t, a, n = title.strip().lower(), (assignee or "").strip().lower(), (note or "").strip().upper()
     if t.startswith("waiting on"):
         return "waiting"
     if t.startswith("sign up"):
@@ -35,7 +36,11 @@ def stage(title, status, assignee):
     if t.startswith("file"):
         return "waiting" if status == "done" else "file"   # File closed its card = the petition went in
     if status == "done":
-        return "file"                                      # Find's card done = Evidence handed it to File
+        if n.startswith("REJECTED"):
+            return "stopped"                               # Qualify said no
+        if n.startswith("QUALIFIED"):
+            return "qualify"                               # Qualify said yes; waiting for the owner
+        return "file"                                      # Evidence handed it to File
     if a == "evidence":
         return "evidence"
     if a == "file":
@@ -109,7 +114,7 @@ def cases(tsv_path):
             if parts == [""] or parts[0] == "case_id":   # blank or a header the model added anyway
                 continue
             assert len(parts) == len(CARD_COLS), f"expected {len(CARD_COLS)} tab-separated fields, got {len(parts)}: {line!r}"
-            st = stage(parts[1], parts[7].strip(), parts[8])
+            st = stage(parts[1], parts[7].strip(), parts[8], parts[10])
             prev = rows.get(parts[0])
             if prev is None or RANK[st] > RANK[prev[1]]:   # several cards share a case (Find's, the File hand-off): keep the furthest step
                 rows[parts[0]] = (parts, st)
