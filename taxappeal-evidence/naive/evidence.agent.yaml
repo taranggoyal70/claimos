@@ -1,0 +1,41 @@
+# Evidence desk on Naive: builds the hearing packet for a company-board card assigned to "evidence" and hands
+# it to File. No schedule: assigning the card is what starts it. setup.sh applies it (create/update by name).
+name: evidence
+description: >
+  Evidence desk. Takes one qualified property-tax case from the company board, rebuilds Find's comparable
+  sales and similar-home assessments for that county, builds the hearing packet (requested value, deadlines,
+  owner checklist), publishes packet.pdf + packet.json as org files and hands the case to the File agent.
+  Never contacts owners, never files anything.
+model: anthropic/claude-haiku-5.5   # same pick as site-sync: gpt-oss-120b lost multi-step procedures in testing
+harness: pi
+window: immediate
+
+budget:
+  cap_usd: 10        # per day
+  max_task_usd: 2    # one card: pip install + a county screen + the packet
+  period: day
+
+system_file: evidence.system.md
+
+skills: []
+
+tools:
+  default_config:
+    permission: deny   # nothing but the tools named below is offered to the model
+  configs:
+    bash: { enabled: true, permission: allow }
+    read: { enabled: true, permission: allow }
+    write: { enabled: true, permission: allow }
+    ls: { enabled: true, permission: allow }
+    fetch_file: { enabled: true, permission: allow }     # the two code zips
+    publish_file: { enabled: true, permission: allow }   # packet.pdf + packet.json
+    find_files: { enabled: true, permission: allow }     # newest taxappeal-evidence.zip
+    board_read: { enabled: true, permission: allow }
+    board_write: { enabled: true, permission: allow }
+    session_spend: { enabled: true, permission: allow }
+
+metadata:
+  desk: property_tax
+  step: evidence
+  hands_off_to: File
+  company: Claim OS
