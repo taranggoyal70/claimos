@@ -105,6 +105,8 @@ card that already carries a `sent:` comment is never sent again, so a new messag
 card Sign up could not send sits in `blocked` with a `held: <why>` or `send failed: <why>` comment; a
 person fixes the body and moves it back to `todo`. The owner's reply, if any, lands in
 `claimos@agentmail.to` and Sign up's hourly pass records it on the owner's `Sign up ·` card.
+The board mirror (`taxappeal-site-sync/mirror_board.py`, every 15 minutes on the laptop) copies the sent text and the
+owner's recorded mails into `cases.messages`, so the owner sees the exchange on `/portal/messages`.
 
 ## Where everything else is
 

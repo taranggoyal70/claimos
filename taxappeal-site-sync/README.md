@@ -93,6 +93,13 @@ the same pass adds one `Message · <address> · <case_id>` card (assignee `signu
 body `to: <email>` + signup.system.md's owner script: confirm owner of record and TRIM notice, free check, agreement + DR-486POA
 next, private-company line); the signup desk emails it and writes `sent:` on the Message card and the Sign up card
 (`taxappeal-chase/HANDOFF-ESCALATE.md`, "Telling the owner something"). The owner's reply lands in `claimos@` and signup's hourly pass takes it from there.
+The owner sees the conversation on `/portal/messages`, which reads `cases.messages`: the same pass (`mirror_messages`) appends
+every sent `Message ·` card (the body minus its `to:` line, dated by its `sent: <date> · <messageId>` comment, `from: claimos`) and
+every owner mail recorded on their `Sign up ·` card (`message_id:` line in the body or a comment; the text comes from the claimos@
+inbox through AgentMail's `extracted_text`, key in `taxappeal-outreach/.env`, `from: owner`). Each entry carries the mail id, so a repeat
+pass writes nothing (`messages: N on the board, 0 written`); the demo seed's rows are never touched. Not mirrored: the owner-script
+replies signup sends by `reply_to_message` (the card records only `replied: <date>`, no id). The card-comment reads add ~1 s per
+`Message ·` / `Sign up ·` card to the pass.
 
 ## Letters to owners (laptop, not the agent)
 
