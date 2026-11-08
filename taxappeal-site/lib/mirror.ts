@@ -1,13 +1,15 @@
 // The board mirror, server-side: a port of taxappeal-site-sync/mirror_board.py + sync.py (through a332f84) to the board
 // REST (lib/naive-board.ts) and PostgREST, plus three bridges for hand-offs no teammate agent writes:
-//   (a) Sign up -> Evidence, (b) Escalate/Collect owner updates -> Message cards, (c) File submitted -> Waiting on card.
+//   (a) Sign up -> Evidence, (b) Escalate/Collect owner updates -> Message cards, (c) File submitted -> Waiting on card,
+//   (d) portal meetings -> Briefing request card (lib/booking-board.ts signalBooking, key briefing-request:<meeting id>).
 // One pass: page the board (~5 pages, ~7 s), read comments only for the cards a step needs (~10 in flight), then write.
 // Every write is idempotent: card keys (signup:<row id>, message:signup:<row id>, msg:<comment id>, waiting:<case_id>),
 // the Find card's assignee for (a), message ids for cases.messages. `dry` returns the planned writes and changes nothing.
 import { db } from './lookup';
 import { cards, comments, addCard, patchCard, addComment, pool, type Card, type Comment } from './naive-board';
+import { signalBooking } from './booking-board';
 
-export const STEPS = ['cases', 'signups', 'messages', 'evidence', 'owner', 'waiting'] as const;
+export const STEPS = ['cases', 'signups', 'messages', 'evidence', 'owner', 'waiting', 'meetings'] as const;
 type Step = (typeof STEPS)[number];
 
 const DEMO_OWNER = 'francesco.rosciano@me.com';   // the portal's seeded mock account: the only owner rows the board never overwrites
@@ -322,6 +324,21 @@ export async function mirrorRun(opts: { dry: boolean; only?: string[] }) {
     }
     out.waiting = res;
   } catch (e) { errors.push(`waiting: ${e}`); }
+
+  // --- (d) portal meetings -> board: booking's own signal, retried every pass. signalBooking skips rows the portal did not make
+  // and past calls, and writes the call-booked comment only when its keyed card is new; it gets our board page, not a second read.
+  // It writes directly, so a dry pass lists the calls it would make (skips included).
+  if (on('meetings')) try {
+    const since = new Date(Date.now() - 14 * 86400e3).toISOString();
+    const ms = await db(`meetings?status=in.(confirmed,requested)&created_at=gte.${since}&select=id,email,slot,address,case_id,status,notes&order=created_at`) as any[];
+    const res: Record<string, number> = { rows: ms.length, created: 0, exists: 0, skipped: 0 };
+    for (const m of ms) try {
+      const r = await write(`signalBooking meeting ${m.id} (${m.status}, case ${m.case_id ?? 'none'}, ${m.email})`, () =>
+        signalBooking(m, { email: m.email, address: (m.case_id && cases.get(m.case_id)?.address) || m.address }, board));
+      if (r) res[r]++;
+    } catch (e) { errors.push(`meetings ${m.id}: ${e}`); }
+    out.meetings = res;
+  } catch (e) { errors.push(`meetings: ${e}`); }
 
   return { ...out, writes, errors, ms: Date.now() - t0 };
 }
