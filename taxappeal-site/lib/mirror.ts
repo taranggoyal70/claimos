@@ -216,7 +216,12 @@ export async function mirrorRun(opts: { dry: boolean; only?: string[] }) {
     for (const c of signupCards) {
       const caseId = caseOf(c);
       if (!caseId) continue;
-      for (const t of texts(c)) {
+      // signup on the native inbox writes each owner mail as a comment: `owner-mail · <YYYY-MM-DD> · <inb_ id>`, then the text
+      for (const x of cm.get(c.id) ?? []) {
+        const [first, ...rest] = lines(x.body), m = first.match(/^owner-mail · (\d{4}-\d{2}-\d{2}) · (\S+)/), text = rest.join('\n').trim();
+        if (m && text && !known.has(m[2]) && !found.some(([, e]) => e.id === m[2])) found.push([caseId, { id: m[2], at: x.created_at, from: 'owner', text: text.slice(0, 2000) }]);
+      }
+      for (const t of texts(c)) {   // older mails: a `message_id: <AgentMail id>` line, the text fetched from claimos@
         const mid = t.match(/^message_id: (<[^>]+>)/m)?.[1], at = t.match(/^date: (.+)$/m)?.[1] ?? '';
         if (!mid || known.has(mid) || found.some(([, e]) => e.id === mid)) continue;
         const text = await ownerText(mid);
