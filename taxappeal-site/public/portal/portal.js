@@ -1,8 +1,9 @@
 /* Portal runtime for /portal (the overview). The other portal pages inline their own copy of the token flow.
      <script src="/portal/portal.js"></script> then Portal.load(render)
    Portal.load(render): reads ?t= (moves it into sessionStorage.claimos_t and off the address bar), calls
-     GET /api/portal?t=, then render(data) with {email, cases, signups, meetings}. No token or a 401 shows the
-     "sign in by email" card; any other failure shows the "could not reach our records" card. Both go into [data-portal].
+     GET /api/portal?t=, then render(data) with {email, cases, signups, meetings}. No token, or a 200 {error: 'expired'}
+     (a 4xx would log a console line), shows the "sign in by email" card; any other failure shows the "could not reach
+     our records" card. Both go into [data-portal].
    Page markup it expects: <span class="nav-who" hidden>Signed in as <b data-email></b></span>,
      <a href="/track" data-signout hidden>Sign out</a>, <main class="wrap portal" data-portal aria-live="polite">.
    Helpers (elements or strings, never HTML): money date when title addr place closed chip nextAction emptyCard
@@ -71,11 +72,10 @@ window.Portal = (() => {
     if (t) { store.set(t); u.searchParams.delete('t'); history.replaceState(null, '', u.pathname + u.search + u.hash); }
     const tok = store.get();
     if (!tok) return show(notice('Sign in by email.', 'We email you a link that opens your properties. It works for 24 hours.', 'Email me a link', '/track'));
-    let r;
-    try { r = await fetch('/api/portal?t=' + encodeURIComponent(tok)); } catch { r = null; }
-    if (r && r.status === 401) { store.clear(); return show(notice('That link has expired.', 'Links work for 24 hours. Request a new one and we email it within a minute.', 'Email me a new link', '/track')); }
-    if (!r || !r.ok) return show(notice('We could not reach our records.', 'Please reload to try again, or email claimos@agentmail.to and we answer by hand.', 'Reload', location.href));
-    const d = await r.json();
+    let d;
+    try { const r = await fetch('/api/portal?t=' + encodeURIComponent(tok)); d = r.ok ? await r.json() : null; } catch { d = null; }
+    if (!d) return show(notice('We could not reach our records.', 'Please reload to try again, or email claimos@agentmail.to and we answer by hand.', 'Reload', location.href));
+    if (d.error === 'expired') { store.clear(); return show(notice('That link has expired.', 'Links work for 24 hours. Request a new one and we email it within a minute.', 'Email me a new link', '/track')); }
     document.querySelectorAll('[data-email]').forEach((e) => { e.textContent = d.email; });
     document.querySelectorAll('.nav-who, [data-signout]').forEach((e) => { e.hidden = false; });
     render(d);

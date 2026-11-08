@@ -25,7 +25,8 @@ async function linked({ file_id, ...doc }: Doc): Promise<Doc> {
 // Everything the portal shows for the owner the token names: sign-ups, cases (documents, messages, history), meetings.
 export async function GET(req: Request) {
   const email = verify(new URL(req.url).searchParams.get('t') ?? '');
-  if (!email) return Response.json({ error: 'expired' }, { status: 401, headers });
+  // 200, not 401: browsers log every 4xx fetch to the console, and the body already says what happened
+  if (!email) return Response.json({ error: 'expired' }, { headers });
   try {
     const enc = encodeURIComponent(email);
     const [{ signups, cases }, meetings] = await Promise.all([

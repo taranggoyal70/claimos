@@ -26,6 +26,6 @@ ORIGIN=${1:-https://claimos-site-mds8vwd4myby.vercel.app}
 CODE="import { sign } from './lib/token.ts'; console.log(sign('francesco.rosciano@me.com', 14 * 86400e3));"
 if command -v bun >/dev/null 2>&1; then TOKEN=$(bun -e "$CODE"); else TOKEN=$(node --input-type=module -e "$CODE"); fi
 # The app accepts only tokens signed with its own TRACK_SECRET; a link it rejects would show "That link has expired" on demo day.
-STATUS=$(curl -sS -o /dev/null -w '%{http_code}' "$ORIGIN/api/portal?t=$TOKEN")
-[ "$STATUS" = 200 ] || { echo "$ORIGIN rejected the token (HTTP $STATUS): TRACK_SECRET is not on the app yet, or the app has not been deployed since it was set. See the header of this script." >&2; exit 1; }
+OUT=$(curl -sS "$ORIGIN/api/portal?t=$TOKEN")
+case "$OUT" in *'"email"'*) ;; *) echo "$ORIGIN rejected the token ($OUT): TRACK_SECRET is not on the app yet, or the app has not been deployed since it was set. See the header of this script." >&2; exit 1 ;; esac
 echo "$ORIGIN/portal?t=$TOKEN"

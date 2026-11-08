@@ -39,7 +39,9 @@ const t = sign(ME);
 const post = (body: unknown) => POST(new Request('https://x/api/portal-action', { method: 'POST', body: JSON.stringify(body) }));
 
 // GET
-assert.equal((await GET(new Request('https://x/api/portal?t=nope'))).status, 401);
+const bad = await GET(new Request('https://x/api/portal?t=nope'));
+assert.equal(bad.status, 200);                                                 // a 4xx would log a browser console line
+assert.deepEqual(await bad.json(), { error: 'expired' });
 const r = await GET(new Request('https://x/api/portal?t=' + encodeURIComponent(t)));
 assert.equal(r.status, 200);
 assert.equal(r.headers.get('cache-control'), 'no-store');
