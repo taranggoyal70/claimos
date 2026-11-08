@@ -152,7 +152,7 @@
 
     const cv = Number(c.county_value), rv = Number(c.requested_value), dv = Number(c.decided_value), sv = money(c.annual_savings) + ' / yr';
     $('#v-county').textContent = money(c.county_value);
-    $('#v-county-sub').textContent = 'From the ' + (c.county ? c.county + ' County' : 'county') + ' roll';
+    $('#v-county-sub').textContent = c.use === 'possessory_interest' ? 'Best-case estimate; the city does not publish the enrolled leasehold value' : 'From the ' + (c.county ? c.county + ' County' : 'county') + ' roll';
     $('#v-ours-label').textContent = won ? 'Decided value' : 'Our value';
     $('#v-ours').textContent = stopped ? '—' : money(won ? c.decided_value : c.requested_value);
     $('#v-ours-sub').textContent = stopped ? 'No value requested' : won ? 'Lowered by ' + money(cv - dv) + ' · ' + sv : money(cv - rv) + ' below the county · est. saving ' + sv;

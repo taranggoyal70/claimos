@@ -20,5 +20,9 @@ export async function ownerData(email: string) {
   const cases = ((await db(`cases?select=${COLS}&owner_email=ilike.${enc}&order=updated_at.desc`)) as (Case & { owner_email: string | null })[])
     .filter((c) => (c.owner_email ?? '').toLowerCase() === email)
     .map(({ owner_email, ...c }) => ({ ...c, history: c.history ?? [], documents: c.documents ?? [], messages: c.messages ?? [] }));
+  // The candidate row's `use` tells the pages when the county's value is an estimate (possessory interests on public land).
+  const ids = cases.map((c) => `"${encodeURIComponent(c.case_id)}"`).join(',');
+  const uses = ids ? ((await db(`candidates?select=case_id,use&case_id=in.(${ids})`)) as { case_id: string; use: string | null }[]) : [];
+  for (const c of cases) c.use = uses.find((u) => u.case_id === c.case_id)?.use ?? null;
   return { signups: signups.map(({ email, ...s }) => s), cases };
 }

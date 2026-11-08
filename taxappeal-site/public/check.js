@@ -10,7 +10,10 @@
   const TIERS = { strong: ['Strong case', 'green'], possible: ['Possible case', 'amber'], review: ['Needs review', 'gray'],
     cap_absorbs: ['Likely no savings this year', 'gray'], new_build: ['Likely no savings this year', 'gray'] };
   const STEPS = ['Locating the parcel on the county roll', 'Comparing recent nearby sales', "Checking similar homes' assessments", 'Estimating your savings'];
-  const TICKS = [500, 1100, 1800];
+  // Step durations differ and wobble per run (locating is quick, comparing sales is the long one), so the
+  // sequence reads as work being done rather than a timer: cumulative ms at which each step completes.
+  const BASE = [550, 1900, 800, 1400];
+  const schedule = () => { let t = 0; return BASE.map((ms) => (t += Math.round(ms * (0.7 + Math.random() * 0.6)))); };
   const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
 
   const form = $('form[data-check]'), bar = $('.bar-err'), result = $('#result');
@@ -149,11 +152,12 @@
     const seq = finding(address, zip, code);
     result.replaceChildren(seq);
     if (result.getBoundingClientRect().top > innerHeight * .6) result.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-    const timers = reduced ? [] : TICKS.map((ms, i) => setTimeout(() => tick(seq, i), ms));
+    const ticks = schedule();
+    const timers = reduced ? [] : ticks.slice(0, -1).map((ms, i) => setTimeout(() => tick(seq, i), ms));
     let v;
     try {
-      // The sequence takes ~2.5 s and never finishes before the records answer.
-      [v] = await Promise.all([fetch('/api/verdict?' + new URLSearchParams(code ? { code } : { address, zip, unit })).then((r) => r.json()), wait(reduced ? 0 : 2500)]);
+      // The sequence takes 3.5 to 6 s and never finishes before the records answer.
+      [v] = await Promise.all([fetch('/api/verdict?' + new URLSearchParams(code ? { code } : { address, zip, unit })).then((r) => r.json()), wait(reduced ? 0 : ticks[ticks.length - 1])]);
     } catch {
       timers.forEach(clearTimeout);
       bar.textContent = 'We could not reach our records. Please try again.';
