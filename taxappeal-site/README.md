@@ -12,7 +12,7 @@ card and never assigns anything to `briefing`: the coordinator builds the deck a
 | - | - | - |
 | `BOOKING_URL` | The presenter's public calendar link, e.g. `https://cal.com/<user>/<event>` or `https://calendly.com/<user>/<event>` | The page keeps its own time picker (the meeting is `requested`). |
 | `PRESENTER_EMAIL` | Who presents the call | `presenter_email: none` on the card. |
-| `NAIVE_API_KEY` | A key with `agents:read,agents:write,files:read` | Board signals are skipped and logged; the booking still saves. The files:read-only key 403s. |
+| `NAIVE_API_KEY` | A key with `agents:read,agents:write,files:read` | The mirror cannot write the board signals; bookings still save. The files:read-only key 403s. |
 
 `GET /api/booking` → `{url, provider}`: `cal` for cal.com, `calendly` for calendly.com, `link` for any other host
 (the picker stays, with an "open our calendar" link), `null` when `BOOKING_URL` is unset or not an http(s) link.
@@ -22,16 +22,21 @@ prefilled with name, email and notes (`<address> · case <case_id>`). The embed'
 with `uid` and `startTime`; Calendly `calendly.event_scheduled`, which carries no time) posts
 `POST /api/portal-action {action: 'book', provider, booking_ref, slot?, name, case_id, address}`. That inserts a
 `meetings` row with status `confirmed` and notes `booked via <provider> · <booking_ref>`. Without `booking_ref` the
-slot is required and the status is `requested`, as before.
+slot is required and the status is `requested`, as before. The reply returns as soon as the row is saved: the booking
+never waits on the board.
 
-**Board signals** (board `brd_3kb4zft8yttkhm04sv6vn8ydw2`), after the row is saved, fail-soft:
+**Board signals** (board `brd_3kb4zft8yttkhm04sv6vn8ydw2`). The board mirror's 15-minute pass calls
+`signalBooking(meeting, owner, board?)` from `lib/booking-board.ts` for meetings rows, so the signals land within about
+15 minutes of the booking. It signals only rows the portal wrote (status `requested`, or `confirmed` with notes starting
+`booked via`) that name a case and whose slot is not past. Seeded, desk-made, cancelled and general-question rows are skipped.
+It writes the card first. The comment follows only when that card is new (the key answers 201), so later passes write nothing.
 
 1. A comment on the owner's `Sign up ·` card. The card is the one whose `email:` (website) or `from:` (mail) line is the
    owner's email, preferring the one whose `case_id:` line is this case.
    ```
-   call-booked · <ISO slot | time in calendar> · <meeting id> · <address> · <case_id | none> · via portal · booking <BOOKING_URL | none>
+   call-booked · <ISO slot | time in calendar> · <meeting id> · <address> · <case_id> · via portal · booking <BOOKING_URL | none>
    ```
-2. One card, only when the meeting names a case: title `Briefing request · <ADDRESS> · <case_id>`, assignee
+2. One card: title `Briefing request · <ADDRESS> · <case_id>`, assignee
    `coordinator`, status `todo`, key `briefing-request:<meeting id>`. The body is these lines:
    ```
    case_id: <case_id>
@@ -54,3 +59,5 @@ slot is required and the status is `requested`, as before.
   instead, so that check has to accept `email:` too.
 - A Calendly booking has no time, so its `slot` is null. The live table still has `slot not null`, so a Calendly booking
   fails to save until a person runs `alter table meetings alter column slot drop not null;`. Cal.com bookings are unaffected.
+- If the comment fails after its card was created, later passes do not retry it, because the key then answers 200.
+  `signalBooking` throws, so the mirror's errors show it.
