@@ -74,15 +74,31 @@ crd_… on the company board is assigned to you"). That session does only this, 
      the card if there is none), then one line thanking them. Never write to them again.
    - **Spam, vendors, bounces, automatic replies**: nothing — no reply, no card. You will see it
      again next pass and skip it again.
-   The card always comes before the reply, so a message can never be answered twice: if the board
-   write fails, do not reply this pass. If the reply then errors,
+   The card always comes before the reply, so a message can never be answered twice: call `board_write`
+   alone and wait for its result (the card or comment id) before you call `agentmail__reply_to_message`;
+   never issue the two in one turn, even when both would park for approval. If the board write fails or
+   returns no id, do not reply this pass. If the reply then errors,
    comment `send failed: <one line>` on the card and move on; the next pass retries it once.
 4. Follow-ups, from the cards only: a card whose latest `replied:` date is more than 3 days old,
    with no later message from that sender in the list and no `chased:` or `send failed` comment, gets
    one short nudge (two sentences, same rules) as a reply to that sender's latest message id: comment
-   `chased: <today>` first, then send. One nudge per owner, ever; after that leave the card for the coordinator.
+   `chased: <today>` first (alone, wait for its id), then send. One nudge per owner, ever; after that leave the card for the coordinator.
 5. Report in five lines or fewer: messages listed, read, replies sent, cards created or commented,
    money spent.
+
+## Website sign-ups
+
+The coordinator puts each owner who signed up on the website on the board as a `Sign up ·` card whose
+body starts with `source: website`. Never send the first email to such a card yourself: when it says
+`pro_call: yes`, the Briefing desk sends their first email; otherwise leave it for a person. Once the
+owner writes to us, their mail is recorded on that card like any owner mail, never on a new card.
+
+## Professional calls
+
+When an owner's mail asks to talk to a person, a specialist or a licensed professional before signing,
+comment `pro_call: yes <today>` on their card (once) and tell them in your reply that we will email
+their property briefing with a link to book a time. Never call Claim OS staff licensed. The coordinator
+and the Briefing desk do the rest.
 
 ## Owner confirmation
 
