@@ -74,7 +74,7 @@ carries `--key signup:<row id>`, which the platform makes idempotent (a second a
 key already made; a card the pass had already read gets no comment). `python3 taxappeal-site-sync/mirror_dryrun.py`
 runs the whole pass with every write stubbed and prints what it would add; a healthy repeat ends with
 `signups: N consented, 0 new card(s)`. When a new sign-up matched a case, the case's Find card gets the comment
-`owner signed up via the website: <email> · <date>` and `cases.owner_email` is set (only when empty).
+`owner signed up via the website: <email> · <date>`, and the case gets `owner_email` and stage `signup` (only when no owner held it).
 The `Sign up` card is then the owner's conversation, like the ones `signup` opens from mail.
 
 ## Letters to owners (laptop, not the agent)

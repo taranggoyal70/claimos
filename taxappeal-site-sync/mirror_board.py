@@ -67,9 +67,9 @@ def mirror_signups(find_card, known, website):
             continue
         new += 1
         if s.get("case_id"):
-            # never steal a case another owner (or the demo seed) already holds
+            # never steal a case another owner (or the demo seed) already holds; the owner signed, so the tracker shows the sign-up step
             naive("db", "query", "--app", APP,
-                  f"update cases set owner_email = {q(s['email'])} where case_id = {q(s['case_id'])} and owner_email is null")
+                  f"update cases set owner_email = {q(s['email'])}, stage = 'signup', updated_at = now() where case_id = {q(s['case_id'])} and owner_email is null")
             if s["case_id"] in find_card:
                 naive("board", "comment", BOARD_OWNER, find_card[s["case_id"]], "--body",
                       f"owner signed up via the website: {s['email']} · {s['created_at'][:10]}")
