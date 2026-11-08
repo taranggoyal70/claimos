@@ -1,0 +1,43 @@
+# Chase desk on Naive: once a day it follows up, by email, on board cards that are waiting on someone
+# (a county office, an owner) and carry a `follow_up:` line. setup.sh applies it and creates the schedule paused.
+name: chase
+description: >
+  Chase desk. Daily follow-ups on cases waiting on someone outside: reads blocked and doing cards that
+  carry a follow_up: line, sends one short follow-up email when one is due, records chased: on the card,
+  attaches any reply from that sender, and after three follow-ups escalates to a person. Email only.
+model: anthropic/claude-haiku-5.5
+harness: pi
+window: immediate
+
+budget:
+  cap_usd: 5          # per day
+  max_task_usd: 0.50  # one pass
+  period: day
+
+system_file: chase.system.md
+
+mcp_servers:
+  - { type: url, name: agentmail, url: "https://mcp.agentmail.to/mcp" }
+
+tools:
+  default_config:
+    permission: ask
+  configs:
+    board_read: { enabled: true, permission: allow }
+    board_write: { enabled: true, permission: allow }
+    ask_operator: { enabled: true, permission: ask }
+    session_spend: { enabled: true, permission: allow }
+    agentmail.list_messages: { enabled: true, permission: allow }
+    agentmail.get_message: { enabled: true, permission: allow }
+    agentmail.send_message: { enabled: true, permission: allow }      # first follow-up, no thread yet
+    agentmail.reply_to_message: { enabled: true, permission: allow }  # later ones, in the sender's thread
+    # The persona also carries the agent_mail *connection*, whose list_messages is broken server-side
+    # ("unexpected keyword argument 'request'"); never offer its tools, so the model uses the MCP ones above.
+    agent_mail.list_messages: { enabled: false, permission: deny }
+    agent_mail.get_message: { enabled: false, permission: deny }
+    agent_mail.send_email: { enabled: false, permission: deny }
+
+metadata:
+  desk: property_tax
+  step: chase
+  company: Claim OS
