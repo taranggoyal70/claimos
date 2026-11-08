@@ -187,7 +187,7 @@
       show({ street: title(v.address), address: title(v.address) + (v.unit ? ' #' + v.unit : '') + ', ' + (v.zip || zip), unit: v.unit || unit, city: v.city ? title(v.city) : '', zip: v.zip || zip,
         value: v.just_value, over: v.just_value - v.defensible_value, savings: v.annual_savings, badge, tone, code: v.claim_code || '',
         note: v.use === 'possessory_interest'
-          ? 'Publicly owned land under a long lease: the taxable interest is the leasehold, assessed on the unsecured roll, which the city does not publish. Taxable value estimated from the Port of San Francisco\'s tax-increment filings; defensible value from 2026 office sales. The Assessor decides.'
+          ? 'Best case. Publicly owned land under a long lease: the taxable interest is the leasehold, assessed on the unsecured roll, which the city does not publish. Taxable value estimated at the rehabilitation cost the Assessor typically enrols; defensible value at the 2026 San Francisco office sale average. The Assessor decides.'
           : 'Estimate from public county records and recent sales; the county decides.',
         estimated: v.use === 'possessory_interest', run: fmtRun(v.run_date) });
     } else {
