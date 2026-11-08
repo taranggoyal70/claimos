@@ -13,7 +13,8 @@ type Step = (typeof STEPS)[number];
 const DEMO_OWNER = 'francesco.rosciano@me.com';   // the portal's seeded mock account: the only owner rows the board never overwrites
 const PRIVATE = 'Claim OS is a private company and is not affiliated with any government agency.';
 const RANK: Record<string, number> = { find: 0, qualify: 1, signup: 2, evidence: 3, file: 4, waiting: 5, appeal: 6, won: 7, stopped: -1 };
-const SIGNUP_FIELDS = ['email', 'address', 'phone', 'call_ok', 'consent', 'verdict', 'case_id', 'claim_code'];   // the card body, in order
+// the card body, in order; `from:` repeats the email because briefing and signup's invoice rule check `to` against a card's from: line
+const SIGNUP_FIELDS = ['email', 'from', 'address', 'phone', 'call_ok', 'consent', 'verdict', 'case_id', 'claim_code'];
 // signup.system.md's owner script: every new website sign-up gets it through a `Message ·` card assigned to signup.
 const OWNER_SCRIPT = (addr: string, call: string) => `Thank you for signing up with Claim OS for ${addr}.
 
@@ -117,12 +118,14 @@ export async function mirrorRun(opts: { dry: boolean; only?: string[] }) {
   out.board = { cards: board.length, case_cards: rows.size, message_cards: msgCards.length, signup_cards: signupCards.length };
 
   const cases = new Map<string, any>((await allRows('cases?select=case_id,owner_email,stage,address,messages&order=case_id')).map((r) => [r.case_id, r]));
+  const signups = on('signups') ? await db('signups?consent=is.true&order=created_at&select=*') as any[] : [];
+  const authCards = [...new Set(signups.map((s) => s.case_id && findCard.get(s.case_id)).filter(Boolean))] as Card[];   // e858143's authorization: line
 
   // Comments: only for the cards a step reads, fetched once, ~10 in flight.
   const sources = board.filter((c) => /^(DEMO · )?(Waiting on|Collect · )/.test(c.title));                      // (b)
   const fileCards = board.filter((c) => c.title.startsWith('File · '));                                         // (c)
-  const need = [...new Set([...(on('messages') ? msgCards : []), ...(on('messages') || on('evidence') || on('owner') ? signupCards : []),
-    ...(on('owner') ? sources : []), ...(on('waiting') ? fileCards : [])])];
+  const need = [...new Set([...(on('messages') ? msgCards : []), ...(on('signups') || on('messages') || on('evidence') || on('owner') ? signupCards : []),
+    ...authCards, ...(on('owner') ? sources : []), ...(on('waiting') ? fileCards.flatMap((c) => [c, findCard.get(lastPart(c.title))!].filter(Boolean)) : [])])];
   const cm = new Map<string, Comment[]>();
   await pool(need, 10, async (c) => cm.set(c.id, await comments(c.id)));
   const texts = (c: Card) => [c.body ?? '', ...(cm.get(c.id) ?? []).map((x) => x.body ?? '')];
@@ -153,12 +156,12 @@ export async function mirrorRun(opts: { dry: boolean; only?: string[] }) {
 
   // --- website sign-ups -> board: mirror_board.mirror_signups() ---
   if (on('signups')) try {
-    const rowsS = await db('signups?consent=is.true&order=created_at&select=*') as any[];
+    const rowsS = signups;
     let fresh = 0;
     for (const s of rowsS) {
       if (website.has(`${s.email}|${when(s.created_at)}`)) continue;
       const addr = [s.address, s.city].filter(Boolean).join(', ') + (s.zip ? ` ${s.zip}` : '');
-      const body = SIGNUP_FIELDS.map((k) => `${k}: ${py(s[k])}`).join('\n') + `\nsource: website\ndate: ${s.created_at}`;
+      const body = SIGNUP_FIELDS.map((k) => `${k}: ${py(s[k === 'from' ? 'email' : k])}`).join('\n') + `\nsource: website\ndate: ${s.created_at}`;
       const made = await write(`add Sign up · ${addr} (blocked, key signup:${s.id})`, () => addCard({ title: `Sign up · ${addr}`, body, status: 'blocked', key: `signup:${s.id}` }));
       if (made && (!made.created || byId.has(made.card.id))) continue;   // the key's card already stood
       fresh++;
@@ -170,14 +173,28 @@ export async function mirrorRun(opts: { dry: boolean; only?: string[] }) {
         await write(`cases ${s.case_id}: owner_email ${s.email}, stage signup (if unowned)`, () => db(`cases?case_id=eq.${encodeURIComponent(s.case_id)}&owner_email=is.null`,
           { method: 'PATCH', body: JSON.stringify({ owner_email: s.email, stage: 'signup', updated_at: new Date().toISOString() }) }));
         const fc = findCard.get(s.case_id);
-        if (fc) {
-          await write(`comment ${fc.id}: owner signed up via the website`, () => addComment(fc.id, `owner signed up via the website: ${s.email} · ${String(s.created_at).slice(0, 10)}`));
-          // the hand-off line the coordinator engine, Escalate and Collect parse; the site offers no fee or appeal choices yet
-          await write(`comment ${fc.id}: authorization: case_id ${s.case_id}`, () => addComment(fc.id, `authorization: case_id ${s.case_id} · scope vab_petition · fee none · partial_above none · reopen_risk no`));
-        }
+        if (fc) await write(`comment ${fc.id}: owner signed up via the website`, () => addComment(fc.id, `owner signed up via the website: ${s.email} · ${String(s.created_at).slice(0, 10)}`));
       }
     }
-    out.signups = { consented: rowsS.length, new: fresh };
+    // e858143: the hand-off line the coordinator engine, Escalate, Collect and File wait for, on the Find card of every consented
+    // website sign-up, not only new ones (older sign-ups never got it). Once per case: a Find card already carrying a line has it.
+    // The site offers no fee or appeal choices yet, so the defaults.
+    const auth: string[] = [];
+    for (const s of rowsS) {
+      const fc = s.case_id ? findCard.get(s.case_id) : undefined;
+      if (!fc || auth.includes(s.case_id) || texts(fc).some((t) => /^authorization:/m.test(t))) continue;
+      auth.push(s.case_id);
+      await write(`comment ${fc.id}: authorization: case_id ${s.case_id}`, () => addComment(fc.id, `authorization: case_id ${s.case_id} · scope vab_petition · fee none · partial_above none · reopen_risk no`));
+    }
+    // Website cards made before the from: line: the REST PATCH cannot rewrite a body, so the line goes on as the card's one comment.
+    const froms: string[] = [];
+    for (const c of signupCards) {
+      const email = (c.body ?? '').match(/^email: *(\S+@\S+)/m)?.[1];
+      if (!/^source: website$/m.test(c.body ?? '') || !email || texts(c).some((t) => /^from: /m.test(t))) continue;
+      froms.push(c.id);
+      await write(`comment ${c.id}: from: ${email}`, () => addComment(c.id, `from: ${email}`));
+    }
+    out.signups = { consented: rowsS.length, new: fresh, authorization_lines: auth.length, from_lines: froms.length };
   } catch (e) { errors.push(`signups: ${e}`); }
 
   // --- board -> cases.messages: mirror_board.mirror_messages() (a332f84) ---
@@ -292,9 +309,12 @@ export async function mirrorRun(opts: { dry: boolean; only?: string[] }) {
       waiting.add(caseId);
       const find = findCard.get(caseId), block = rawBlock(find?.body ?? null) ?? rawBlock(fc.body), j = caseBlock(find?.body ?? null) ?? caseBlock(fc.body);
       const office = proof.match(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/)?.[0];
+      // Escalate reads `authorization:` from the Waiting on card itself (live_escalate.md 4a), so the Find card's line travels along
+      const authLine = find && texts(find).map((t) => t.match(/^authorization:.*$/m)?.[0]).find(Boolean);
       const addr = fc.title.split(' · ').slice(1, -1).join(' ');
       const body = [`case_id: ${caseId}`, 'level: vab_petition', `petition: ${proof.match(RECEIPT)![1]} · filed per ${fc.id}`,
         ...(office ? [`follow_up: ${[j?.jurisdiction?.county, 'VAB clerk', office].filter(Boolean).join(' ')}, every 7 days, last chased never`] : []),
+        ...(authLine ? [authLine] : []),
         ...(block ? ['', '```json', block, '```'] : [])].join('\n');
       const made = await write(`add Waiting on county · ${addr} · ${caseId} (blocked, key waiting:${caseId}${office ? `, follow_up ${office}` : ', no follow_up'})`, () =>
         addCard({ title: `Waiting on county · ${addr} · ${caseId}`, body, status: 'blocked', key: `waiting:${caseId}` }));
