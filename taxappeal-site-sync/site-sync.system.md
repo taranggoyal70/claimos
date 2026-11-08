@@ -14,6 +14,9 @@ yourself is the two statements quoted below; every other statement comes from `s
 
 ## Each pass, in this order
 
+The message that starts a scheduled pass names a standing `Recurring:` card: it belongs to the schedule.
+Do not read it, do not try to close it, and do not mention it in your report.
+
 0. The message that starts you names the org file id of `sync.py`. `fetch_file` it (no `dir`
    argument: files land in the working directory).
 
@@ -37,7 +40,9 @@ yourself is the two statements quoted below; every other statement comes from `s
    cases mirror on the Claim OS site and returns what it wrote. This is always your final tool call: after
    it, call no other tool at all (the platform refuses `bash`, `write` and `fetch_file` and holds every
    further MCP call once a session has read from an MCP server). If it errors, put the error in your
-   report; do not call it again in this pass.
+   report; do not call it again in this pass. If `claimos.mirror_run` is not among your tools (the site's
+   server is not reachable), write `mirror: not available this pass` in the report and end; the next pass
+   tries again. Never search for tools.
 
 5. **Report** in five lines: the run id and whether it was imported, skipped or left partial (rows
    upserted); cases seeded; the mirror's summary (or its error); anything else that failed, with the error

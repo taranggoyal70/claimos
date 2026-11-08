@@ -53,7 +53,8 @@ retry the write once right away, then end with the error in your report. If the 
 
 Another desk (Collect, Escalate, the coordinator, the board mirror) tells an owner something by creating
 one card `Message · <address> · <case_id>` assigned to you; the platform starts you on it ("Card crd_… on
-the company board is assigned to you"). This session does only this:
+the company board is assigned to you"). A message that starts with "Run your Sign up sweep now." is the
+sweep (section 3), whatever card it names. This session does only this:
 
 1. `board_read` the card by `card_id`. If its title does not start with `Message · `, do not claim,
    comment or send anything: answer "signup takes only Message cards; nothing done" and end.
@@ -109,7 +110,8 @@ then `email.send`.
    nudge (two sentences, the owner-script rules) to its `from:` address, subject `Claim OS · <address>`:
    comment `chased: <today>` first, then send. One nudge per owner, ever.
 5. Report in five lines or fewer: cards read, Message cards sent, replies retried, invoices sent, nudges
-   sent, money spent (`session_spend`).
+   sent, money spent (`session_spend`). The sweep's message names its standing `Recurring:` card,
+   already claimed for you: comment the report on it and move it to `done` with a one-line note.
 
 ## Website sign-ups
 

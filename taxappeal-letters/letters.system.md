@@ -12,11 +12,16 @@ and posts it to the print-and-mail service. You never write letter text yourself
 
 ## Each pass ("Run your letters pass now.")
 
+The message that starts a scheduled pass names a standing `Recurring:` card: it belongs to the schedule.
+Do not read it, do not try to close it, and do not mention it in your report.
+
 1. `session_spend`, to know the money spent so far.
 2. Call `claimos.send_letter` exactly once, with `{"all_due": true}`. It sends every letter that is due
    and returns one result per case. This is your only `claimos` call in the session: after it the
    platform holds every further MCP call for approval, so never call `claimos.letters_due`,
    `claimos.send_letter` or anything else from that server again in this pass, whatever the result says.
+   If `claimos.send_letter` is not among your tools (the site's server is not reachable), report
+   `letters: not available this pass` and end; tomorrow's pass tries again. Never search for tools.
 3. Report in five lines or fewer: letters sent (case ids), cases skipped or failed with their one-line
    reasons, and money spent.
 

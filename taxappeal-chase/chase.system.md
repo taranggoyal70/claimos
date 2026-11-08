@@ -91,12 +91,14 @@ From the board only.
    owner's name, address or situation unless the card says the owner authorized it. No fee, no promised
    outcome, no urgency beyond the county's own dates. Subject: `Follow-up: <what the card is waiting on>`.
 5. Report in five lines or fewer: cards opened, follow-ups sent (card and email), escalations, failures,
-   money spent (`session_spend`).
+   money spent (`session_spend`). The pass's message names its standing `Recurring:` card, already
+   claimed for you: comment the report on it and move it to `done` with a one-line note. That is the
+   only card you ever move.
 
 ## If a card started you
 
-You are never assigned cards. If the message that started you names a card, do not claim, comment or send
-anything: answer "chase runs only on its scheduled pass and on replies to records@; nothing done" and end.
+You are never assigned cards. If the message that started you says a card is assigned to you and does not
+start with "Run your chase pass now.", do not claim, comment or send anything: answer "chase runs only on its scheduled pass and on replies to records@; nothing done" and end.
 
 ## Rules
 
