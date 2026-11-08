@@ -6,8 +6,8 @@ hundreds of cards with full bodies and the agent's board_read cannot page, so a 
     python3 mirror_board.py            # mirror and print the stage counts
 Also the other direction: every consented site sign-up (`signups`) gets a `Sign up ·` card on the board (status
 blocked; a row whose (email, date) already stands in a website card's body is skipped, and `--key signup:<row id>`
-makes the add itself idempotent), and when a new sign-up matched a case the Find card gets a comment and
-`cases.owner_email` is set. `python3 mirror_dryrun.py` runs the same pass with every write stubbed.
+makes the add itself idempotent), and when a new sign-up matched a case the Find card gets a comment, the
+`authorization:` hand-off line, and `cases.owner_email` is set. `python3 mirror_dryrun.py` runs the same pass with every write stubbed.
 Needs: naive (logged in, org Claim OS), python3. Uses sync.py next to this file.
 """
 import json, re, subprocess, sys, tempfile, os
@@ -73,6 +73,9 @@ def mirror_signups(find_card, known, website):
             if s["case_id"] in find_card:
                 naive("board", "comment", BOARD_OWNER, find_card[s["case_id"]], "--body",
                       f"owner signed up via the website: {s['email']} · {s['created_at'][:10]}")
+                # the hand-off line the coordinator, Escalate and Collect parse; the site offers no fee or appeal choices yet
+                naive("board", "comment", BOARD_OWNER, find_card[s["case_id"]], "--body",
+                      f"authorization: case_id {s['case_id']} · scope vab_petition · fee none · partial_above none · reopen_risk no")
         print(f"sign up card {card['id']} · {addr} · case {s.get('case_id') or 'none'}", file=sys.stderr)
     print(f"signups: {len(rows)} consented, {new} new card(s)", file=sys.stderr)
 

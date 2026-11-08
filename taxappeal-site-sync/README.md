@@ -75,7 +75,10 @@ carries `--key signup:<row id>`, which the platform makes idempotent (a second a
 key already made; a card the pass had already read gets no comment). `python3 taxappeal-site-sync/mirror_dryrun.py`
 runs the whole pass with every write stubbed and prints what it would add; a healthy repeat ends with
 `signups: N consented, 0 new card(s)`. When a new sign-up matched a case, the case's Find card gets the comment
-`owner signed up via the website: <email> · <date>`, and the case gets `owner_email` and stage `signup` (only when no owner held it).
+`owner signed up via the website: <email> · <date>` and, as its own comment, the hand-off line the coordinator engine,
+Escalate (step 4a) and Collect (step 4c) parse: `authorization: case_id <id> · scope vab_petition · fee none · partial_above none ·
+reopen_risk no` (the site collects no fee or appeal choices, so the defaults: accept partial wins, no reopen risk). The case gets
+`owner_email` and stage `signup` (only when no owner held it).
 The `Sign up` card is then the owner's conversation, like the ones `signup` opens from mail.
 
 ## Letters to owners (laptop, not the agent)

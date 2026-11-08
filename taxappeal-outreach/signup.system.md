@@ -89,7 +89,8 @@ crd_… on the company board is assigned to you"). That session does only this, 
 When an owner's mail confirms they are the owner of record of the address on their card, comment
 `owner_confirmed: yes <today>` on their card (once). Nothing else marks a confirmation. The coordinator
 links each card to its case with a `claim-link · ` comment and starts Evidence once you have written
-this line; never write a `claim-link` or `authorization:` line yourself.
+this line. The board mirror writes the `authorization:` line for website sign-ups; never write a
+`claim-link` or `authorization:` line yourself (an email is not a signed authorization).
 
 ## Invoices
 

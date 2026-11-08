@@ -53,7 +53,7 @@ Teammates' agents on the same board: `find` (Nick, 6-hourly), `qualify` (Smaran)
 - Chase → Escalate: `decision-letter · case … · level … · received … · <messageId>` (full letter) + `decision:` + `escalate`; Escalate answers with card notes (`WON · `, `APPEAL · `, `STOPPED · `) or `escalate-result · PENDING|INCOMPLETE …`.
 - Escalate → Evidence (refile): `Evidence · <address> · <case_id>` with `fix:` lines and `petition_deadline:`.
 - Escalate → Collect: `Collect · <address> · <case_id>`; notes `INVOICE · ` / `PAID · ` → tracker `won` with status `invoice` / `paid`.
-- Planned: `authorization: case_id <id> · scope vab_petition · fee <…|none> · partial_above <$|none> · reopen_risk <yes|no>` written on the case card by the board mirror from the site's sign-up/authorization choices.
+- Sign up → coordinator / Escalate / Collect: `authorization: case_id <id> · scope vab_petition · fee none · partial_above none · reopen_risk no`, a comment on the case's Find card, written by the board mirror (`mirror_signups`) for every consented website sign-up that matched a case (since 2026-11-08; the site collects no fee or appeal choices yet, so the defaults). Mail sign-ups still get no line.
 
 Details: `taxappeal-chase/HANDOFF-ESCALATE.md`, each folder's README.
 
@@ -77,7 +77,7 @@ Check: `/check` shows the "Have a letter from us?" code field and `/api/verdict?
 
 ## Open items
 
-1. Dashboard: label won cases "Invoice sent" / "Paid" from `cases.status`; collect the two authorization choices on the site and write the `authorization:` line (queued behind the portal build).
+1. Dashboard: label won cases "Invoice sent" / "Paid" from `cases.status`; collect the two authorization choices (`partial_above`, `reopen_risk`) on the site; the mirror writes the `authorization:` line with the defaults until then.
 2. Board mirror on a schedule (Mac mini launchd) instead of by hand.
 3. Remove the now-useless AgentMail forward to `signup@claim-os-d4myby.usenaive.ai` (one AgentMail call, must run as Francesco).
 4. `claim-os-d4myby.usenaive.ai` requested as a site domain; Naïve hasn't connected its HTTP track yet.
