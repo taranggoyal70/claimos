@@ -7,7 +7,7 @@
 :root {
   --ink: #111110; --ink-2: #2c2a26; --muted: #736e68; --muted-2: #6b6664;
   --bg: #ffffff; --surface: #f4f3f0; --surface-2: #ebe9e4; --line: #e9e7e2; --dark: #1b1d21;
-  --red: #b42318; --green: #2f8f5b; --amber: #d08a1d; --gray: #9a948d;
+  --red: #b42318; --green: #2f8f5b; --amber: #d08a1d; --gray: #76716b;   /* 4.8:1 on white; #9a948d was 3.0:1 */
   --radius: 12px; --radius-s: 8px;
   --shadow: 0 1px 2px rgba(17, 17, 16, .04), 0 14px 36px -14px rgba(17, 17, 16, .22);
   --ease: cubic-bezier(.16, 1, .3, 1);
