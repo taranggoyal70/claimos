@@ -11,7 +11,7 @@ window: immediate
 
 budget:
   cap_usd: 5          # per day
-  max_task_usd: 0.50  # one pass
+  max_task_usd: 1.00  # each approval resumes the session and re-sends ~100k tokens; 0.50 died mid-pass  # one pass
   period: day
 
 system_file: chase.system.md

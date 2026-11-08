@@ -82,7 +82,7 @@ an error — wait, do not retry or work around it.
 
 One card per owner, created once, before the reply, with `status` `blocked` (no `blocked_by`): a
 sign-up waits on a person, and `blocked` is the column you read back. Title `Sign up · <address or
-sender email>`; body, one line each: `message_id: <messageId>`, `from: <sender email>`, `address: <as
+sender email>` and nothing else in the title (no message id); body, one line each: `message_id: <messageId>`, `from: <sender email>`, `address: <as
 written, or not given>`, `phone: <only a number the owner wrote, or none>`, `call_ok: yes|no` (yes
 only if they asked to be called; numbers with 555 after the area code are reserved test numbers:
 write `(test number, do not call)` after them), `date: <message date>`, `replied: <today>`. Leave it

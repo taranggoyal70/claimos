@@ -24,11 +24,11 @@ echo "3/3 schedule: daily 09:30 America/New_York, created paused"
 CRON="30 9 * * *"
 DEP=$(naive deploy list | jq -r --arg a "$AGENT" --arg c "$CRON" '.data[] | select(.agent_id==$a and .cron==$c) | .id' | head -1)
 if [ -z "$DEP" ]; then
-  DEP=$(naive deploy create --agent "$AGENT" --cron "$CRON" --timezone America/New_York --budget-usd 0.50 \
+  DEP=$(naive deploy create --agent "$AGENT" --cron "$CRON" --timezone America/New_York --budget-usd 1.00 \
     --window immediate --identity "$IDN" --prompt "Run your chase pass now." | jq -r .id)
   naive deploy pause "$DEP" >/dev/null   # a new schedule starts enabled; keep it paused until one good pass
 fi
 echo "  $DEP ($(naive deploy show "$DEP" | jq -r .schedule_status))"
 
-echo "done. One pass by hand: naive session create --agent $AGENT --identity $IDN --message 'Run your chase pass now.' --budget-usd 0.50 --window immediate"
+echo "done. One pass by hand: naive session create --agent $AGENT --identity $IDN --message 'Run your chase pass now.' --budget-usd 1.00 --window immediate"
 echo "then: naive deploy resume $DEP"

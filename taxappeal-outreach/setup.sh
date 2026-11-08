@@ -42,9 +42,9 @@ OUTREACH=$(apply outreach); echo "  outreach $OUTREACH (started by assigning it 
 
 echo "4/4 signup schedule: every 15 minutes, created paused"
 DEP=$(naive deploy list | jq -r --arg a "$AGENT" '.data[] | select(.agent_id==$a and .cron=="*/15 * * * *") | .id' | head -1)
-[ -n "$DEP" ] || DEP=$(naive deploy create --agent "$AGENT" --cron "*/15 * * * *" --budget-usd 0.30 \
+[ -n "$DEP" ] || DEP=$(naive deploy create --agent "$AGENT" --cron "*/15 * * * *" --budget-usd 1.00 \
   --window immediate --identity "$IDN" --prompt "Run your Sign up pass now on the inbox claimos@agentmail.to." | jq -r .id) \
   && naive deploy pause "$DEP" >/dev/null   # a new schedule starts enabled; keep it paused until one good pass
 echo "  $DEP ($(naive deploy show "$DEP" | jq -r .schedule_status))"
 
-echo "done. After one good pass (naive session create --agent $AGENT --identity $IDN --message 'Run your Sign up pass now on the inbox claimos@agentmail.to.' --budget-usd 0.50 --window immediate): naive deploy resume $DEP"
+echo "done. After one good pass (naive session create --agent $AGENT --identity $IDN --message 'Run your Sign up pass now on the inbox claimos@agentmail.to.' --budget-usd 1.00 --window immediate): naive deploy resume $DEP"
