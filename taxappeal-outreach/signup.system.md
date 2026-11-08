@@ -37,7 +37,9 @@ message id, `(message inb_…)`: that `inb_…` id, in angle brackets, is the me
 Record it, alone, and wait for the result before anything else:
 1. `board_read` with `status` `blocked` (never the unfiltered board; it holds hundreds of Find cards) and
    look for a `Sign up ·` card whose `from:` line is this sender or whose title carries this address.
-2. Found: one `comment` on it with the lines `message_id: <inb_…>`, `from:`, `address:`, `phone:`, `call_ok:`, `date:`, `replied: <today>` (plus
+   One sender is one card: if a card's `from:` line is this sender, that is their card, even when this
+   mail names another address (the new address goes in the comment).
+2. Found: one `comment` on it with the lines `message_id: <inb_…>` (angle brackets included, e.g. `message_id: <inb_1wg6hsk8szm7tse132kbcfm15c>`), `from:`, `address:`, `phone:`, `call_ok:`, `date:`, `replied: <today>` (plus
    `STOP` for a stop). Not found: `create` the card (see Board), then `update` it to `blocked`.
 3. Only once the board write returned its id, `email.send` the reply: `to` the sender, `subject`
    `Re: <their subject>` (or `Claim OS · <address>` when they gave no subject), `text` the reply.
