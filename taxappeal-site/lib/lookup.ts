@@ -16,6 +16,14 @@ export async function db(path: string, init: { method?: string; body?: string } 
   return r.json();
 }
 
+// Exact row count from the Content-Range header: a plain read returns at most 1,000 rows, whatever `limit` says.
+export async function count(path: string) {
+  const r = await fetch(`${REST}/${path}`, { method: 'HEAD', headers: { apikey: KEY, authorization: `Bearer ${KEY}`, prefer: 'count=exact' } });
+  const total = r.headers.get('content-range')?.split('/')[1] ?? '';
+  if (!r.ok || !/^\d+$/.test(total)) throw new Error(`db count ${r.status}: ${path}`);
+  return Number(total);
+}
+
 // One JSON error shape for both handlers instead of a bare platform 500.
 export function fail(e: unknown) {
   console.error(e);
