@@ -191,7 +191,7 @@
       show({ street: title(v.address), address: title(v.address) + (v.unit ? ' #' + v.unit : '') + ', ' + (v.zip || zip), unit: v.unit || unit, city: v.city ? title(v.city) : '', zip: v.zip || zip,
         value: v.just_value, over: v.just_value - v.defensible_value, savings: v.annual_savings, badge, tone, code: v.claim_code || '',
         note: v.use === 'possessory_interest'
-          ? 'Publicly owned land under a long lease: the taxable interest is the leasehold, on the unsecured roll the city does not publish. Port of San Francisco filings put it near $12.4M; 2026 sales nearby (600 20th St at about $1,200 per sq ft, 1 De Haro St at about $800) put the market value well above that, so we see no case to appeal.'
+          ? 'Publicly owned land under a long lease: the taxable interest is the leasehold, on the unsecured roll the city does not publish. Port of San Francisco tax-increment filings put its taxable value near $17M; 2026 Dogpatch rents and San Francisco office cap rates put its market value near $21M, so we see no case to appeal.'
           : 'Estimate from public county records and recent sales; the county decides.',
         estimated: v.use === 'possessory_interest', run: fmtRun(v.run_date) });
     } else {
