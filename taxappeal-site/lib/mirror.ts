@@ -90,7 +90,13 @@ export async function mirrorRun(opts: { dry: boolean; only?: string[] }) {
   const t0 = Date.now(), dry = opts.dry;
   const on = (s: Step) => !opts.only?.length || opts.only.includes(s);
   const writes: string[] = [], errors: string[] = [], out: Record<string, unknown> = { dry };
-  const write = async <T>(desc: string, f: () => Promise<T>) => { writes.push(desc); return dry ? undefined : f(); };
+  // Vercel stops the function at 60 s: past 45 s a write is deferred like a dry one (every write is idempotent), so the pass
+  // returns cleanly and the next 15-minute pass picks up where this one stopped.
+  const late = () => Date.now() - t0 > 45_000, deferred: string[] = [];
+  const write = async <T>(desc: string, f: () => Promise<T>) => {
+    if (!dry && late()) { deferred.push(desc); return undefined; }
+    writes.push(desc); return dry ? undefined : f();
+  };
 
   // --- board read: mirror_board.main() ---
   const board = await cards();
@@ -223,7 +229,7 @@ export async function mirrorRun(opts: { dry: boolean; only?: string[] }) {
       }
       for (const t of texts(c)) {   // older mails: a `message_id: <AgentMail id>` line, the text fetched from claimos@
         const mid = t.match(/^message_id: (<[^>]+>)/m)?.[1], at = t.match(/^date: (.+)$/m)?.[1] ?? '';
-        if (!mid || known.has(mid) || found.some(([, e]) => e.id === mid)) continue;
+        if (!mid || known.has(mid) || found.some(([, e]) => e.id === mid) || late()) continue;
         const text = await ownerText(mid);
         if (text) found.push([caseId, { id: mid, at, from: 'owner', text }]);
       }
@@ -345,5 +351,5 @@ export async function mirrorRun(opts: { dry: boolean; only?: string[] }) {
     out.meetings = res;
   } catch (e) { errors.push(`meetings: ${e}`); }
 
-  return { ...out, writes, errors, ms: Date.now() - t0 };
+  return { ...out, writes, deferred: deferred.length ? deferred : undefined, errors, ms: Date.now() - t0 };
 }
