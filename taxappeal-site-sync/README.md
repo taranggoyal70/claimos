@@ -45,3 +45,18 @@ naive deploy resume dep_…
 - A county re-run whose case ids are unchanged but whose values changed is not re-imported
   (shortcut: upgrade when Find starts changing values between runs).
 - `find_files` is name-search; if Find renames its outputs the prompt's two queries must follow.
+
+## Board mirror (laptop, not the agent)
+
+The agent only imports Find runs now. Mirroring the board into `cases` runs from a machine with the
+CLI logged in, because the board holds hundreds of full-bodied cards and an agent's `board_read`
+cannot page (it overflowed the model on 2026-11-08):
+
+```bash
+python3 taxappeal-site-sync/mirror_board.py     # reads every column with `naive board show`, upserts cases, prints stage counts
+```
+
+Stage comes from the card (`sync.py: stage()`): `Waiting on …` → waiting, `Sign up ·` → signup,
+`File ·` → file (done → waiting), a done Find card → Qualify's verdict in the note (QUALIFIED →
+qualify, REJECTED → stopped, EVIDENCE ready → file); the furthest step wins when cards share a case.
+Run it after a Find run or a few times a day (a launchd job on the Mac mini is the natural home).
