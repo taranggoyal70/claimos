@@ -2,7 +2,7 @@
 // is an individual or a trust, carrying the claim code the owner types on /check. lib/letter.html is read at render
 // time, so its wording is the only copy. Lob posts the letter; without LOB_API_KEY everything runs dry (render only).
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { db } from './lookup';
 import { naive, cards, comments, comment, fileLines } from './naive';
@@ -107,7 +107,10 @@ export function render(j: any, rec: any, code: string) {
     county_value: money(v.just_value), our_value: money(e.defensible_value), savings: money(e.annual_savings), code, site: SITE, case_id: j.case_id,
   }).map(([k, x]) => [k, esc(x)]));
   vals.mail = [owner.name, m.line1, m.line2, cityStateZip].filter(Boolean).map(esc).join('<br>');
-  const tpl = readFileSync(join(__dirname, 'letter.html'), 'utf8');
+  // __dirname exists only in a CommonJS build; the function's working directory holds lib/ via vercel.json includeFiles.
+  const tplPath = [typeof __dirname === 'string' ? join(__dirname, 'letter.html') : '', join(process.cwd(), 'lib', 'letter.html')].find((x) => x && existsSync(x));
+  if (!tplPath) throw new Error('lib/letter.html not found in the deployment');
+  const tpl = readFileSync(tplPath, 'utf8');
   // string.Template.substitute: $$, $name, ${name}; an unknown name is an error, never a blank in a mailed letter
   return tpl.replace(/\$(?:(\$)|([_a-z][_a-z0-9]*)|\{([_a-z][_a-z0-9]*)\})/gi, (_, d, a, b) => {
     if (d) return '$';
