@@ -5,7 +5,7 @@ the `claimos-site` app (`app_nkhc92xe21cyzfd5qakpkcj4g4`): `candidates` (Find's 
 contact anyone and never write to the board.
 
 Every database call is the `apps` tool, action `db_query`, on that app id. The only SQL you write
-yourself is the two short reads quoted below; every other statement comes from `sync.py`.
+yourself is the two statements quoted below; every other statement comes from `sync.py`.
 
 ## Each pass
 
@@ -24,21 +24,24 @@ yourself is the two short reads quoted below; every other statement comes from `
    (it is an upsert, so repeating is safe). Stop before your budget runs out: the next pass resumes
    from `run_rows`.
 
-2. **Cases: the company board.** Run
-   `select to_char(coalesce(max(updated_at), 'epoch') at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as since from cases`.
-   `board_read` the list **20 cards at a time** (`limit: 20`, then the cursor it returns, until it says
-   there are no more). Never ask for more per call: every card comes with its whole body and a hundred
-   of them does not fit in your context. The body is already in the list, so read no card again.
-   Handle each page before asking for the next: keep the cards whose `updated_at` is later than
-   `since`; a card whose body has no ```json block with a `case_id` is not a case, skip it. For each
-   case card write one line to `cards.tsv`: nine tab-separated fields, no header, no quotes, values
-   copied exactly from the JSON block and the card:
+2. **Cases.** First seed every case Find considers mail-ready, straight from the database (these are
+   exactly the cards Find posts, so no board read is needed for them):
+   `insert into cases (case_id, address, county, county_value, requested_value, annual_savings, stage, status, updated_at) select case_id, address, county, just_value, defensible_value, annual_savings, 'find', 'todo', imported_at from candidates where tier in ('strong', 'possible') on conflict (case_id) do nothing`
+   Then mirror what moved on the board: `board_read({status: "doing", limit: 100})`, then the same
+   for `blocked` and `done`. Never read the board unfiltered: it is hundreds of cards, each with its
+   whole body, and does not fit in your context. A card whose body has no ```json block with a
+   `case_id` is not a case: skip it. If no case card moved, say so and go to the report. For each case
+   card write one line to `cards.tsv`: nine tab-separated fields, no header, no quotes, values copied
+   exactly from the JSON block and the card:
    `case_id ⇥ property.address ⇥ jurisdiction.county ⇥ values.just_value ⇥ estimate.defensible_value ⇥ estimate.annual_savings ⇥ status ⇥ assignee (empty if none) ⇥ updated_at`
-   Then `python3 sync.py cases cards.tsv > cases.sql`, run `cases.sql` with `db_query`, check
-   `upserted` equals the lines you wrote, and move on to the next page with a fresh `cards.tsv`.
+   where `status`, `assignee` and `updated_at` are the card's own fields (`status` is one of todo,
+   doing, blocked, done), not anything inside the body.
+   Then `python3 sync.py cases cards.tsv > cases.sql`, run `cases.sql` with `db_query` and check
+   `upserted` equals the lines you wrote.
 
 3. **Report** in five lines: the run id and whether it was imported, skipped or left partial (rows
-   upserted); cards read and cases upserted; the result of `select stage, count(*) from cases group by 1`;
+   upserted); cases seeded (the insert's row count) and moved cards upserted; the result of
+   `select stage, count(*) from cases group by 1`;
    anything that failed, with the error text; money spent (`session_spend`).
 
 ## Rules

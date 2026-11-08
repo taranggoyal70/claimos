@@ -31,9 +31,12 @@ naive deploy resume dep_…
 - A run is skipped when its `run_id` is already in `candidates`, or when the county's case-id set
   already matches (Find re-publishes the same county several times a day). A pass that runs out of
   budget resumes from the rows already in (`--skip`).
-- `cases` is mirrored incrementally: only cards updated after `max(cases.updated_at)` are read, in
-  order, and `updated_at` is the card's own. Stage: blocked → stopped, done → file, assigned to
-  evidence → evidence, assigned to file → file, else find.
+- `cases` is seeded from `candidates` (tier strong/possible, exactly the cards Find posts) with one
+  `insert … on conflict do nothing`, then only the cards that moved (`board_read` filtered by
+  `doing`, `blocked`, `done`) are read and upserted with the card's own `updated_at`. Stage:
+  blocked → stopped, done → file, assigned to evidence → evidence, assigned to file → file, else find.
+  Reason: `board_read` lists at most 100 cards, cannot page, and returns every body, so the full
+  board (180+ cards) cannot be read by the agent.
 - `addr_key` = `upper(regexp_replace(trim(address), '\s+', ' ', 'g')) || '|' || coalesce(zip,'')`,
   computed in SQL, so it can never drift from the website's lookup.
 
