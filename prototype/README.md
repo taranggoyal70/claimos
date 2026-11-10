@@ -60,3 +60,12 @@ The split works:
 - The same deterministic case data drives every surface.
 
 Before production, replace the replay data in `assets/demo-data.js` with normalized Naive session, tool, cost, artifact and approval events.
+
+
+## Property intake
+
+`/intake` is a homeowner-facing request preview with a coded property illustration, a scroll-driven notice-to-dossier sequence and three-step local request preparation. The process can also be explored with buttons and replayed. Motion respects the system's reduced-motion preference; the illustration has a pause control.
+
+Property details, contact information and optional notice selection remain in page memory. Saving downloads a JSON request with `submitted: false`, `authorization: false` and `status: local_draft`. The notice itself is never uploaded or included in that download. No signup-agent API endpoint is connected by this page.
+
+Check the empty-field and invalid-email states, sample details, back/edit controls, supported notice selection and removal, request download and reset. Check desktop scroll choreography, phone-width layout, keyboard focus, pause and replay.

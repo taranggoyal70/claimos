@@ -1,13 +1,739 @@
-<!doctype html><html lang="en" data-theme="light"><head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Intake — Claim OS</title>
-  <script>try{if(localStorage.getItem('gcm-theme')==='dark')document.documentElement.dataset.theme='dark'}catch{}</script><link rel="stylesheet" href="assets/base.css"><link rel="stylesheet" href="assets/product.css"><link rel="stylesheet" href="assets/polish.css">
-</head><body class="product-body">
-  <nav class="product-nav"><div class="nav-in"><a class="brand" href="/"><i class="brand-mark"></i><span>Claim OS</span></a><div class="nav-links"><a href="/app">Operations</a><a href="/case">Case</a><a href="/desks">Desks</a><a class="active" href="/intake">Intake</a><a href="/proof">Proof</a></div><div class="nav-end"><button class="theme-btn" data-theme-toggle>Dark</button><a class="btn primary nav-cta" href="/live">Live demo →</a></div></div></nav>
-  <main class="product-main">
-    <header class="product-head"><div><span class="eyebrow">One front door</span><h1>Forward any bill, letter or denial.</h1><p>The intake agent extracts the facts, identifies the recovery desk, checks the deadline and decides whether the company can help.</p></div></header>
-    <section class="intake-stage">
-      <div class="intake-box"><div><span class="eyebrow">Forward or upload</span><h2>intake@claimos.demo</h2><p>PDF, image, email or text. Unsupported matters are declined honestly.</p><div class="intake-actions"><button class="btn primary" type="button" data-use-sample>Use sample assessment notice</button><div class="intake-address">Sample: SF assessment notice · Jordan Lee</div></div></div></div>
-      <article class="intake-result" id="intake-result"><span class="eyebrow">Classification result</span><h2>Property Tax</h2><dl><div><dt>Jurisdiction</dt><dd>San Francisco, California</dd></div><div><dt>Deadline</dt><dd>Dec 15, 2026 · 40 days remaining</dd></div><div><dt>Potential recovery</dt><dd>$1,018 / year</dd></div><div><dt>Evidence state</dt><dd>Assessment record found · comparables required</dd></div><div><dt>Next action</dt><dd>Verify owner and request consent</dd></div></dl><a class="btn recovery" href="/case">Open created case →</a></article>
-    </section>
-  </main><script type="module" src="assets/product.js"></script><script type="module" src="assets/polish.js"></script>
-</body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Start with your property — Claim OS</title>
+    <meta
+      name="description"
+      content="A clearer next step for your property tax notice. Prepare your property review request with Claim OS."
+    />
+    <meta name="theme-color" content="#f4f3eb" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;650;700;750;800&family=Fraunces:ital,wght@1,450&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%232b4a3b'/%3E%3Cpath d='M10 21 20 12 30 21v10H10Z' fill='none' stroke='%23f4f3eb' stroke-width='2'/%3E%3Cpath d='m15 23 4 4 7-8' fill='none' stroke='%23c9df8c' stroke-width='2'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="assets/intake.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#request">Skip to your request</a>
+    <svg class="icon-library" aria-hidden="true">
+      <defs>
+        <symbol id="arrow" viewBox="0 0 24 24">
+          <path d="M5 12h14m-6-6 6 6-6 6" />
+        </symbol>
+        <symbol id="check" viewBox="0 0 24 24">
+          <path d="m5 12 4 4L19 6" />
+        </symbol>
+        <symbol id="document" viewBox="0 0 24 24">
+          <path d="M14 3H5v18h14V8Zm0 0v5h5M8 12h8m-8 4h6" />
+        </symbol>
+        <symbol id="replay" viewBox="0 0 24 24">
+          <path d="M4 10a8 8 0 1 1 1 8M4 4v6h6" />
+        </symbol>
+        <symbol id="down" viewBox="0 0 24 24">
+          <path d="M12 3v12m-5-5 5 5 5-5M5 17v4h14v-4" />
+        </symbol>
+        <symbol id="plus" viewBox="0 0 24 24">
+          <path d="M12 5v14M5 12h14" />
+        </symbol>
+      </defs>
+    </svg>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="wordmark" href="/" aria-label="Claim OS home"
+          ><span class="brand-glyph"><i></i><i></i><i></i></span>claim<span
+            class="brand-os"
+            >os</span
+          ><span class="brand-period">.</span></a
+        >
+        <nav aria-label="Main navigation">
+          <a href="#how-it-works">How it works</a
+          ><a href="#your-control">Your control</a
+          ><a class="header-cta" href="#request"
+            >Start your request <svg class="icon"><use href="#arrow" /></svg
+          ></a>
+        </nav>
+      </div>
+      <div class="page-progress" aria-hidden="true"></div>
+    </header>
+    <main>
+      <section class="hero content-width" aria-labelledby="hero-heading">
+        <div class="hero-copy">
+          <div class="eyebrow enter" style="--order: 0">
+            <span class="status-dot"></span> PROPERTY TAX, WITH A CLEARER PATH
+          </div>
+          <h1 id="hero-heading">
+            <span class="line"><span style="--order: 1">Your home.</span></span
+            ><span class="line"
+              ><span style="--order: 2">Your money.</span></span
+            ><span class="line"
+              ><em style="--order: 3">Your next move.</em></span
+            >
+          </h1>
+          <p class="hero-description enter" style="--order: 4">
+            A tax notice shouldn’t be a guessing game. Turn your property
+            details into a clear starting point for review.
+          </p>
+          <div class="hero-actions enter" style="--order: 5">
+            <a class="button button-dark" href="#request"
+              >Let’s start with your property
+              <svg class="icon"><use href="#arrow" /></svg></a
+            ><a class="text-link" href="#how-it-works"
+              >See the process <span>↘</span></a
+            >
+          </div>
+          <div class="hero-footnote enter" style="--order: 6">
+            <span class="tiny-check">✓</span> A simple request. You stay in
+            control.
+          </div>
+        </div>
+        <div class="hero-art enter" style="--order: 2" data-scene="0">
+          <div class="art-heading">
+            <span class="mini-label">A CLOSER LOOK AT HOME</span
+            ><span class="art-index">FIG. 01</span>
+          </div>
+          <div class="plot-area" aria-hidden="true">
+            <div class="plot-grid"></div>
+            <div class="plot-orbit"></div>
+            <svg class="house-drawing" viewBox="0 0 600 450" fill="none">
+              <defs>
+                <pattern
+                  id="roof-lines"
+                  width="12"
+                  height="12"
+                  patternUnits="userSpaceOnUse"
+                  patternTransform="rotate(-30)"
+                >
+                  <path d="M0 0v12" stroke="#6e8975" stroke-width=".65" />
+                </pattern>
+                <linearGradient id="lawn" x1="0" y1="0" x2="1" y2="1">
+                  <stop stop-color="#e2e8cd" />
+                  <stop offset="1" stop-color="#edf0df" />
+                </linearGradient>
+              </defs>
+              <g class="ground-layer">
+                <path d="m52 279 266-153 230 133-266 153Z" fill="url(#lawn)" />
+                <path
+                  class="parcel-line"
+                  d="m52 279 266-153 230 133-266 153Z"
+                  stroke="#879b77"
+                  stroke-width="1.1"
+                  stroke-dasharray="5 6"
+                />
+                <path
+                  d="m58 293 224 129 266-154M83 307l199 115"
+                  stroke="#b5bfaa"
+                />
+                <path d="m234 354 48 28 63-36-48-28Z" fill="#e7e2d2" />
+                <path
+                  d="m245 360 63-36m-51 43 63-36m-51 43 63-36m-51 43 63-36"
+                  stroke="#c1c2b0"
+                  stroke-width=".8"
+                />
+              </g>
+              <g class="house-shadow">
+                <path
+                  d="m132 292 159 92 204-117-159-92Z"
+                  fill="#52674d"
+                  opacity=".07"
+                />
+              </g>
+              <g
+                class="house-body"
+                stroke="#47624e"
+                stroke-width="1.2"
+                stroke-linejoin="round"
+              >
+                <path d="m163 223 132 76v77l-132-76Z" fill="#f6f4e9" />
+                <path d="m295 299 142-82v77l-142 82Z" fill="#e7ebdc" />
+                <path d="m163 223 142-82 132 76-142 82Z" fill="#f8f6ec" />
+                <path
+                  d="m170 241 117 68m-117-53 117 68m-117-53 117 68m-117-53 117 68M304 313l124-72m-124 87 124-72m-124 87 124-72"
+                  stroke="#b4bcaa"
+                  stroke-width=".6"
+                />
+                <path d="m185 256 29 17v34l-29-17Z" fill="#dbe5d9" />
+                <path d="m199 264 1 34m-15-25 29 17" stroke="#738b75" />
+                <path d="m239 286 29 17v54l-29-17Z" fill="#5c7560" />
+                <path d="m244 294 19 11v24l-19-11Z" fill="#cedcbe" />
+                <circle
+                  cx="261"
+                  cy="337"
+                  r="1.6"
+                  fill="#f5efdc"
+                  stroke="none"
+                />
+                <path
+                  d="m316 306 27-16v32l-27 16Zm60-35 27-16v32l-27 16Z"
+                  fill="#c5d4c0"
+                />
+                <path
+                  d="m329 298 1 32m-14-8 27-16m46-43v32m-13-8 27-16"
+                  stroke="#738b75"
+                />
+                <path
+                  d="m237 341 35 20v7l-35-20Zm-5 4 40 23v7l-40-23Z"
+                  fill="#d9dccb"
+                />
+              </g>
+              <g
+                class="roof-layer"
+                stroke="#47624e"
+                stroke-width="1.15"
+                stroke-linejoin="round"
+              >
+                <path d="m146 223 96-108 132 76-96 108Z" fill="#a5b394" />
+                <path
+                  d="m146 223 96-108 132 76-96 108Z"
+                  fill="url(#roof-lines)"
+                />
+                <path
+                  d="m242 115 142-82 70 179-80-21Z"
+                  fill="#e6e9d7"
+                  opacity="0"
+                />
+                <path d="m242 115 148 85 64 12-142-82Z" fill="#f0f0df" />
+                <path d="m278 299 96-108 80 21-149 86Z" fill="#748d70" />
+                <path
+                  d="m278 299 27-1 149-86"
+                  stroke="#39563e"
+                  stroke-width="3"
+                />
+                <path
+                  d="m281 158 19-11 21 12-19 11v-35l-21-12Z"
+                  fill="#eeeadd"
+                />
+                <path d="m302 170 19-11v-35l-19 11Z" fill="#ced5bf" />
+                <path d="m281 123 19-11 21 12-19 11Z" fill="#a4af96" />
+              </g>
+              <g class="garden" stroke="#839771" stroke-width="1.1">
+                <path d="M113 275v38m0-17-13-13m13 5 12-13" />
+                <ellipse cx="112" cy="266" rx="22" ry="32" fill="#bcc9a4" />
+                <path d="M112 239v56m0-23-12-10m12 21 13-15" />
+                <path d="M464 266v41" />
+                <ellipse cx="464" cy="252" rx="17" ry="25" fill="#d1dab9" />
+                <path d="M464 231v48m0-18 10-10" />
+              </g>
+              <g class="dimension-lines" stroke="#93a084" stroke-width=".7">
+                <path
+                  d="m67 315 205 118m-212-114 12-8m193 126 12-8M326 401l207-119m-212 115 11 7m196-126 11 7"
+                />
+                <path
+                  class="trace-path"
+                  d="M111 300 160 329 231 288 295 326 380 277 461 324"
+                  stroke="#668147"
+                  stroke-width="2"
+                  stroke-dasharray="520"
+                />
+              </g>
+              <g class="house-pin">
+                <circle cx="301" cy="91" r="23" fill="#2b4a3b" />
+                <path
+                  d="m291 92 7 7 13-16"
+                  stroke="#e5efcf"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path d="M301 114v25" stroke="#2b4a3b" stroke-dasharray="2 3" />
+              </g>
+            </svg>
+            <span class="plot-coordinate coordinate-a">YOUR PROPERTY</span
+            ><span class="plot-coordinate coordinate-b"
+              >ONE CLEAR STARTING POINT</span
+            >
+            <div class="notice-float">
+              <div class="notice-top">
+                <span class="document-icon"
+                  ><svg class="icon"><use href="#document" /></svg></span
+                ><span
+                  >Property tax notice<small>Illustrative document</small></span
+                ><span class="notice-check">✓</span>
+              </div>
+              <div class="notice-lines"><i></i><i></i><i></i></div>
+              <div class="scan-line"></div>
+              <div class="notice-bottom">
+                <span class="status-dot"></span
+                ><span data-art-status>Your property comes first</span>
+              </div>
+            </div>
+            <div class="orbit-label">
+              <span class="status-dot"></span
+              ><span data-art-label>01 / Locate the property</span>
+            </div>
+          </div>
+          <div class="art-footer">
+            <span>From an address to a better question.</span
+            ><button
+              class="motion-toggle"
+              type="button"
+              aria-label="Pause illustration"
+              aria-pressed="false"
+            >
+              <span data-motion-label>Pause</span
+              ><span data-motion-icon>Ⅱ</span>
+            </button>
+          </div>
+        </div>
+        <div class="hero-bottom">
+          <span>BUILT AROUND THE HOMEOWNER</span
+          ><span
+            >Explore what happens next
+            <span class="scroll-indicator">↓</span></span
+          >
+        </div>
+      </section>
+      <section
+        class="principle-strip content-width"
+        id="your-control"
+        aria-label="Your control"
+      >
+        <p>
+          <svg class="icon"><use href="#check" /></svg> You choose what to share
+        </p>
+        <p>
+          <svg class="icon"><use href="#check" /></svg> Clear steps, not
+          promises
+        </p>
+        <p>
+          <svg class="icon"><use href="#check" /></svg> Your approval before
+          filing
+        </p>
+      </section>
+      <section
+        class="journey content-width"
+        id="how-it-works"
+        aria-labelledby="journey-heading"
+      >
+        <div class="journey-sticky">
+          <div class="section-heading reveal">
+            <span class="eyebrow">01 — THE PROCESS</span>
+            <h2 id="journey-heading">
+              Less back-and-forth.<br />More <em>moving forward.</em>
+            </h2>
+            <p>A clear path from the first detail to the next decision.</p>
+          </div>
+          <div class="journey-layout">
+            <div class="journey-steps" aria-label="Explore the review process">
+              <button
+                type="button"
+                class="journey-step is-active"
+                data-phase-button="0"
+                aria-pressed="true"
+              >
+                <span class="step-number">01</span
+                ><span
+                  ><strong>Start with what you know.</strong
+                  ><span
+                    >Your address and a notice, if you have one.<br />No need to
+                    make sense of everything first.</span
+                  ></span
+                ><span class="step-arrow">↗</span>
+              </button>
+              <button
+                type="button"
+                class="journey-step"
+                data-phase-button="1"
+                aria-pressed="false"
+              >
+                <span class="step-number">02</span
+                ><span
+                  ><strong>Build a clearer picture.</strong
+                  ><span
+                    >Property records, eligibility and evidence.<br />Missing
+                    information becomes a clear next step.</span
+                  ></span
+                ><span class="step-arrow">↗</span>
+              </button>
+              <button
+                type="button"
+                class="journey-step"
+                data-phase-button="2"
+                aria-pressed="false"
+              >
+                <span class="step-number">03</span
+                ><span
+                  ><strong>Keep the decision yours.</strong
+                  ><span
+                    >Review the proposed next step.<br />Nothing is filed
+                    without your authorization.</span
+                  ></span
+                ><span class="step-arrow">↗</span>
+              </button>
+              <div class="journey-controls">
+                <span><span data-phase-count>01</span> / 03</span
+                ><button class="text-link" type="button" data-replay>
+                  <svg class="icon"><use href="#replay" /></svg> Replay process
+                </button>
+              </div>
+            </div>
+            <div
+              class="dossier-stage"
+              data-phase="0"
+              aria-label="Illustrated property review process"
+            >
+              <div class="stage-grid"></div>
+              <span class="stage-caption"
+                >ILLUSTRATED PROCESS · NOT A LIVE CASE</span
+              >
+              <div class="source-slip source-a">
+                <svg class="icon"><use href="#document" /></svg
+                ><span>Assessment notice<small>Your starting point</small></span
+                ><i></i>
+              </div>
+              <div class="source-slip source-b">
+                <svg class="icon"><use href="#document" /></svg
+                ><span>Property record<small>The supporting facts</small></span
+                ><i></i>
+              </div>
+              <svg
+                class="connection-paths"
+                viewBox="0 0 600 440"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M90 110C90 185 300 90 300 175M500 125C500 190 300 115 300 175"
+                />
+                <circle r="4">
+                  <animateMotion
+                    dur="2.8s"
+                    repeatCount="indefinite"
+                    path="M90 110C90 185 300 90 300 175"
+                  />
+                </circle>
+              </svg>
+              <article class="case-dossier">
+                <div class="dossier-tab">YOUR PROPERTY REVIEW</div>
+                <div class="dossier-title">
+                  <div>
+                    <span class="mini-label">A CLEARER PICTURE</span>
+                    <h3>One property.<br />One place to start.</h3>
+                  </div>
+                  <span class="dossier-seal">C<span>OS</span></span>
+                </div>
+                <div class="dossier-row">
+                  <span>Property details</span
+                  ><span class="row-state"
+                    ><i></i><span>Added by you</span></span
+                  >
+                </div>
+                <div class="dossier-row evidence-row">
+                  <span>Supporting records</span
+                  ><span class="row-state"><i></i><span>For review</span></span>
+                </div>
+                <div class="dossier-row decision-row">
+                  <span>Next decision</span
+                  ><span class="row-state"
+                    ><i></i><span>Yours to make</span></span
+                  >
+                </div>
+                <div class="dossier-foot">
+                  <span data-dossier-status
+                    >Start with the property, not the paperwork.</span
+                  ><span>↗</span>
+                </div>
+              </article>
+              <div class="approval-slip">
+                <span class="approval-icon"
+                  ><svg class="icon"><use href="#check" /></svg
+                ></span>
+                <div>
+                  Your approval matters.<small
+                    >Review first. Authorize when you’re ready.</small
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section
+        class="request-section content-width"
+        id="request"
+        aria-labelledby="request-heading"
+      >
+        <div class="request-intro reveal">
+          <span class="eyebrow">02 — YOUR STARTING POINT</span>
+          <h2 id="request-heading">
+            Let’s take the<br />
+            <em>first step.</em>
+          </h2>
+          <p>
+            Tell us a little about the property.<br />You don’t need to have all
+            the answers.
+          </p>
+          <div class="request-expectations">
+            <span>What you’ll prepare</span>
+            <p><b>01</b> The property and its location</p>
+            <p><b>02</b> Your details and connection to it</p>
+            <p><b>03</b> A request you can review and save</p>
+          </div>
+          <div class="preview-note">
+            <span class="status-dot"></span>
+            <p>
+              <strong>You’re trying the intake preview.</strong>Your details
+              stay in this page. Saving a request does not submit it or start an
+              appeal.
+            </p>
+          </div>
+        </div>
+        <div class="request-panel reveal">
+          <div class="form-topline">
+            <span>YOUR REVIEW REQUEST</span
+            ><span
+              ><b data-step-current>01</b><span class="muted"> / 03</span></span
+            >
+          </div>
+          <ol class="form-progress" aria-label="Request progress">
+            <li class="current" aria-current="step"><span>1</span> Property</li>
+            <li><span>2</span> About you</li>
+            <li><span>3</span> Review</li>
+          </ol>
+          <form id="intake-form" novalidate>
+            <fieldset data-form-step="0">
+              <legend>First, where is the property?</legend>
+              <p class="field-intro">
+                Use the address shown on your tax notice.
+              </p>
+              <div class="field">
+                <label for="property-address">Property address</label
+                ><input
+                  id="property-address"
+                  name="address"
+                  autocomplete="street-address"
+                  placeholder="Street address, including unit"
+                  required
+                  maxlength="240"
+                  aria-describedby="address-error"
+                /><span class="field-error" id="address-error"></span>
+              </div>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="property-county">County</label
+                  ><select
+                    id="property-county"
+                    name="county"
+                    required
+                    aria-describedby="county-error"
+                  >
+                    <option value="">Select county</option>
+                    <option>Lee</option>
+                    <option>Hendry</option>
+                    <option>Bay</option>
+                    <option>Other Florida county</option></select
+                  ><span class="field-error" id="county-error"></span>
+                </div>
+                <div class="field">
+                  <label for="property-state">State</label
+                  ><input
+                    id="property-state"
+                    value="Florida"
+                    readonly
+                    aria-label="State: Florida"
+                  />
+                </div>
+              </div>
+              <div class="upload-field">
+                <input
+                  id="notice-file"
+                  type="file"
+                  accept="application/pdf,image/png,image/jpeg"
+                  aria-describedby="file-hint file-error"
+                /><label class="upload-target" for="notice-file"
+                  ><span class="upload-icon"
+                    ><svg class="icon"><use href="#plus" /></svg></span
+                  ><span
+                    ><strong data-file-name
+                      >Add a tax notice
+                      <span class="optional">(optional)</span></strong
+                    ><small id="file-hint"
+                      >PDF, JPG or PNG · up to 10 MB · stays local</small
+                    ></span
+                  ></label
+                ><button
+                  type="button"
+                  class="remove-file"
+                  data-remove-file
+                  hidden
+                  aria-label="Remove selected notice"
+                >
+                  ×</button
+                ><span class="field-error" id="file-error"></span>
+              </div>
+              <button class="sample-link" type="button" data-use-sample>
+                Just exploring? Try a sample property <span>↗</span>
+              </button>
+            </fieldset>
+            <fieldset data-form-step="1" hidden>
+              <legend>And a little about you.</legend>
+              <p class="field-intro">
+                So your request has the right person attached.
+              </p>
+              <div class="field">
+                <label for="owner-name">Full name</label
+                ><input
+                  id="owner-name"
+                  name="name"
+                  autocomplete="name"
+                  placeholder="Your full name"
+                  required
+                  maxlength="120"
+                  aria-describedby="name-error"
+                /><span class="field-error" id="name-error"></span>
+              </div>
+              <div class="field">
+                <label for="owner-email">Email address</label
+                ><input
+                  id="owner-email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="you@example.com"
+                  required
+                  maxlength="254"
+                  aria-describedby="email-error"
+                /><span class="field-error" id="email-error"></span>
+              </div>
+              <div class="field">
+                <label for="owner-role">Your connection to the property</label
+                ><select
+                  id="owner-role"
+                  name="relationship"
+                  required
+                  aria-describedby="role-error"
+                >
+                  <option value="">Select your relationship</option>
+                  <option value="owner">I own the property</option>
+                  <option value="representative">
+                    I represent the property owner
+                  </option>
+                  <option value="exploring">
+                    I’m exploring for someone else
+                  </option></select
+                ><span class="field-error" id="role-error"></span>
+              </div>
+              <p class="field-note">
+                This request is not a signature or authorization to file an
+                appeal.
+              </p>
+            </fieldset>
+            <fieldset data-form-step="2" hidden>
+              <legend>A good place to start.</legend>
+              <p class="field-intro">
+                Check your details before saving your request.
+              </p>
+              <div class="review-property">
+                <span class="mini-label">PROPERTY</span>
+                <h3 data-review-address></h3>
+                <p data-review-location></p>
+                <button class="edit-link" type="button" data-edit="0">
+                  Edit property <span>↗</span>
+                </button>
+              </div>
+              <dl class="review-details">
+                <div>
+                  <dt>Name</dt>
+                  <dd data-review-name></dd>
+                </div>
+                <div>
+                  <dt>Email</dt>
+                  <dd data-review-email></dd>
+                </div>
+                <div>
+                  <dt>Relationship</dt>
+                  <dd data-review-role></dd>
+                </div>
+                <div>
+                  <dt>Tax notice</dt>
+                  <dd data-review-file>No notice selected</dd>
+                </div>
+              </dl>
+              <button class="edit-link" type="button" data-edit="1">
+                Edit your details <span>↗</span>
+              </button>
+              <div class="save-note">
+                <svg class="icon"><use href="#document" /></svg>
+                <p>
+                  You’ll save a request file to your device. Your notice is not
+                  included, and nothing is submitted.
+                </p>
+              </div>
+            </fieldset>
+            <div class="form-actions">
+              <button type="button" class="back-button" data-back hidden>
+                ← Back</button
+              ><button type="submit" class="button button-dark" data-next>
+                <span data-next-label>Continue</span
+                ><svg class="icon"><use href="#arrow" /></svg>
+              </button>
+            </div>
+            <div class="form-bottom">
+              <span data-form-note>No account or payment details needed.</span
+              ><span class="form-local"
+                ><span class="status-dot"></span> LOCAL PREVIEW</span
+              >
+            </div>
+          </form>
+          <section class="request-saved" hidden aria-labelledby="saved-heading">
+            <div class="saved-mark">
+              <svg class="icon"><use href="#check" /></svg>
+            </div>
+            <span class="mini-label">REQUEST PREPARED</span>
+            <h3 id="saved-heading" tabindex="-1">
+              Your next step,<br /><em>in one place.</em>
+            </h3>
+            <p>
+              Your request file is ready on your device. This preview hasn’t
+              sent your details or opened an appeal.
+            </p>
+            <button
+              type="button"
+              class="button button-dark"
+              data-download-again
+            >
+              Download again
+              <svg class="icon"><use href="#down" /></svg></button
+            ><button type="button" class="text-link" data-start-over>
+              Prepare another request <span>↗</span>
+            </button>
+          </section>
+          <div
+            class="sr-only"
+            role="status"
+            aria-live="polite"
+            data-announcement
+          ></div>
+        </div>
+      </section>
+      <section class="closing content-width reveal">
+        <span class="eyebrow"
+          >A HOME IS PERSONAL. THE PROCESS SHOULD FEEL THAT WAY.</span
+        >
+        <p>Clarity first.<br /><em>Every step after.</em></p>
+        <a class="text-link" href="#request"
+          >Start with your property <svg class="icon"><use href="#arrow" /></svg
+        ></a>
+      </section>
+    </main>
+    <footer class="site-footer content-width">
+      <a class="wordmark" href="/"
+        >claim<span class="brand-os">os</span
+        ><span class="brand-period">.</span></a
+      >
+      <p>
+        Claim OS is a private company, not a government agency.<br />Eligibility,
+        filing requirements and outcomes depend on the individual case.
+      </p>
+      <a href="/">Back to Claim OS <span>↗</span></a>
+    </footer>
+    <script type="module" src="assets/intake.js"></script>
+  </body>
+</html>
